@@ -7,6 +7,7 @@
  */
 class UserIdentity extends CUserIdentity
 {
+	private $_id;
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -17,17 +18,17 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		$users=array(
-			// username => password
-			'demo'=>'demo',
-			'admin'=>'admin',
-		);
-		if(!isset($users[$this->username]))
+		$users = UsuarioSms::model()->find("LOWER(login)=?", array(strtolower($this->username)));
+
+		if($users===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		elseif($users[$this->username]!==$this->password)
+		elseif(md5($this->password)!==$users->pwd)
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else
+		{
+			$this->_id=$users->id_usuario;
 			$this->errorCode=self::ERROR_NONE;
+		}
 		return !$this->errorCode;
 	}
 }

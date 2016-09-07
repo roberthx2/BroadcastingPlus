@@ -17,10 +17,22 @@
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 </head>
+<style type="text/css">
+	@media (max-width: 768px) {
+	 	.alinear {
+		  	float: left;
+		}
+	}
 
+	@media (min-width: 768px) {
+		.alinear {
+		  	float: right;
+		}
+	}
+</style>
 <body>
 
-<div>
+<div class="container-fluid">
 	<?php
 		$this->widget(
 	    'booster.widgets.TbNavbar',
@@ -35,12 +47,13 @@
 	            array(
 	                'class' => 'booster.widgets.TbMenu',
 	                'type'  => 'navbar',
-	                'htmlOptions' => array('class' => 'pull-right '),
+	                'htmlOptions' => array('class' => 'alinear'),
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('site/index'), 'active' => true, 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest),
 		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => '#', 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
+		                    array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array(
 		                        'label' => Yii::app()->user->name,
 		                        'url' => '#',
@@ -62,40 +75,21 @@
 	?>
 </div>
 
-<div class="container" id="page">
-
-	<div id="header">
-		<div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
-	</div><!-- header -->
-
-	<div id="mainmenu">
-		<?php $this->widget('zii.widgets.CMenu',array(
-			'items'=>array(
-				array('label'=>'Home', 'url'=>Yii::app()->createUrl('site/index')),
-				array('label'=>'About', 'url'=>Yii::app()->createUrl('site/page')),
-				array('label'=>'Contact', 'url'=>Yii::app()->createUrl('site/contact')),
-				array('label'=>'Login', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
-			),
-		)); ?>
-	</div><!-- mainmenu -->
-	<?php if(isset($this->breadcrumbs)):?>
-		<?php $this->widget('zii.widgets.CBreadcrumbs', array(
-			'links'=>$this->breadcrumbs,
-		)); ?><!-- breadcrumbs -->
-	<?php endif?>
-
+<div class="container-fluid well">
+<div class="clear"></div>
 	<?php echo $content; ?>
 
-	<div class="clear"></div>
-
-	<div id="footer">
-		Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
-		All Rights Reserved.<br/>
-		<?php echo Yii::powered(); ?>
-	</div><!-- footer -->
-
-</div><!-- page -->
+	
+</div>
+<div class="footer">
+	  <div class="container-fluid">
+		<div class="row">
+			<center>Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
+			All Rights Reserved.<br/>
+			<?php echo Yii::powered(); ?></center>
+		</div> <!-- /row -->
+	  </div> <!-- /container -->
+	</div>
 
 </body>
 </html>

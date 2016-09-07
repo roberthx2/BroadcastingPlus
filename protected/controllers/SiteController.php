@@ -72,6 +72,11 @@ class SiteController extends Controller
 		$this->render('contact',array('model'=>$model));
 	}
 
+	public function actionContactosIMC()
+	{
+		$this->render('contactosIMC',array());
+	}
+
 	/**
 	 * Displays the login page
 	 */

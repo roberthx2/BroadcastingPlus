@@ -3,25 +3,25 @@
 if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.14.188.47')){
 
 	//Servidores
-	$host_F1 = "200.109.237.18";
-	$host_F2 = "200.109.237.18";
-	$host_Hostgator = "200.109.237.18";
+	$host_F1 = "localhost";//"200.109.237.18";
+	$host_F2 = "localhost";//"200.109.237.18";
+	$host_Hostgator = "localhost";//"200.109.237.18";
 
 	//Datos F1
-	$user_F1 = 'roberth.riera';
-	$pwd_F1 = 'WPjvzyb7na';
+	$user_F1 = 'root';
+	$pwd_F1 = '';
 
 	//Datos F2
-	$user_F2 = 'roberth.riera';
-	$pwd_F2 = 'WPjvzyb7na';
+	$user_F2 = 'root';
+	$pwd_F2 = '';
 
 	//Datos insignia_masivo_premium
-	$user_F2_mp = 'roberth.riera';
-	$pwd_F2_mp = 'WPjvzyb7na';
+	$user_F2_mp = 'root';
+	$pwd_F2_mp = '';
 
 	//Datos Hostgator
-	$user_Hostgator = 'roberth.riera';
-	$pwd_Hostgator = 'WPjvzyb7na';
+	$user_Hostgator = 'root';//roberth.riera
+	$pwd_Hostgator = '';//WPjvzyb7na
 } else
 	{
 		//Servidores
@@ -74,9 +74,10 @@ return array(
 		
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
+			'password'=>'12345',
 			// If removed, Gii defaults to localhost only. Edit carefully to taste.
-			'ipFilters'=>array('127.0.0.1','::1'),
+			//'ipFilters'=>array('127.0.0.1','::1'),
+			'ipFilters'=>array($_SERVER['REMOTE_ADDR']),
 		),
 	),
 
@@ -165,14 +166,14 @@ return array(
 			'charset' => 'utf8',
 		),
 
-		'db_supervision_modems'=>array(
+		/*'db_supervision_modems'=>array(
 			'class' => 'CDbConnection',
 			'connectionString' => 'mysql:host='.$host_F2.';dbname=supervision_modems',
 			'emulatePrepare' => true,
 			'username' => $user_F2,
 			'password' => $pwd_F2,
 			'charset' => 'utf8',
-		),
+		),*/
 
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
