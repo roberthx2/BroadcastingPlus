@@ -75,21 +75,19 @@
 	?>
 </div>
 
-<div class="container-fluid well">
-<div class="clear"></div>
-	<?php echo $content; ?>
-
-	
+<div class="container-fluid" style="margin-top: 60px">
+	<div class="clear"></div>
+		<?php echo $content; ?>
 </div>
-<div class="footer">
-	  <div class="container-fluid">
+<div class="footer" style="margin-bottom: 30px">
+  	<div class="container-fluid">
 		<div class="row">
 			<center>Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
 			All Rights Reserved.<br/>
 			<?php echo Yii::powered(); ?></center>
 		</div> <!-- /row -->
-	  </div> <!-- /container -->
-	</div>
+  	</div> <!-- /container -->
+</div>
 
 </body>
 </html>
