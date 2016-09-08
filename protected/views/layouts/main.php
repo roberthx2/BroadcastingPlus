@@ -76,17 +76,10 @@
 </div>
 
 <div class="container-fluid" style="margin-top: 60px">
-	<div class="clear"></div>
 		<?php echo $content; ?>
+		<div class="clear"></div>
 </div>
-<div class="footer" style="margin-bottom: 30px">
-  	<div class="container-fluid">
-		<div class="row">
-			<center>Copyright &copy; <?php echo date('Y'); ?> by My Company.<br/>
-			All Rights Reserved.<br/>
-			<?php echo Yii::powered(); ?></center>
-		</div> <!-- /row -->
-  	</div> <!-- /container -->
+<div class="footer" onclick="window.location = 'http://insignia.com.ve/';" style="height: 145px; cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/images/footerIzquierda.png')">
 </div>
 
 </body>
