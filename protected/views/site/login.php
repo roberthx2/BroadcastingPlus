@@ -4,47 +4,64 @@
 /* @var $form CActiveForm  */
 
 $this->pageTitle=Yii::app()->name . ' - Login';
-$this->breadcrumbs=array(
-	'Login',
-);
 ?>
+	<div class="form col-xs-12 col-sm-4 col-md-4 col-lg-4" >
+		<h2>Login</h2>
+		<?php 
 
-<h1>Login</h1>
+		$form = $this->beginWidget(
+			'booster.widgets.TbActiveForm',
+			array(
+				'id' => 'login-form',
+				'enableClientValidation'=>true,
+				'clientOptions'=>array(
+					'validateOnSubmit'=>true,
+				),
+				//'type' => 'horizontal',
+				//'htmlOptions' => array('style'=>'aling:center'),
+				//'htmlOptions' => array('class' => 'well'),
+			)
+		);
 
-<p>Please fill out the following form with your login credentials:</p>
+		?>	
+	
+		<div >
+				<?php echo $form->textFieldGroup($model,'username',array(
+					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
+					'widgetOptions' => array(
+					)
+				)); ?>
+			<?php echo $form->error($model,'username'); ?>
+		</div>
 
-<div class="form">
-<?php $form=$this->beginWidget('CActiveForm', array(
-	'id'=>'login-form',
-	'enableClientValidation'=>true,
-	'clientOptions'=>array(
-		'validateOnSubmit'=>true,
-	),
-)); ?>
+		<div>
+			<?php echo $form->passwordFieldGroup($model,'password',array(
+					'prepend' => '<i class="glyphicon glyphicon-pencil"></i>',
+					'widgetOptions' => array(
+					)
+				)); ?>
+			<?php echo $form->error($model,'password'); ?>
+		</div>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+		<div>
+			<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+			<?php echo $form->checkboxGroup(
+				$model,
+				'rememberMe',
+				array(
+				)
+			); ?>
+			<?php echo $form->error($model,'rememberMe'); ?></div><div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'username'); ?>
-		<?php echo $form->textField($model,'username'); ?>
-		<?php echo $form->error($model,'username'); ?>
-	</div>
+			<?php $this->widget(
+					'booster.widgets.TbButton',
+					array(
+						'buttonType' => 'submit',
+						'context' => 'success',
+						'label' => 'Iniciar Session',
+					)
+				); ?></div>
+		</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'password'); ?>
-		<?php echo $form->passwordField($model,'password'); ?>
-		<?php echo $form->error($model,'password'); ?>
-	</div>
-
-	<div class="row rememberMe">
-		<?php echo $form->checkBox($model,'rememberMe'); ?>
-		<?php echo $form->label($model,'rememberMe'); ?>
-		<?php echo $form->error($model,'rememberMe'); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Login'); ?>
-	</div>
-
+	</div><!-- form -->
 <?php $this->endWidget(); ?>
-</div><!-- form -->
