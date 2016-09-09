@@ -75,12 +75,12 @@
 	?>
 </div>
 
-<div class="container-fluid" style="margin-top: 80px">
+<div class="container-fluid" style="margin-top: 10%; margin-bottom:5%; ">
 		<?php echo $content; ?>
 		<div class="clear"></div>
 </div>
 <br><br>
-<div class="footer  visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="height: 145px; cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/images/footerIzquierda.png')">
+<div class="footer visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="height: 145px; cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/images/footerIzquierda.png')">
 </div>
 
 </body>
