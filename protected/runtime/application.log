@@ -24516,3 +24516,156 @@ Stack trace:
 REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
 HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
 ---
+2016/09/08 22:30:50 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "¬‘n¨³Ñ-2ÒC)ƒ¯‡Ïäž.30u<\zŸ—þ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xAC\x91n\xA8\xB3\xD1-\x072\xD2C)\x83\xAF\x1C...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/bootstrap-yii.css
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:30:50 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "á?<âüKÑþ|o”iÒØZÇF}_R‰A)"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xE1\x01\x14?\x0E<\xE2\xFCK\xD1\xFE|o\x94i...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/js/bootstrap-noconflict.js
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:30:50 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "<¹÷žÖ[„ÆHø–u¸³Ía¯\ˆ´’jESSo	È"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('<\x18\xB9\xF7\x9E\xD6[\x84\x1D\xC6H\xF8\x96u\xB8...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/jquery-ui-bootstrap.css
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:30:51 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:30:52 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "á?<âüKÑþ|o”iÒØZÇF}_R‰A)"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xE1\x01\x14?\x0E<\xE2\xFCK\xD1\xFE|o\x94i...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/js/bootstrap-noconflict.js
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:30:52 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://10.0.0.102/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:38:32 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "¬‘n¨³Ñ-2ÒC)ƒ¯‡Ïäž.30u<\zŸ—þ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xAC\x91n\xA8\xB3\xD1-\x072\xD2C)\x83\xAF\x1C...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/bootstrap-yii.css
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:38:32 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "<¹÷žÖ[„ÆHø–u¸³Ía¯\ˆ´’jESSo	È"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('<\x18\xB9\xF7\x9E\xD6[\x84\x1D\xC6H\xF8\x96u\xB8...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/jquery-ui-bootstrap.css
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:38:32 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "á?<âüKÑþ|o”iÒØZÇF}_R‰A)"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xE1\x01\x14?\x0E<\xE2\xFCK\xD1\xFE|o\x94i...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/js/bootstrap-noconflict.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:38:32 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/08 22:38:33 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:31 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "á?<âüKÑþ|o”iÒØZÇF}_R‰A)"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xE1\x01\x14?\x0E<\xE2\xFCK\xD1\xFE|o\x94i...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/js/bootstrap-noconflict.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:31 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "¬‘n¨³Ñ-2ÒC)ƒ¯‡Ïäž.30u<\zŸ—þ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xAC\x91n\xA8\xB3\xD1-\x072\xD2C)\x83\xAF\x1C...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/bootstrap-yii.css
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:31 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "<¹÷žÖ[„ÆHø–u¸³Ía¯\ˆ´’jESSo	È"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('<\x18\xB9\xF7\x9E\xD6[\x84\x1D\xC6H\xF8\x96u\xB8...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/css/jquery-ui-bootstrap.css
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:32 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:33 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "á?<âüKÑþ|o”iÒØZÇF}_R‰A)"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xE1\x01\x14?\x0E<\xE2\xFCK\xD1\xFE|o\x94i...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/js/bootstrap-noconflict.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
+2016/09/09 18:00:33 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'No es posible resolver la solicitud "À¤É¿¯Xæ)I§ÇèÌìLj†©ë½‘[ó]k½‚ñÜ"' in C:\xampp\htdocs\yii\framework\web\CWebApplication.php:286
+Stack trace:
+#0 C:\xampp\htdocs\yii\framework\web\CWebApplication.php(141): CWebApplication->runController('\xC0\xA4\x07\xC9\xBF\xAFX\xE6)I\xA7\xC7\xE8\xCC\xEC...')
+#1 C:\xampp\htdocs\yii\framework\base\CApplication.php(185): CWebApplication->processRequest()
+#2 C:\xampp\htdocs\BroadcastingPlus\index.php(13): CApplication->run()
+#3 {main}
+REQUEST_URI=/BroadcastingPlus/assets/5114fe4c/notify/notify.min.js
+HTTP_REFERER=https://localhost/BroadcastingPlus/QRXVpd8Msz1qyLzRvhMjRrfrTVDmlwwiTMV_m9Nts5g
+---
