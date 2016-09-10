@@ -1,6 +1,6 @@
 <?php
 
-class PromocionesPremiumController extends Controller
+class ClienteAlarmasController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones'),
+				'actions'=>array('index','view'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -62,16 +62,16 @@ class PromocionesPremiumController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new PromocionesPremium;
+		$model=new ClienteAlarmas;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['PromocionesPremium']))
+		if(isset($_POST['ClienteAlarmas']))
 		{
-			$model->attributes=$_POST['PromocionesPremium'];
+			$model->attributes=$_POST['ClienteAlarmas'];
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_promo));
+				$this->redirect(array('view','id'=>$model->id));
 		}
 
 		$this->render('create',array(
@@ -91,11 +91,11 @@ class PromocionesPremiumController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['PromocionesPremium']))
+		if(isset($_POST['ClienteAlarmas']))
 		{
-			$model->attributes=$_POST['PromocionesPremium'];
+			$model->attributes=$_POST['ClienteAlarmas'];
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_promo));
+				$this->redirect(array('view','id'=>$model->id));
 		}
 
 		$this->render('update',array(
@@ -122,7 +122,7 @@ class PromocionesPremiumController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('PromocionesPremium');
+		$dataProvider=new CActiveDataProvider('ClienteAlarmas');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -133,24 +133,12 @@ class PromocionesPremiumController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new PromocionesPremium('search');
+		$model=new ClienteAlarmas('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PromocionesPremium']))
-			$model->attributes=$_GET['PromocionesPremium'];
+		if(isset($_GET['ClienteAlarmas']))
+			$model->attributes=$_GET['ClienteAlarmas'];
 
 		$this->render('admin',array(
-			'model'=>$model,
-		));
-	}
-
-	public function actionIndexPromociones()
-	{
-		$model=new PromocionesPremium('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PromocionesPremium']))
-			$model->attributes=$_GET['PromocionesPremium'];
-
-		$this->render('indexPromociones',array(
 			'model'=>$model,
 		));
 	}
@@ -159,12 +147,12 @@ class PromocionesPremiumController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return PromocionesPremium the loaded model
+	 * @return ClienteAlarmas the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=PromocionesPremium::model()->findByPk($id);
+		$model=ClienteAlarmas::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -172,11 +160,11 @@ class PromocionesPremiumController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param PromocionesPremium $model the model to be validated
+	 * @param ClienteAlarmas $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='promociones-premium-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='cliente-alarmas-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
