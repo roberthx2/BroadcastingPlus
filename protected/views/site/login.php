@@ -31,7 +31,6 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 					'widgetOptions' => array(
 					)
 				)); ?>
-			<?php echo $form->error($model,'username'); ?>
 		</div>
 
 		<div>
@@ -40,7 +39,6 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 					'widgetOptions' => array(
 					)
 				)); ?>
-			<?php echo $form->error($model,'password'); ?>
 		</div>
 
 		<div>

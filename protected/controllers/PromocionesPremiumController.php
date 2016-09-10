@@ -143,18 +143,6 @@ class PromocionesPremiumController extends Controller
 		));
 	}
 
-	public function actionIndexPromociones()
-	{
-		$model=new PromocionesPremium('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PromocionesPremium']))
-			$model->attributes=$_GET['PromocionesPremium'];
-
-		$this->render('indexPromociones',array(
-			'model'=>$model,
-		));
-	}
-
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
@@ -181,5 +169,17 @@ class PromocionesPremiumController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionIndexPromociones()
+	{
+		$model=new PromocionesPremium('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['PromocionesPremium']))
+			$model->attributes=$_GET['PromocionesPremium'];
+
+		$this->render('indexPromociones',array(
+			'model'=>$model,
+		));
 	}
 }
