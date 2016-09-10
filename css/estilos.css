@@ -1,0 +1,16 @@
+
+/* Small devices (tablets, 768px and up) */
+@media (max-width: 768px) { 
+	.contenedor_principal {
+		margin-top: 20%; 
+		margin-bottom:25%;
+	}
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 768px) {
+	.contenedor_principal {
+		margin-top: 10%; 
+		margin-bottom:5%;
+	}
+}

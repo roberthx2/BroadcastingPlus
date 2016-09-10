@@ -14,22 +14,25 @@
 
 	<!--<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">-->
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/estilos.css">
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-</head>
+
 <style type="text/css">
 	@media (max-width: 768px) {
-	 	.alinear {
+	 	.menu_superior {
 		  	float: left;
 		}
 	}
 
 	@media (min-width: 768px) {
-		.alinear {
+		.menu_superior {
 		  	float: right;
 		}
 	}
 </style>
+</head>
+
 <body>
 
 <div class="container-fluid">
@@ -47,7 +50,7 @@
 	            array(
 	                'class' => 'booster.widgets.TbMenu',
 	                'type'  => 'navbar',
-	                'htmlOptions' => array('class' => 'alinear'),
+	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('site/index'), 'active' => true, 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest),
@@ -75,7 +78,7 @@
 	?>
 </div>
 
-<div class="container-fluid" style="margin-top: 10%; margin-bottom:5%; ">
+<div class="container-fluid contenedor_principal">
 		<?php echo $content; ?>
 		<div class="clear"></div>
 </div>
