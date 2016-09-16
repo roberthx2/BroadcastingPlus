@@ -89,6 +89,11 @@ return array(
 			'allowAutoLogin'=>true,
 		),
 
+		'authManager'=>array(
+			'class'=>'CDbAuthManager',
+			'conecctionID'=>'db_sms',
+		),
+
 		'booster' => array(
     		'class' => 'booster.components.Booster',
 		),

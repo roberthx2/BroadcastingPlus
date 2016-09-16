@@ -97,7 +97,10 @@ class SiteController extends Controller
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login())
-			{print_r(Yii::app()->user->id);
+			{print_r("Este es el id: ".Yii::app()->user->id);
+		//print_r("Este es el login: ".Yii::app()->user->login);
+		//print_r("Este es el id_cliente: ".Yii::app()->user->id_cliente);
+
 				//print_r(Yii::app()->user->accesosBCP);
 				exit;
 				if(Yii::app()->user->accesosBCNL["broadcasting"] == 1)
