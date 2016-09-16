@@ -8,6 +8,8 @@
 class UserIdentity extends CUserIdentity
 {
 	private $_id;
+	private $_accesosBCNL;
+	private $_accesosBCP;
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -27,6 +29,8 @@ class UserIdentity extends CUserIdentity
 		else
 		{
 			$this->_id=$users->id_usuario;
+			$this->_accesosBCNL = Accesos::model()->findByPk($this->_id)->attributes;
+			$this->_accesosBCP = AccesosBcp::model()->findByPk($this->_id);
 			$this->errorCode=self::ERROR_NONE;
 		}
 		return !$this->errorCode;

@@ -97,7 +97,18 @@ class SiteController extends Controller
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login())
-				$this->redirect(Yii::app()->createUrl('promocionesPremium/indexPromociones'));
+			{print_r(Yii::app()->user->id);
+				//print_r(Yii::app()->user->accesosBCP);
+				exit;
+				if(Yii::app()->user->accesosBCNL["broadcasting"] == 1)
+				{
+					$this->redirect(Yii::app()->createUrl('promocionesPremium/indexPromociones'));
+				}
+				else
+				{
+					Yii::app()->user->setFlash("error_acceso", "Acceso no permitido");
+				}
+			}
 		}
 		// display the login form
 		$this->render('login',array('model'=>$model));

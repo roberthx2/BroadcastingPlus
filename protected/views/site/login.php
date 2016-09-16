@@ -2,7 +2,9 @@
 /* @var $this SiteController */
 /* @var $model LoginForm */
 /* @var $form CActiveForm  */
-
+if(Yii::app()->user->hasFlash('error_acceso')):?>
+<script>alert("<?php echo Yii::app()->user->getFlash('error_acceso'); ?>");</script>
+<?php endif;
 $this->pageTitle=Yii::app()->name . ' - Login';
 ?>
 	<div class="form col-xs-12 col-sm-4 col-md-4 col-lg-3" >
