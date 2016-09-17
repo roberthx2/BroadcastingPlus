@@ -99,7 +99,8 @@ class SiteController extends Controller
 			if($model->validate() && $model->login())
 			{print_r("Este es el id: ".Yii::app()->user->id);
 		//print_r("Este es el login: ".Yii::app()->user->login);
-		//print_r("Este es el id_cliente: ".Yii::app()->user->id_cliente);
+		print_r("Este es la cadena sc: ".Yii::app()->user->getIdCustomer()->cadena_sc);
+		print_r("id_cliente : ".Yii::app()->user->getIdCliente());
 
 				//print_r(Yii::app()->user->accesosBCP);
 				exit;

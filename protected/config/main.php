@@ -85,14 +85,15 @@ return array(
 	'components'=>array(
 
 		'user'=>array(
+			'class' => 'WebUser',
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
 		),
 
-		'authManager'=>array(
+		/*'authManager'=>array(
 			'class'=>'CDbAuthManager',
 			'conecctionID'=>'db_sms',
-		),
+		),*/
 
 		'booster' => array(
     		'class' => 'booster.components.Booster',
