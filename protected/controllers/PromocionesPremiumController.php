@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones'),
+				'actions'=>array('index','view', 'indexPromociones', 'prueba'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -181,5 +181,9 @@ class PromocionesPremiumController extends Controller
 		$this->render('indexPromociones',array(
 			'model'=>$model,
 		));
+	}
+
+	public function actionPrueba(){
+		return 'tabla';
 	}
 }

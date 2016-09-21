@@ -101,7 +101,7 @@ class SiteController extends Controller
 			{
 				if(Yii::app()->user->getAccesos()->broadcasting == 1)
 				{
-					$this->redirect(Yii::app()->createUrl('promocionesPremium/indexPromociones'));
+					$this->redirect(Yii::app()->createUrl('home/index'));
 				}
 				else
 				{
