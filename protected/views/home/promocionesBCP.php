@@ -1,3 +1,4 @@
+<br>
 <?php
 $this->widget( 'booster.widgets.TbGridView' , array (
         'type'=>'striped bordered condensed', 

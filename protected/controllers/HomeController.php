@@ -6,10 +6,13 @@ class HomeController extends Controller
 
 	public function actionIndex()
 	{
-		$this->render('index');
+		$model=new PromocionesPremium('search');
+		$model->unsetAttributes();
+
+		$this->render('index', array('model'=>$model));
 	}
 
-	public function actionPromocionesBCP()
+	/*public function actionPromocionesBCP()
 	{
 		$model=new PromocionesPremium('search');
 		$model->unsetAttributes();  // clear any default values
@@ -24,7 +27,7 @@ class HomeController extends Controller
 	public function actionPromocionesBNL()
 	{
 		$this->renderPartial('promocionesBNL');
-	}
+	}*/
 
 	// Uncomment the following methods and override them if needed
 	/*
