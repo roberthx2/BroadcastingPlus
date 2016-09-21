@@ -1,10 +1,21 @@
+<?php 
+	if($error == true ): ?>
+		
+	    <div class="container-fluid">
+	      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	        <div class="alert alert-danger">
+	          <button type="button" class="close" data-dismiss="alert">&times;</button>
+	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo "Acceso Denegado" ?>
+	        </div>
+	      </div>
+	    </div>
+	  
+	 <?php endif; ?>
 <?php
 /* @var $this SiteController */
 /* @var $model LoginForm */
 /* @var $form CActiveForm  */
-if(Yii::app()->user->hasFlash('error_acceso')):?>
-<script>alert("<?php echo Yii::app()->user->getFlash('error_acceso'); ?>");</script>
-<?php endif;
+
 $this->pageTitle=Yii::app()->name . ' - Login';
 ?>
 	<div class="form col-xs-12 col-sm-4 col-md-4 col-lg-3" >

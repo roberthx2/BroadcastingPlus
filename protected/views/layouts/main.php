@@ -53,8 +53,8 @@
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('promocionesPremium/indexPromociones'), 'active' => true, 'visible'=>!Yii::app()->user->isGuest),
-		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest),
-		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => '#', 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
+		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => '#', 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
 		                    array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array(
@@ -77,10 +77,9 @@
 		);
 	?>
 </div>
-
 <div class="container-fluid contenedor_principal">
-		<?php echo $content; ?>
-		<div class="clear"></div>
+	<?php echo $content; ?>
+	<div class="clear"></div>
 </div>
 <br><br>
 <div class="footer visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="height: 145px; cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/images/footerIzquierda.png')">

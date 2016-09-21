@@ -8,7 +8,7 @@ class WebUser extends CWebUser
     // Return first name.
     // accesdemos al Cus
 
-    protected function loadUser($usuario_id=null)
+    /*protected function loadUser($usuario_id=null)
     {
          if($this->_model===null)
          {
@@ -23,38 +23,24 @@ class WebUser extends CWebUser
     {
         $user = $this->loadUser(Yii::app()->user->id);
         return $user;
-    }
+    }*/
 
-    public function getIdCliente()
+    public function modelSMS()
     {
-        $user = UsuarioSms::model()->findByPk(Yii::app()->user->id);
-        return $user->id_cliente;
-    }
-
-    public function getlogin()
-    {
-        $record=Usuario::model()->findByAttributes(array('login'=>$this->username));
-        $this->_login=$record->login;
-        return $this->_login;
-    }
-    public function getPassword()
-    {
-        $record=Usuario::model()->findByAttributes(array('login'=>$this->username));
-        $this->_password=$record->pwd;
-        return $this->_password;
-    }
-
-    public function getScCadena()
-    {
-        $record=Usuario::model()->findByAttributes(array('login'=>$this->username));
-        $this->_scCadena=$record->cadena_sc;
-        return $this->_scCadena;
+        $this->_model = UsuarioSms::model()->findByPk(Yii::app()->user->id);
+        return $this->_model;
     }
 
     public function getAccesos()
     {
-        $record=Accesos::model()->findByPk(Yii::app()->user->id);
-        return $record;
+        $this->_model = Accesos::model()->findByPk(Yii::app()->user->id);
+        return $this->_model;
+    }
+
+    public function getAccesosBCP()
+    {
+        $this->_model = AccesosBcp::model()->findByPk(Yii::app()->user->id);
+        return $this->_model;
     }     
 }
 

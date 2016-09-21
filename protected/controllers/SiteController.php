@@ -83,6 +83,7 @@ class SiteController extends Controller
 	public function actionLogin()
 	{
 		$model=new LoginForm;
+		$error = false;
 
 		// if it is ajax validation request
 		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
@@ -97,25 +98,20 @@ class SiteController extends Controller
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login())
-			{print_r("Este es el id: ".Yii::app()->user->id);
-		//print_r("Este es el login: ".Yii::app()->user->login);
-		print_r("Este es la cadena sc: ".Yii::app()->user->getIdCustomer()->cadena_sc);
-		print_r("id_cliente : ".Yii::app()->user->getIdCliente());
-
-				//print_r(Yii::app()->user->accesosBCP);
-				exit;
-				if(Yii::app()->user->accesosBCNL["broadcasting"] == 1)
+			{
+				if(Yii::app()->user->getAccesos()->broadcasting == 1)
 				{
 					$this->redirect(Yii::app()->createUrl('promocionesPremium/indexPromociones'));
 				}
 				else
 				{
-					Yii::app()->user->setFlash("error_acceso", "Acceso no permitido");
+					Yii::app()->user->logout();
+					$error = true;
 				}
 			}
 		}
 		// display the login form
-		$this->render('login',array('model'=>$model));
+		$this->render('login',array('model'=>$model, 'error'=>$error));
 	}
 
 	/**

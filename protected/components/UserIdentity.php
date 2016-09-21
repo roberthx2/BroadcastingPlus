@@ -8,7 +8,6 @@
 class UserIdentity extends CUserIdentity
 {
 	private $_id;
-	private $_idCliente;
 	/**
 	 * Authenticates a user.
 	 * The example implementation makes sure if the username and password
@@ -37,11 +36,4 @@ class UserIdentity extends CUserIdentity
 	{
 		return $this->_id;
 	}
-
-	public function getIdCliente()
-    {
-        $record=UsuarioSms::model()->findByAttributes(array('login'=>$this->username));
-        $this->_idCliente=$record->id_cliente;
-        return $this->_idCliente;
-    }
 }
