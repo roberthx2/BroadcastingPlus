@@ -1,15 +1,19 @@
 <?php
 
+$contenido = array(
+        		array('label' => 'Broadcasting', 'content' => 'loading ....', 'active' => true),
+        	);
+
+if (Yii::app()->user->getAccesosBCP()->broadcasting_premium)
+    array_push($contenido, array('label' => 'Broadcasting Premium', 'content' => $this->renderPartial('promocionesBCP', array('model'=>$modelBCP), true)));
+
 $this->widget(
     'booster.widgets.TbTabs',
     array(
     	'id' => 'mytabs',
         'type' => 'tabs',
         //'justified' => true,
-        'tabs' => array(
-        	array('label' => 'Broadcasting', 'content' => 'loading ....', 'active' => true),
-        	array('label' => 'Broadcasting Premium', 'content' => $this->renderPartial('promocionesBCP', array('model'=>$model), true)),
-        ),
+        'tabs' => $contenido
     )
 );
 ?>
