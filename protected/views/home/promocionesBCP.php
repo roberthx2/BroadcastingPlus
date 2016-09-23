@@ -72,14 +72,18 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('style' => 'color: white; background: #004d99;text-align: center;'),
 	            'buttons' => array(
 	            	'ver'=>array(
-	            			'label'=>'',
-	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open'),
+	            			'label'=>' ',
+	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'title'=>'Ver'),
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			),
 	            	'Confirmar'=>array(
+	            			'label'=>' ',
+	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar'),
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			),
 	            	'Cancelar'=>array(
+	            			'label'=>' ',
+	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar'),
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			)
 	            ),
