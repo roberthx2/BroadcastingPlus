@@ -1,4 +1,5 @@
 <?php
+echo "<h3>Promociones del dia</h3>";
 
 $contenido = array(
         		array('label' => 'Broadcasting', 'content' => 'loading ....', 'active' => true),
