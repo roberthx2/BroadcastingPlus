@@ -4,6 +4,7 @@ class WebUser extends CWebUser
 {
     // Store model to not repeat query.
     private $_model;
+    private $_admin;
 
     // Return first name.
     // accesdemos al Cus
@@ -41,6 +42,15 @@ class WebUser extends CWebUser
     {
         $this->_model = AccesosBcp::model()->findByPk(Yii::app()->user->id);
         return $this->_model;
+    }
+
+    public function isAdmin()
+    {
+        $model = $this->modelSMS();
+
+        if ($model->id_perfil == 2)
+            return true;
+        return false;
     }     
 }
 

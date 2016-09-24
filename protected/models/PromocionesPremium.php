@@ -139,11 +139,11 @@ class PromocionesPremium extends CActiveRecord
 		$model = new CSqlDataProvider($sql, array(
 			'db'=>Yii::app()->db_masivo_premium, 
 			'totalItemCount'=>$total["total"],
-			/*'sort'=>array(
+			'sort'=>array(
         		'attributes'=>array(
              		'fecha', 'id_promo',
         		),
-    		),*/ 
+    		),
     		'pagination'=>array(
         		'pageSize'=>10,
     		),

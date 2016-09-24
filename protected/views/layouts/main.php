@@ -19,11 +19,11 @@
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 
 <style type="text/css">
-	@media (max-width: 768px) {
+	/*@media (max-width: 768px) {
 	 	.menu_superior {
 		  	float: left;
 		}
-	}
+	}*/
 
 	@media (min-width: 768px) {
 		.menu_superior {
