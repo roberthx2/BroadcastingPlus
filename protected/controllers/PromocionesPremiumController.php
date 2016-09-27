@@ -183,7 +183,76 @@ class PromocionesPremiumController extends Controller
 		));
 	}
 
-	public function actionPrueba(){
-		return 'tabla';
+	public function actionObtenerStatus($status, $fecha, $hora, $fecha_limite, $hora_limite, $no_enviados, $all_sms)
+	{
+	    switch ($status)
+	    {
+	        case 0: 
+	            //$estado = "No Confirmada";
+	            $estado = 0;
+	            break;
+	        case 1: 
+	            //$estado = "Enviada";
+	            $estado = 1;
+	        break;
+	        case 2:
+	            //$estado = "Confirmada";
+	            $estado = 2;
+	            $ts_actual = time();
+	            $ts_inicio = strtotime($fecha . " " . $hora);
+	            $ts_fin = strtotime($fecha_limite . " " . $hora_limite);
+	            
+	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
+	                if ($no_enviados > 0) {
+	                    //$estado = "En Transito";
+	                    $estado = 6;
+	                } else { 
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                } 
+	            }
+
+	            if ($ts_actual < $ts_inicio) {
+	                //$estado = "Confirmada";
+	                $estado = 2;
+	            }
+
+	            if ($ts_actual > $ts_fin) {  
+	                if ($no_enviados > 0) {
+	                    //$estado = "Incompleta";
+	                    $estado = 3;
+	                }
+	                if($no_enviados == $all_sms){
+	                    //$estado = "No Enviada";
+	                    $estado = 5;
+	                }
+	                if($no_enviados == 0){
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                }
+	            }
+
+	        break;
+	        case 4: 
+	            //$estado = "Cancelada";
+	            $estado = 4;
+	            
+	            if($no_enviados == $all_sms){
+	                //$estado = "Cancelada";
+	                $estado = 4;
+	            }
+	            if($no_enviados >= 0 && $no_enviados < $all_sms){
+	                //$estado = "Enviada y Cancelada";
+	                $estado = 7;
+	            }
+	        break;
+	        case 5: 
+	            //$estado = "No enviada";
+	            $estado = 5;
+	        break;
+
+	    
+	    }
+	    return $estado; 
 	}
 }

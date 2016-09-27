@@ -91,6 +91,10 @@ return array(
 			'allowAutoLogin'=>true,
 		),
 
+		'format' => array(
+        	'timeFormat' => 'h:m a',
+    	),
+
 		/*'authManager'=>array(
 			'class'=>'CDbAuthManager',
 			'conecctionID'=>'db_sms',
