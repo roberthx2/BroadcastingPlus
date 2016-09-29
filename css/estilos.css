@@ -14,3 +14,9 @@
 		margin-bottom:5%;
 	}
 }
+
+.trOverFlow {
+    text-align : left;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}

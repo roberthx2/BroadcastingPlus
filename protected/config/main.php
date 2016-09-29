@@ -92,7 +92,7 @@ return array(
 		),
 
 		'format' => array(
-        	'timeFormat' => 'h:m a',
+        	'timeFormat' => 'h:i a',
     	),
 
 		/*'authManager'=>array(
