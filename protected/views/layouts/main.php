@@ -16,6 +16,7 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">-->
 
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/estilos.css">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/menuLista.css">
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 
@@ -55,7 +56,9 @@
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'active' => true, 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
-		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => '#', 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
+		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => Yii::app()->createUrl('promocionesPremium/create'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
+		                    array('label'=>'Listas', 'icon'=>'glyphicon glyphicon-list','url'=>Yii::app()->createUrl('lista/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->listas),
+		                    array('label'=>'Exentos', 'icon'=>'glyphicon glyphicon-ban-circle','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
 		                    array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array(

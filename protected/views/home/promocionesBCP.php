@@ -127,13 +127,31 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			'visible'=>'visibleConfirmar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modelConfirmar'),
-	            			),
+	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modalConfirmar'),
+	            			'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalConfirmar").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalConfirmar").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalConfirmar").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("Ocurrio un error al cargar la información");
+                                        }
+                                    });
+                                }'
+                            ),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			'visible'=>'visibleCancelar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modelEliminar'),
+	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
 	            			)
 	            ),
 	        ),
@@ -195,15 +213,14 @@ function visibleCancelar($data)
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
-    array('id' => 'modelConfirmar')
+    array('id' => 'modalConfirmar')
 ); ?>
  
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">&times;</a>
-        <h4>Confirmar Promoción</h4>
+    <div class="modal-header" style="background-color:#428bca">
+        <h4 class="modal-title" style="color:#fff;">Confirmar Promoción</h4>
     </div>
  
-    <div class="modal-body">
+    <div class="modal-body" id="divModalConfirmar">
        
     </div>
  
@@ -231,15 +248,14 @@ function visibleCancelar($data)
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
-    array('id' => 'modelEliminar')
+    array('id' => 'modalEliminar')
 ); ?>
  
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">&times;</a>
-        <h4>Cancelar Promoción</h4>
+    <div class="modal-header" style="background-color:#428bca">
+		<h4 class="modal-title" style="color:#fff;">Cancelar Promoción</h4>
     </div>
  
-    <div class="modal-body">
+    <div class="modal-body" id="divModalEliminar">
        
     </div>
  
