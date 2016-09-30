@@ -1,6 +1,5 @@
 <br>
 <?php
-
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'type'=>'striped bordered', 
         'responsiveTable' => true,
@@ -9,7 +8,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow'),
-        'filter'=> $model,
+        //'filter'=> $model,
         'columns'=> array( 
         	array(
 	            'name' => 'id',
@@ -128,7 +127,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("#")',
 	            			'visible'=>'visibleConfirmar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;'),
+	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modelConfirmar'),
 	            			),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
@@ -140,7 +139,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	        ),
         ),
     ));
-
 ?>
 
 <?php
@@ -194,6 +192,42 @@ function visibleCancelar($data)
 }
 
 ?>
+
+<?php $this->beginWidget(
+    'booster.widgets.TbModal',
+    array('id' => 'modelConfirmar')
+); ?>
+ 
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">&times;</a>
+        <h4>Confirmar Promoción</h4>
+    </div>
+ 
+    <div class="modal-body">
+       
+    </div>
+ 
+    <div class="modal-footer">
+        <?php $this->widget(
+            'booster.widgets.TbButton',
+            array(
+                'context' => 'primary',
+                'label' => 'Aceptar',
+                'url' => '#',
+                'htmlOptions' => array('data-dismiss' => 'modal'),
+            )
+        ); ?>
+        <?php $this->widget(
+            'booster.widgets.TbButton',
+            array(
+                'label' => 'Close',
+                'url' => '#',
+                'htmlOptions' => array('data-dismiss' => 'modal'),
+            )
+        ); ?>
+    </div>
+ 
+<?php $this->endWidget(); ?>
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
