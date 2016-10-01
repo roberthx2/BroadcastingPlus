@@ -10,7 +10,7 @@
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 768px) {
 	.contenedor_principal {
-		margin-top: 10%; 
+		margin-top: 6%; 
 		margin-bottom:5%;
 	}
 }
