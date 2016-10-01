@@ -62,7 +62,7 @@ class ListaController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Lista;
+		$model=new ListaForm;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
