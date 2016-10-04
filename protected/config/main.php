@@ -85,6 +85,10 @@ return array(
 	// application components
 	'components'=>array(
 
+		'Funciones'=>array(
+			'class'=>'ext.Funciones',
+		),
+
 		'user'=>array(
 			'class' => 'WebUser',
 			// enable cookie-based authentication

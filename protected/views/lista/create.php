@@ -4,6 +4,18 @@
 /* @var $form CActiveForm */
 ?>
 
+<?php if(Yii::app()->user->hasFlash('danger')):?>
+	<br>
+    <div class="container-fluid">
+	      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	        <div class="alert alert-danger">
+	          <button type="button" class="close" data-dismiss="alert">&times;</button>
+	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo Yii::app()->user->getFlash('danger'); ?>
+	        </div>
+	      </div>
+	    </div>
+<?php endif; ?>
+
 <div class="form col-xs-12 col-sm-12 col-md-10 col-lg-8" >
 
 <?php /*$form=$this->beginWidget('CActiveForm', array(
@@ -28,14 +40,18 @@ $form = $this->beginWidget(
 
 	<?php if (Yii::app()->user->isAdmin()){ ?>
 		<div>
-			<?php echo $form->textFieldGroup(
+			<?php echo $form->dropDownListGroup(
 				$model,
 				'id_usuario',
 				array(
 					'wrapperHtmlOptions' => array(
 						//'class' => 'col-sm-5',
 					),
-					'hint' => 'En caso de seleccionar, la lista sera asociada a dicho usuario',
+					'widgetOptions' => array(
+						'data' => CHtml::listData(UsuarioMasivo::model()->findAll(array("order"=>"login")), 'id_usuario', 'login'),
+						'htmlOptions' => array('prompt' => 'Seleccionar...'),
+					),
+					'hint' => 'En caso de seleccionar un usuario, la lista sera asociada a dicho usuario',
 				)
 			); ?>
 		</div>
@@ -47,8 +63,12 @@ $form = $this->beginWidget(
 				'nombre',
 				array(
 					'wrapperHtmlOptions' => array(
+						'placeholder' => 'Nombre de la lista',
 						//'class' => 'col-sm-5',
 					),
+					'widgetOptions' => array(
+						'htmlOptions' => array('placeholder' => 'Nombre de la lista'),
+					)
 				)
 			); ?>
 	</div>

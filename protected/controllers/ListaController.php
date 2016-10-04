@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete'),
+				'actions'=>array('create','update', 'admin', 'delete', 'reporteCrearLista'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -63,15 +63,70 @@ class ListaController extends Controller
 	public function actionCreate()
 	{
 		$model=new ListaForm;
+		//$model_user=new usersMasivo;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Lista']))
+		if(isset($_POST['ListaForm']))
 		{
-			$model->attributes=$_POST['Lista'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_lista));
+			$model->attributes=$_POST['ListaForm'];
+			
+			if ($model->validate())
+			{
+				$transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+	            try
+	            {
+					if ($model->id_usuario == "")
+						$model->id_usuario = Yii::app()->user->id;
+
+					$id_proceso = Yii::app()->Funciones->obtenerNumeroProceso();
+
+					$sql = "CALL split_numeros('".$model->numeros."', ',', ".$id_proceso.")";
+            		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+            		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) SELECT id_proceso, numero FROM splitvalues_numeros WHERE id_proceso = ".$id_proceso;
+					Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+					$operadoras = Yii::app()->Funciones->operadorasBCNL();
+
+					//Updatea los id_operadora de los numeros validos
+					Yii::app()->Funciones->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
+
+					$sql = "SELECT COUNT(id_proceso) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND id_operadora <> 'NULL'";
+					$total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+					if ($total["total"] > 0)
+					{
+						$model_lista = new Lista;
+						$model_lista->id_usuario = $model->id_usuario;
+						$model_lista->nombre = $model->nombre;
+						$model_lista->save();
+						$id_lista = $model_lista->primaryKey;
+
+						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND id_operadora <> 'NULL'";
+						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+						$transaction->commit();
+						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso));
+					}
+					else
+					{
+						$error = "La lista no fue creada ya que no contiene destinatarios validos";
+						Yii::app()->user->setFlash("danger", $error);
+						$transaction->rollBack();
+						//$this->redirect(array('create'));
+					}
+
+					//Borra el id_proceso y todos los numeros en tmp_procesamiento asociados a el con el metodo de cascada
+					//ProcesosActivos::model()->deleteByPk($id_proceso);           		
+
+				} catch (Exception $e)
+					{
+                		$transaction->rollBack();
+            		}
+			}
 		}
 
 		$this->render('create',array(
@@ -170,4 +225,12 @@ class ListaController extends Controller
 			Yii::app()->end();
 		}
 	}
+
+	public function actionReporteCrearLista($id_proceso)
+	{
+		$model_procesamiento = TmpProcesamiento::model()->findAll($id_proceso);
+
+		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento));
+	}
+
 }
