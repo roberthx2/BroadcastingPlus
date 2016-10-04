@@ -38,7 +38,7 @@ class Funciones extends CApplicationComponent
 	public function operadorasBCNL()
 	{
 		$criteria = new CDbCriteria();
-		$criteria->select = "id_operadora_bcnl AS id_operadora, prefijo";
+		$criteria->select = "id_operadora_bcnl AS id_operadora, prefijo, descripcion";
 		$criteria->group = "prefijo";
 		$criteria->order = "id_operadora_bcnl ASC";
 
@@ -48,7 +48,7 @@ class Funciones extends CApplicationComponent
 	public function operadorasBCP($digitel_alf)
 	{
 		$criteria = new CDbCriteria;
-		$criteria->select = "id_operadora_bcp AS id_operadora, prefijo";
+		$criteria->select = "id_operadora_bcp AS id_operadora, prefijo, descripcion";
 		$criteria->addCondition("id_operadora_bcp != ".$digitel);
 		$criteria->order = "id_operadora_bcp ASC";
 

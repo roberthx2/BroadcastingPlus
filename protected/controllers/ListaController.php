@@ -228,9 +228,20 @@ class ListaController extends Controller
 
 	public function actionReporteCrearLista($id_proceso)
 	{
-		$model_procesamiento = TmpProcesamiento::model()->findAll($id_proceso);
+		//$model_procesamiento = TmpProcesamiento::model()->findAll($id_proceso);
+		//$model_procesamiento = new 
+		/*$criteria=new CDbCriteria;
+		$criteria->compare('id_proceso',$id_proceso);
+		$model_procesamiento = new CActiveDataProvider($this, array('criteria'=>$criteria));*/
 
-		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento));
+		$model_procesamiento = new TmpProcesamiento("searchReporteLista");
+		$model_procesamiento->unsetAttributes();
+		if(isset($_GET['TmpProcesamiento'])){
+			$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
+			print_r($model_procesamiento);
+		}
+
+		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso));
 	}
 
 }

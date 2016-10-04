@@ -24,6 +24,9 @@ class TmpProcesamiento extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+
+	public $buscar;
+
 	public function tableName()
 	{
 		return 'tmp_procesamiento';
@@ -115,6 +118,64 @@ class TmpProcesamiento extends CActiveRecord
 		));
 	}
 
+	public function searchReporteLista($id_proceso)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare("id_proceso",$id_proceso);
+		$criteria->compare('numero',$this->numero,true);
+		$criteria->compare('id_operadora',$this->id_operadora);
+		/*$criteria->addCondition("numero LIKE '%".$this->buscar."%'", "OR");
+		$criteria->compare("id_operadora", $this->buscar, "OR");*/
+
+		//print_r($criteria);
+
+		//print_r($buscar);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchReporte($id_proceso)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		//$criteria->condition = 'id_proceso = '.$id_proceso;
+		//$criteria->compare('numero',$this->numero,true,'AND', 'ILIKE');
+		$criteria->condition = "numero LIKE '%".$this->numero."%' AND id_proceso = ".$id_proceso;
+		$criteria->addCondition("id_operadora LIKE '%".$this->id_operadora."%' AND id_proceso = ".$id_proceso,"OR");
+		
+		//print_r($criteria); exit;
+		$dataProvider = new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'pagination'=>array(
+        		'pageSize'=>10,
+    		),
+		));
+
+		return $dataProvider;
+	}
+
+	public function searchTmp($id_proceso)
+	{
+		$criteria=new CDbCriteria;
+
+		//if (isset($_GET['buscar'])) {
+  print_r($this->numero);
+  exit;
+            $criteria->condition = "id_proceso = ".$id_proceso;
+            $criteria->compare('numero',$this->buscar,true,'ILIKE');
+            $criteria->compare('id_operadora', $this->buscar,true,'OR','ILIKE');
+        //}
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
 	/**
 	 * @return CDbConnection the database connection used for this class
 	 */

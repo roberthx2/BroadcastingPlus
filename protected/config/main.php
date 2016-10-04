@@ -68,6 +68,7 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.controllers.*',
+		//'Ext.EDataTables.*',
 	),
 
 	'modules'=>array(
