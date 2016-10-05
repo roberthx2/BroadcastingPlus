@@ -124,15 +124,11 @@ class TmpProcesamiento extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare("id_proceso",$id_proceso);
-		$criteria->compare('numero',$this->numero,true);
-		$criteria->compare('id_operadora',$this->id_operadora);
-		/*$criteria->addCondition("numero LIKE '%".$this->buscar."%'", "OR");
-		$criteria->compare("id_operadora", $this->buscar, "OR");*/
-
-		//print_r($criteria);
-
-		//print_r($buscar);
+		$criteria->condition = "(id_proceso = ".$id_proceso.") AND ";
+		$this->numero = $this->buscar;
+		$this->id_operadora = $this->buscar;
+		$criteria->condition .= "(numero LIKE '%".$this->numero."%' OR ";
+		$criteria->condition .= "id_operadora LIKE '%".$this->id_operadora."%')";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -235,10 +235,10 @@ class ListaController extends Controller
 		$model_procesamiento = new CActiveDataProvider($this, array('criteria'=>$criteria));*/
 
 		$model_procesamiento = new TmpProcesamiento("searchReporteLista");
-		$model_procesamiento->unsetAttributes();
+		//$model_procesamiento->unsetAttributes();
 		if(isset($_GET['TmpProcesamiento'])){
-			$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
-			print_r($model_procesamiento);
+			//$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
+			$model_procesamiento->buscar = $_GET['TmpProcesamiento']["buscar"];
 		}
 
 		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso));
