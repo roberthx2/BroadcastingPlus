@@ -170,4 +170,32 @@ class TmpProcesamientoController extends Controller
 			Yii::app()->end();
 		}
 	}
+
+	public function actionResumenGeneral($id_proceso, $nombre)
+	{
+		$objeto = array();
+
+		$sql = "SELECT (SELECT 'Total') AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso."
+				UNION
+				SELECT (SELECT 'Rechazado') AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado != 1
+				UNION
+				SELECT descripcion, COUNT(*) AS total FROM tmp_procesamiento t 
+				INNER JOIN tmp_procesamiento_estado e ON t.estado = e.id_estado
+				WHERE id_proceso = ".$id_proceso."
+				GROUP BY estado";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		if ($nombre != "")
+		{
+			$objeto[] = array('descripcion'=>'Nombre','total'=>$nombre);
+		}
+
+		foreach ($sql as $value)
+		{
+			$objeto[] = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
+		}
+
+		return $objeto;
+	}
 }
