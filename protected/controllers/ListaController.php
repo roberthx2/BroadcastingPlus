@@ -241,6 +241,8 @@ class ListaController extends Controller
 			$model_procesamiento->buscar = $_GET['TmpProcesamiento']["buscar"];
 		}
 
+		ProcesosActivos::model()->deleteByPk($id_proceso); 
+
 		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso));
 	}
 
