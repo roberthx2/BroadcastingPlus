@@ -91,10 +91,16 @@ class ListaController extends Controller
 
 					$operadoras = Yii::app()->Funciones->operadorasBCNL();
 
-					//Updatea los id_operadora de los numeros validos
+					//Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
 					Yii::app()->Funciones->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
 
-					$sql = "SELECT COUNT(id_proceso) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND id_operadora <> 'NULL'";
+					//Updatea en estado 3 todos los numeros duplicados
+					Yii::app()->Funciones->filtrarDuplicados($id_proceso);
+
+					//Updatea a esatdo = 1 todos los numeros validos 
+					Yii::app()->Funciones->updateAceptados($id_proceso);
+
+					$sql = "SELECT COUNT(id_proceso) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 					$total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 					if ($total["total"] > 0)
@@ -105,18 +111,17 @@ class ListaController extends Controller
 						$model_lista->save();
 						$id_lista = $model_lista->primaryKey;
 
-						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND id_operadora <> 'NULL'";
+						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
 						$transaction->commit();
-						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso));
+						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre));
 					}
 					else
 					{
 						$error = "La lista no fue creada ya que no contiene destinatarios validos";
 						Yii::app()->user->setFlash("danger", $error);
 						$transaction->rollBack();
-						//$this->redirect(array('create'));
 					}
 
 					//Borra el id_proceso y todos los numeros en tmp_procesamiento asociados a el con el metodo de cascada
@@ -124,6 +129,8 @@ class ListaController extends Controller
 
 				} catch (Exception $e)
 					{
+						$error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+						Yii::app()->user->setFlash("danger", $error);
                 		$transaction->rollBack();
             		}
 			}
@@ -226,24 +233,9 @@ class ListaController extends Controller
 		}
 	}
 
-	public function actionReporteCrearLista($id_proceso)
+	public function actionReporteCrearLista($id_proceso, $nombre)
 	{
-		//$model_procesamiento = TmpProcesamiento::model()->findAll($id_proceso);
-		//$model_procesamiento = new 
-		/*$criteria=new CDbCriteria;
-		$criteria->compare('id_proceso',$id_proceso);
-		$model_procesamiento = new CActiveDataProvider($this, array('criteria'=>$criteria));*/
-
-		$model_procesamiento = new TmpProcesamiento("searchReporteLista");
-		//$model_procesamiento->unsetAttributes();
-		if(isset($_GET['TmpProcesamiento'])){
-			//$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
-			$model_procesamiento->buscar = $_GET['TmpProcesamiento']["buscar"];
-		}
-
-		ProcesosActivos::model()->deleteByPk($id_proceso); 
-
-		$this->render("reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso));
+		$this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre));
 	}
 
 }

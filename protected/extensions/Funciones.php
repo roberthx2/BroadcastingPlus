@@ -62,6 +62,68 @@ class Funciones extends CApplicationComponent
 			$sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = ".$id_proceso." AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
             Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 		}
+
+		$sql = "UPDATE tmp_procesamiento SET estado = 2 WHERE id_proceso = ".$id_proceso." AND id_operadora IS NULL";
+        Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+	}
+
+	public function filtrarDuplicados($id_proceso)
+	{
+		//NO USE CRITERIA PORQUE NO QUISO FUNCIONAR :@
+		$sql = "SELECT COUNT(numero) - 1 AS total, GROUP_CONCAT(id) AS ids
+				FROM tmp_procesamiento 
+				WHERE id_proceso = ".$id_proceso." 
+				GROUP BY numero
+				HAVING total > 0";
+				
+		$model = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		foreach ($model as $value)
+		{
+			$sql = "UPDATE tmp_procesamiento SET estado = 3 WHERE id IN (".$value["ids"].") LIMIT ".$value["total"];
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		}
+	}
+
+	public function updateAceptados($id_proceso)
+	{
+		$sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = ".$id_proceso." AND estado IS NULL";
+		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+	}
+
+	public function colorOperadoraBCNL($id_operadora)
+	{
+		if ($id_operadora == 2) //Movistar
+			$color = "#5bc0de";
+		else if ($id_operadora == 3) //Movilnet
+			$color = "#f0ad4e";
+		else if ($id_operadora == 4) //Digitel
+			$color = "#d9534f";
+		else $color = "#999";
+
+		return $color;
+	}
+
+	public function colorOperadoraBCP($id_operadora)
+	{
+		if ($id_operadora == 1 || $id_operadora == 2) //Movistar
+			$color = "#5bc0de";
+		else if ($id_operadora == 3 || $id_operadora == 4) //Movilnet
+			$color = "#f0ad4e";
+		else if ($id_operadora == 5 || $id_operadora == 6) //Digitel
+			$color = "#d9534f";
+		else $color = "#999";
+
+		return $color;
+	}
+
+	public function colorValidoInvalido($id_estado)
+	{
+		if ($id_estado == 1) //Valido
+			$color = "#5cb85c";
+		else $color = "#d9534f"; //Invalido
+
+		return $color;
 	}
 }
 

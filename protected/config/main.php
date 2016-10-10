@@ -1,6 +1,6 @@
 <?php
 
-if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.14.188.47') || ($_SERVER['SERVER_NAME'] == '10.0.0.102')){
+if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.14.188.47') || ($_SERVER['SERVER_NAME'] == '10.0.0.102') || ($_SERVER['SERVER_NAME'] == '192.168.2.124' || true)){
 
 	//Servidores
 	$host_F1 = "localhost";//"200.109.237.18";
@@ -52,6 +52,7 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
 Yii::setPathOfAlias('booster', dirname(__FILE__).'/../extensions/booster');
+Yii::setPathOfAlias('highcharts', dirname(__FILE__).'/../extensions/highcharts/highcharts');
 
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',

@@ -12,10 +12,10 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo Yii::app()->createUrl('lista/create');?>">Crear</a>
+                    <a href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Crear</a>
                 </li>
                 <li>
-                    <a href="<?php echo Yii::app()->createUrl('lista/admin');?>">Administrar</a>
+                    <a href="<?php echo Yii::app()->createUrl('lista/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Administrar</a>
                 </li>
             </ul>
         </div>

@@ -67,7 +67,7 @@ $form = $this->beginWidget(
 						//'class' => 'col-sm-5',
 					),
 					'widgetOptions' => array(
-						'htmlOptions' => array('placeholder' => 'Nombre de la lista'),
+						'htmlOptions' => array('placeholder' => 'Nombre de la lista', 'autocomplete'=>'off'),
 					)
 				)
 			); ?>
