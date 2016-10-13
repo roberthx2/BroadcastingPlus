@@ -32,9 +32,12 @@ class Lista extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario, nombre', 'required'),
+			array('id_usuario, nombre', 'required','message'=>'{attribute} requerido'),
 			array('id_usuario', 'numerical', 'integerOnly'=>true),
 			array('nombre', 'length', 'max'=>30),
+			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
+			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
+			//array("nombre", "existe", "usuario"=>$this->id_usuario)
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id_lista, id_usuario, nombre, numero, id_operadora', 'safe', 'on'=>'search'),
@@ -63,6 +66,24 @@ class Lista extends CActiveRecord
 			'id_usuario' => 'Id Usuario',
 			'nombre' => 'Nombre',
 		);
+	}
+
+	public function existe($attribute,$params)
+	{
+		if ($this->id_usuario == "")
+			$id_usuario = Yii::app()->user->id;
+		else
+			$id_usuario = $this->id_usuario;
+
+		$model = Lista::model()->find("id_usuario =? AND LOWER(nombre) =?", array($id_usuario, $this->$attribute));
+		
+		if($model != null)
+			$this->addError($attribute, "El nombre de la lista ya existe");	
+	}
+
+	public function limpiarNombre($cadena)
+	{
+		return Yii::app()->Funciones->limpiarNombre($cadena);
 	}
 
 	/**
@@ -148,7 +169,7 @@ class Lista extends CActiveRecord
 	public function searchTmp($id_usuario)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_lista, t.nombre, u.login AS login, COUNT(ld.id_lista) AS total ";
+		$criteria->select = "t.id_lista, t.nombre, t.id_usuario, u.login AS login, COUNT(ld.id_lista) AS total ";
 		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
 

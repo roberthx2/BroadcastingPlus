@@ -64,16 +64,23 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'editable' => array(
 	            	'type' => 'text',
-	            	'pk' => '$data["id_lista"]',
-	            	//'mode' => 'inline',
+	            	//'pk' => '$data["id_lista"]',
+	            	'mode' => 'inline',
 	            	'showbuttons' => false,
 	            	'title' => 'Ingrese el nombre',
 	            	//'text' => 'okno',
 	            	'disabled' =>true,
+	            	/*'params'=> function ($params, $data) {
+	            		$params["pk"] = $data["id_usuario"];
+	            		return $params;
+	            	},*/
                     //'url' => $this->owner->createUrl('example/editable'),
-                    'url'=>Yii::app()->controller->createUrl('lista/updateGridView'),
+                    'url'=>Yii::app()->controller->createUrl('lista/editableSaver'),
                     'placement' => 'top',
                     'inputclass' => 'input-medium',
+                    'success'=>'js:function(response,newValue){
+						alert(response);
+					}',
                 )
         	),
         	array(
@@ -117,7 +124,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     <div class="modal-header" style="background-color:#428bca">
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar Lista</h4>
     </div>
- 
+ 	
     <div class="modal-body" id="divModalEliminar" >
        
     </div>

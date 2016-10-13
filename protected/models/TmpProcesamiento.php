@@ -141,7 +141,7 @@ class TmpProcesamiento extends CActiveRecord
 			'criteria'=>$criteria,
 			'sort'=>array(
         		'attributes'=>array(
-             		'numero'
+             		'numero', 'o.descripcion', 'e.descripcion'
         		),
     		),
 		));

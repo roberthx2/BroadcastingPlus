@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'updateGridView'),
+				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -160,10 +160,10 @@ class ListaController extends Controller
 		));
 	}
 
-	public function actionUpdateGridView()
+	public function actionEditableSaver()
 	{
-	    Yii::import('booster.widgets.TbEditableField');
-	    $es = new TbEditableField('Lista');
+	    Yii::import('booster.widgets.TbEditableSaver');
+	    $es = new TbEditableSaver('Lista');
 	    $es->update();
 	}
 

@@ -44,7 +44,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
         	),
         	array(
-	            //'name' => 'descripcion',
+	            'name' => 'o.descripcion',
 	            'header' => 'Operadora',
                 'value' => function($data)
                 {
@@ -63,7 +63,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
         	),
             array(
-                //'name' => 'descripcion',
+                'name' => 'e.descripcion',
                 'header' => 'Estado',
                 'value' => function($data)
                 {
