@@ -175,9 +175,9 @@ class TmpProcesamientoController extends Controller
 	{
 		$objeto = array();
 
-		$sql = "SELECT (SELECT 'Total') AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso."
+		$sql = "SELECT 'Total' AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso."
 				UNION
-				SELECT (SELECT 'Rechazado') AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado != 1
+				SELECT 'Rechazado' AS descripcion, COUNT(*) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado != 1
 				UNION
 				SELECT descripcion, COUNT(*) AS total FROM tmp_procesamiento t 
 				INNER JOIN tmp_procesamiento_estado e ON t.estado = e.id_estado
@@ -216,8 +216,31 @@ class TmpProcesamientoController extends Controller
 		return $objeto;
 	}
 
-	public function actionReporteTorta($id_proceso)
+	public function actionReporteTortaBCNL($id_proceso)
 	{
-		
+		$sql = "SELECT 'INVALIDOS' AS descripcion, COUNT(*) AS total, 0 AS id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado <> 1
+				UNION
+				SELECT o.descripcion, COUNT(*) AS total, t.id_operadora FROM tmp_procesamiento t 
+				INNER JOIN (SELECT id_operadora_bcnl, descripcion FROM operadoras_relacion GROUP BY id_operadora_bcnl) o ON t.id_operadora = o.id_operadora_bcnl 
+				WHERE t.id_proceso = ".$id_proceso." AND t.estado = 1 
+				GROUP BY id_operadora";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		$data = array();
+		$bandera = 0;
+
+		foreach ($sql as $value)
+		{
+			if ($bandera == 0)
+			{
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+          		$bandera++;
+			}
+          	else
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]));
+		}
+
+		return $data;
 	}
 }

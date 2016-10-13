@@ -29,13 +29,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'htmlOptions' => array('class' => 'trOverFlow'),
        // 'filter'=> $model_procesamiento,
         'columns'=> array( 
-        	array(
+        	/*array(
 	            'name' => 'id_proceso',
 	            'header' => 'Id proceso',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
-        	), 
+        	),*/ 
         	array(
 	            'name' => 'numero',
 	            'header' => 'Número',
@@ -54,7 +54,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                             'context' => '',
                             // 'default', 'primary', 'success', 'info', 'warning', 'danger'
                             'label' => $data["descripcion_oper"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->colorOperadoraBCNL($data["id_operadora"]).';'),    
+                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($data["id_operadora"]).';'),    
                         )
                     );
                 },
@@ -75,7 +75,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                             //'context' => $objeto['clase'],
                             // 'default', 'primary', 'success', 'info', 'warning', 'danger'
                             'label' => $data["descripcion_estado"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->colorValidoInvalido($data["estado"]).';'),    
+                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorValidoInvalido($data["estado"]).';'),    
                         )
                     );
                 },

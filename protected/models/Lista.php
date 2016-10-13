@@ -13,6 +13,9 @@
  */
 class Lista extends CActiveRecord
 {
+	public $total;
+	public $buscar;
+	public $login;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -34,7 +37,7 @@ class Lista extends CActiveRecord
 			array('nombre', 'length', 'max'=>30),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_lista, id_usuario, nombre', 'safe', 'on'=>'search'),
+			array('id_lista, id_usuario, nombre, numero, id_operadora', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -74,18 +77,101 @@ class Lista extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	public function searchOriginal()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
-
 		$criteria->compare('id_lista',$this->id_lista);
 		$criteria->compare('id_usuario',$this->id_usuario);
 		$criteria->compare('nombre',$this->nombre,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function search($id_usuario)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$post_table = ListaDestinatarios::model()->tableName();
+        $post_count_sql = "(select count(id_lista) from $post_table pt where pt.id_lista = 67)";
+
+        $criteria->select = array("t.id_usuario", "t.nombre", $post_count_sql." AS total");
+
+        $criteria->with = array("listaDestinatarioses"=>array('condition' => 'listaDestinatarioses.id_lista = t.id_lista'));
+	
+		if ($id_usuario != null)
+			$criteria->compare('t.id_usuario',$id_usuario);
+		$criteria->compare('t.id_lista',67);
+		$criteria->compare('t.nombre',$this->nombre,true);
+		
+
+		print_r($criteria);
+		//exit;
+
+		$var =  new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+		print_r($var->getData());
+		exit;
+	}
+
+	public function search2($id_usuario)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "u.login AS id_usuario, t.nombre";
+
+		if ($id_usuario != null)
+			$criteria->condition = "(id_usuario = ".$id_usuario.") AND ";
+		$criteria->with = array("listaDestinatarioses");
+		$criteria->condition .= "(nombre LIKE '%".$this->buscar."%' ) ";
+		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario";
+		//$criteria->with = array("listaDestinatarioses"=>array("select"=>"id_operadora", "on"=>"t.id_lista = listaDestinatarioses.id_lista")); 
+		//$criteria->group = "listaDestinatarioses.id_lista";
+		$criteria->order = "u.login, t.nombre";
+		$criteria->together = true;
+
+		print_r($criteria);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchTmp($id_usuario)
+	{
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_lista, t.nombre, u.login AS login, COUNT(ld.id_lista) AS total ";
+		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
+
+		if ($id_usuario != null) //NO es admin
+			$criteria->condition = "(t.id_usuario = ".$id_usuario.") AND ";
+		else  $criteria->condition = "(u.login LIKE '%".$this->buscar."%') OR "; //SI es admin
+
+		$criteria->condition .= "(t.nombre LIKE '%".$this->buscar."%')";
+		//$criteria->having = "(total LIKE '%".$this->buscar."%' ) ";
+		$criteria->group = "ld.id_lista";
+		//$criteria->order = "u.login, t.nombre";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'login ASC',
+        		'attributes'=>array(
+             		'u.login','nombre'
+        		),
+    		),
+    		'pagination'=>array(
+        		'pageSize'=>10,
+    		),
 		));
 	}
 

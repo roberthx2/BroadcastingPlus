@@ -12,12 +12,6 @@
       <div class="panel-body">
         <?php
 
-          $data = array();
-          $data[] = array('name' => 'MOVISTAR', 'y' => 11, 'color' => '#5bc0de');
-          $data[] = array('name' => 'MOVILNET', 'y' => 12, 'color' => '#f0ad4e');
-          $data[] = array('name' => 'DIGITEL', 'y' => 13, 'color' => '#d9534f');
-          $data[] = array('name' => 'INVALIDOS', 'y' => 14, 'color' => '#999', 'sliced' => true, 'selected' => true);
-
          $this->widget('highcharts.HighchartsWidget', array(
             'scripts' => array(
                 'modules/exporting',
@@ -42,7 +36,7 @@
                     'style' => array(
                         'fontFamily' => 'Verdana, Arial, Helvetica, sans-serif',
                     ),
-                    //'weight' => 200
+                    'weight' => 300
                 ),
                 'plotOptions' => array(
                     'pie' => array(

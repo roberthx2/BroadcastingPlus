@@ -91,6 +91,14 @@ return array(
 			'class'=>'ext.Funciones',
 		),
 
+		'Filtros'=>array(
+			'class'=>'ext.Filtros',
+		),
+
+		'Procedimientos'=>array(
+			'class'=>'ext.Procedimientos',
+		),
+
 		'user'=>array(
 			'class' => 'WebUser',
 			// enable cookie-based authentication

@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete', 'reporteCrearLista'),
+				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'updateGridView'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -49,12 +49,12 @@ class ListaController extends Controller
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed
 	 */
-	public function actionView($id)
+	/*public function actionView($id)
 	{
 		$this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
-	}
+	}*/
 
 	/**
 	 * Creates a new model.
@@ -81,29 +81,24 @@ class ListaController extends Controller
 					if ($model->id_usuario == "")
 						$model->id_usuario = Yii::app()->user->id;
 
-					$id_proceso = Yii::app()->Funciones->obtenerNumeroProceso();
+					$id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
 
-					$sql = "CALL split_numeros('".$model->numeros."', ',', ".$id_proceso.")";
-            		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
-
-            		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) SELECT id_proceso, numero FROM splitvalues_numeros WHERE id_proceso = ".$id_proceso;
-					Yii::app()->db_masivo_premium->createCommand($sql)->execute();
-
-					$operadoras = Yii::app()->Funciones->operadorasBCNL();
+					//Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+					Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->numeros);
 
 					//Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-					Yii::app()->Funciones->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
+					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
 
 					//Updatea en estado 3 todos los numeros duplicados
-					Yii::app()->Funciones->filtrarDuplicados($id_proceso);
+					Yii::app()->Filtros->filtrarDuplicados($id_proceso);
 
 					//Updatea a esatdo = 1 todos los numeros validos 
-					Yii::app()->Funciones->updateAceptados($id_proceso);
+					Yii::app()->Filtros->filtrarAceptados($id_proceso);
 
-					$sql = "SELECT COUNT(id_proceso) AS total FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
-					$total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+					//Cantidad de destinatarios validos
+					$total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
 
-					if ($total["total"] > 0)
+					if ($total > 0)
 					{
 						$model_lista = new Lista;
 						$model_lista->id_usuario = $model->id_usuario;
@@ -165,18 +160,40 @@ class ListaController extends Controller
 		));
 	}
 
+	public function actionUpdateGridView()
+	{
+	    Yii::import('booster.widgets.TbEditableField');
+	    $es = new TbEditableField('Lista');
+	    $es->update();
+	}
+
 	/**
 	 * Deletes a particular model.
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id)
+	public function actionDeleteLista($id)
 	{
 		$this->loadModel($id)->delete();
+		Yii::app()->user->setFlash("success", "La lista fue eliminada correctamente");
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
 			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+	}
+
+	public function actionViewDelete($id_lista)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "t.id_lista, t.nombre, u.login AS login, COUNT(ld.id_lista) AS total";
+		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
+		$criteria->compare('t.id_lista',$id_lista);
+		$criteria->group = "ld.id_lista";
+
+		$model = Lista::model()->find($criteria);
+
+		$this->renderPartial('viewDelete',array("model"=>$model));
 	}
 
 	/**
@@ -195,14 +212,22 @@ class ListaController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Lista('search');
+		$model=new Lista('search2');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Lista']))
-			$model->attributes=$_GET['Lista'];
+			$model->buscar = $_GET['Lista']["buscar"];
+			//$model->attributes=$_GET['Lista'];
 
-		$this->render('admin',array(
-			'model'=>$model,
-		));
+		if(Yii::app()->user->isAdmin())
+			$id_usuario = null;
+		else $id_usuario = Yii::app()->user->id;
+
+		$this->render('admin',array('model'=>$model, 'id_usuario'=>$id_usuario));
+	}
+	public function actionAdmin2()
+	{
+		$data = $this->actionReporteTorta(66);
+		$this->renderPartial("graficoTortaBCNL", array("data"=>$data), false, true);
 	}
 
 	/**
@@ -236,6 +261,32 @@ class ListaController extends Controller
 	public function actionReporteCrearLista($id_proceso, $nombre)
 	{
 		$this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre));
+	}
+
+	public function actionReporteTorta($id_lista)
+	{
+		$sql = "SELECT o.descripcion, COUNT(*) AS total, t.id_operadora FROM lista_destinatarios t 
+				INNER JOIN (SELECT id_operadora_bcnl, descripcion FROM operadoras_relacion GROUP BY id_operadora_bcnl) o ON t.id_operadora = o.id_operadora_bcnl 
+				WHERE t.id_lista = ".$id_lista." 
+				GROUP BY id_operadora";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		$data = array();
+		$bandera = 0;
+
+		foreach ($sql as $value)
+		{
+			if ($bandera == 0)
+			{
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+          		$bandera++;
+			}
+          	else
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]));
+		}
+
+		return $data;
 	}
 
 }

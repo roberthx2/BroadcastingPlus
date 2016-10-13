@@ -1,12 +1,13 @@
-<div class="col-md-5">
+<div class="col-md-4">
 	<?php 
 		$objeto = TmpProcesamientoController::actionResumenGeneral($id_proceso, $nombre);
 		echo $this->renderPartial("/TmpProcesamiento/resumenGeneral", array("objeto"=>$objeto), true); 
 	?>
 </div>
-<div class="col-md-7">
+<div class="col-md-8">
 <?php 
-	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", false, true); 
+	$data = TmpProcesamientoController::actionReporteTortaBCNL($id_proceso);
+	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
 ?>
 </div>
 <div class="col-md-12">

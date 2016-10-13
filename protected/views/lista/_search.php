@@ -1,35 +1,17 @@
-<?php
-/* @var $this ListaController */
-/* @var $model Lista */
-/* @var $form CActiveForm */
-?>
-
 <div class="wide form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
-	'action'=>Yii::app()->createUrl($this->route),
+	'action'=>Yii::app()->createUrl($this->route, array("id_usuario"=>$id_usuario)),
 	'method'=>'get',
 )); ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'id_lista'); ?>
-		<?php echo $form->textField($model,'id_lista'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'id_usuario'); ?>
-		<?php echo $form->textField($model,'id_usuario'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'nombre'); ?>
-		<?php echo $form->textField($model,'nombre',array('size'=>30,'maxlength'=>30)); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Search'); ?>
-	</div>
-
+<div class="form-group col-md-6">
+    <div class="input-group">
+      <?php echo $form->textField($model,'buscar',array('class'=>'form-control','size' => 45, 'maxlength' => 45, 'placeholder' => 'Buscar...', 'autocomplete'=>'off')); ?>
+      <span class="input-group-btn" title="Buscar">
+        <button class="btn btn-primary" type="submit" ><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->	
 <?php $this->endWidget(); ?>
-
-</div><!-- search-form -->
+</div><!-- Search-form -->

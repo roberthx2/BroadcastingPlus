@@ -147,67 +147,7 @@ class TmpProcesamiento extends CActiveRecord
 		));
 	}
 
-	public function searchReporteListaOriginal($id_proceso)
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
 
-		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_proceso, t.numero, t.id_operadora, t.estado, o.descripcion AS descripcion";
-		$criteria->condition = "(id_proceso = ".$id_proceso.") AND ";
-		$this->numero = $this->buscar;
-		$this->descripcion = $this->buscar;
-		$criteria->condition .= "(numero LIKE '%".$this->numero."%' OR ";
-		$criteria->condition .= "descripcion LIKE '%".$this->descripcion."%')";
-		$criteria->join = "LEFT JOIN (SELECT id_operadora_bcnl, descripcion from operadoras_relacion group by id_operadora_bcnl) as o ON t.id_operadora = o.id_operadora_bcnl";
-		//$criteria->group = "o.id_operadora_bcnl";
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-        		'attributes'=>array(
-             		'numero'
-        		),
-    		),
-		));
-	}
-
-	public function searchReporte($id_proceso)
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
-		//$criteria->condition = 'id_proceso = '.$id_proceso;
-		//$criteria->compare('numero',$this->numero,true,'AND', 'ILIKE');
-		$criteria->condition = "numero LIKE '%".$this->numero."%' AND id_proceso = ".$id_proceso;
-		$criteria->addCondition("id_operadora LIKE '%".$this->id_operadora."%' AND id_proceso = ".$id_proceso,"OR");
-		
-		//print_r($criteria); exit;
-		$dataProvider = new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'pagination'=>array(
-        		'pageSize'=>10,
-    		),
-		));
-
-		return $dataProvider;
-	}
-
-	public function searchTmp($id_proceso)
-	{
-		$criteria=new CDbCriteria;
-
-		//if (isset($_GET['buscar'])) {
-  print_r($this->numero);
-  exit;
-            $criteria->condition = "id_proceso = ".$id_proceso;
-            $criteria->compare('numero',$this->buscar,true,'ILIKE');
-            $criteria->compare('id_operadora', $this->buscar,true,'OR','ILIKE');
-        //}
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
 	/**
 	 * @return CDbConnection the database connection used for this class
 	 */
