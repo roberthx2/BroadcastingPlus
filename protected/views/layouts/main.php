@@ -15,9 +15,17 @@
 	<!--<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">-->
 
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/estilos.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/menuLista.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/simple-sidebar.css">
+
+	<?php  
+	 $baseUrl = Yii::app()->baseUrl; 
+	  Yii::app()->clientScript->registerCssFile($baseUrl.'/css/estilos.css');  
+	 /* Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/bootstrap.min.js');
+	  $cs = Yii::app()->getClientScript();
+	  $cs->registerScriptFile($baseUrl.'/js/bootstrap-editable.js');
+	  $cs->registerCssFile($baseUrl.'/css/bootstrap-editable.css');*/
+	?>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 

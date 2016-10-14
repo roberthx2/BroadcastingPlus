@@ -53,6 +53,7 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 // CWebApplication properties can be configured here.
 Yii::setPathOfAlias('booster', dirname(__FILE__).'/../extensions/booster');
 Yii::setPathOfAlias('highcharts', dirname(__FILE__).'/../extensions/highcharts/highcharts');
+Yii::setPathOfAlias('editable', dirname(__FILE__).'/../extensions/x-editable');
 
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
@@ -69,6 +70,7 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.controllers.*',
+		'editable.*',
 		//'Ext.EDataTables.*',
 	),
 
@@ -117,6 +119,16 @@ return array(
 		'booster' => array(
     		'class' => 'booster.components.Booster',
 		),
+
+		//X-editable config
+        'editable' => array(
+            'class'     => 'editable.EditableConfig',
+            'form'      => 'booster',//'bootstrap',        //form style: 'bootstrap', 'jqueryui', 'plain' 
+            'mode'      => 'popup',            //mode: 'popup' or 'inline'  
+            'defaults'  => array(              //default settings for all editable elements
+               'emptytext' => 'Click to edit'
+            )
+        ),  
 
 		// uncomment the following to enable URLs in path-format
 		

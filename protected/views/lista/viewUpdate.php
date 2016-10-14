@@ -1,4 +1,4 @@
-<div class="col-md-4">
+<div class="col-md-5">
 	<?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
 	<div class="panel-group" id="accordion">
 		<div class="panel panel-primary">
@@ -12,17 +12,30 @@
 		    <div id="collapseOne" class="panel-collapse collapse in">
 		      	<div class="panel-body">
 		        	<ul class="list-group">
-		        		<li class="list-group-item">
-		        			<?php $this->widget(
-		                    	'booster.widgets.TbBadge',
-		                    	array(
-		                        //'context' => $context,
-		                        // 'default', 'success', 'info', 'warning', 'danger'
-		                        	'label' => $model_lista->nombre,
-		                        	'htmlOptions' => array('style' => 'background-color: #f0ad4e; color: white'),
-		                    	)
-		                	); ?>
-		                	<?php echo '<strong>Nombre</strong>'; ?>
+		        		<li class="list-group-item" style="padding: 0px;">
+		                	<?php
+		                		$this->widget(
+								    'booster.widgets.TbEditableDetailView',
+								    array(
+								        'id' => 'region-details',
+								        'data' => $model_lista,
+								        'showbuttons' => false,
+								        'mode' => 'inline',
+								        'htmlOptions' => array('class' => 'color: black; text-decoration: none;'),
+								        'url' => $this->createUrl('lista/editableSaver'),
+								        'params' => array("model"=>"Lista"),
+								        'attributes' => array(
+								            'nombre',
+								        ),
+								        'success' => 'js: function(response, newValue) {
+									       if(!response.success) return response.msg;
+									    }',
+									   	'options' => array(
+									    	'ajaxOptions' => array('dataType' => 'json')
+									   	), 
+								    )
+								);
+		                	?>
 		        		</li>
 			        	<li class="list-group-item">
 			        		<?php $this->widget(
@@ -31,7 +44,7 @@
 			                        //'context' => $context,
 			                        // 'default', 'success', 'info', 'warning', 'danger'
 			                        'label' => $model_lista->login,
-			                        'htmlOptions' => array('style' => 'background-color: #5bc0de; color: white'),
+			                        'htmlOptions' => array('style' => 'background-color: white; color: black'),
 			                    )
 			                ); ?>
 			                <?php echo '<strong>Usuario</strong>'; ?>
@@ -56,7 +69,7 @@
 	<?php $this->endWidget(); ?>
 </div>
 
-<div class="col-md-8">
+<div class="col-md-7">
 <?php 
 	$data = $this->actionReporteTorta($model_lista->id_lista);
 	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
@@ -92,14 +105,34 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow'),
+        'selectableRows' => 2,
        // 'filter'=> $model_procesamiento,
+        'bulkActions' => array(
+		    'actionButtons' => array(
+		        array(
+		            'buttonType' => 'button',
+		            'context' => 'primary',
+		            'size' => 'small',
+		            'label' => 'Testing Primary Bulk Actions',
+		            'click' => 'js:function(values){console.log(values);}',
+		            'id' => 'id_lista',
+		            )
+		    ),
+		        // if grid doesn't have a checkbox column type, it will attach
+		        // one and this configuration will be part of it
+	        'checkBoxColumnConfig' => array(
+	            'name' => 'id_lista',
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'col-xs-1 col-sm-1 col-md-1 col-lg-1'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	        ),
+	    ),
         'columns'=> array( 
         	array(
 	            'name' => 'numero',
 	            'header' => 'Número',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
 	            'name' => 'o.descripcion',
@@ -118,17 +151,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 },
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         ),
     ));
 ?>
 </div>
-
-<style type="text/css">
-    a:link, a:visited {
-        color: white;
-        text-decoration: none;
-    }
-</style>
 </div>

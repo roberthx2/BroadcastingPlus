@@ -17,7 +17,7 @@
         { 
             $context = "";
             if ($bandera == 1)
-                $context = "background-color: #f0ad4e; color: white";
+                $context = "background-color: white; color: black";
             if ($bandera == 2)
                 $context = "background-color: #5bc0de; color: white";
             if ($bandera == 3)
@@ -29,7 +29,7 @@
                 <?php $this->widget(
                     'booster.widgets.TbBadge',
                     array(
-                        'context' => $context,
+                        //'context' => $context,
                         // 'default', 'success', 'info', 'warning', 'danger'
                         'label' => $value["total"],
                         'htmlOptions' => array('style' => $context),

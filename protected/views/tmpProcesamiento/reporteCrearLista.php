@@ -41,7 +41,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Número',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
 	            'name' => 'o.descripcion',
@@ -60,7 +60,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 },
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
             array(
                 'name' => 'e.descripcion',
@@ -81,7 +81,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 },
                 'type' => 'raw',
                 'htmlOptions' => array('style' => 'text-align: center;'),
-                'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             ),
         ),
     ));
@@ -104,10 +104,3 @@ function estado($estado, $descripcion_estado)
 }
 
 ?>
-
-<style type="text/css">
-    a:link, a:visited {
-        color: white;
-        text-decoration: none;
-    }
-</style>

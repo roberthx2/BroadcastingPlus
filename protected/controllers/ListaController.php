@@ -183,12 +183,14 @@ class ListaController extends Controller
 
 	public function actionEditableSaver()
 	{
-	    Yii::import('booster.widgets.TbEditableSaver');
-	    $es = new TbEditableSaver('Lista');
-	    $es->update();
-
-	    /*header('Content-Type: application/json; charset="UTF-8"');
-		echo CJSON::encode(array('output' => $formulario));*/
+	    $es = new EditableSaver($_POST["model"]);
+	    try {
+	        $es->update();
+	    } catch(CException $e) {
+	        echo CJSON::encode(array('success' => false, 'msg' => $e->getMessage()));
+	        return;
+	    }
+	    echo CJSON::encode(array('success' => true));
 	}
 
 	/**
@@ -322,13 +324,4 @@ class ListaController extends Controller
 
 		return Yii::app()->getRequest()->sendFile(strtoupper($nombre).".txt", $lista->numero);
 	}
-
-	public function actionTest()
-	{
-		$formulario = "este es un mensaje";
-
-		header('Content-Type: application/json; charset="UTF-8"');
-		echo CJSON::encode(array('output' => $formulario));
-	}
-
 }

@@ -52,8 +52,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Usuario',
 	            'type' => 'raw',
 //	            'ajaxUpdate'=>true,
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class' => 'test'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	),
         	array(
@@ -61,84 +61,36 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'name' => 'nombre',
 	            'header' => 'Nombre',
 	            //'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
-	            'editable' => array(
-	            	'type' => 'text',
-	            	//'pk' => '$data["id_lista"]',
-	            	'mode' => 'inline',
-	            	'showbuttons' => false,
-	            	'title' => 'Ingrese el nombre',
-	            	//'text' => 'okno',
-	            	'disabled' =>true,
-	            	'encode' => false,
-	            	//'params'=> array('id_usuario'=>'$data["id_usuario"]'),/*function ($params, $data) {
-	            	//	$params["pk"] = $data["id_usuario"];
-	            	//	return $params;
-	            	//},*/
-                    //'url' => $this->owner->createUrl('example/editable'),
-                    //'url'=>Yii::app()->controller->createUrl('lista/editableSaver'),
-                    'placement' => 'top',
-                    'inputclass' => 'input-medium',
-                    /*'validate' => 'js: function(value) {
-						  $.ajax({
-	                        url: "/BroadcastingPlus/index.php?r=lista/editableSaver",
-	                        type:"post", 
-	                        async:false,   
-	                        data:{nombre:value},
-	                        
-	                        complete: function()
-	                        {
-	                            return "enviando";
-	                        },
-	                        success: function(data)
-	                        {
-	                            return data.output;
-	                        },
-	                        error: function()
-	                        {
-	                          return "mal";  
-	                        }
-	                    });
-					}',*/
-					/*'display' => 'js: function(value, sourceData) {
-					  var escapedValue = $("<div>").text(value).html();
-					  $(this).html("<b>" + escapedValue + "</b>")
-					}',*/
-					/*'onInit' => 'js: function(event, editable) {
-					  console.debug("X-Editable field " + editable.options.name + " ready to serve.");
-					}',*/
-					/*'onShown' => 'js: function(event) {
-					  var tip = $(this).data("editableContainer").tip();
-					  tip.find("input").val("overwriting value of input.");
-					}',*/
-					/*'onHidden' => 'js: function(event, reason) {
-					  if (reason === "save" || reason === "cancel") {
-					    // auto-open next editable
-					    $(this).closest("tr").next().find(".editable").editable("show");
-					  }
-					}',*/
-					/*'onSave' => 'js: function(event, params) {
-					  console.debug("Saved value: " + params.newValue);
-					}'*/
-                    /*'success' => 'js: function(response, newValue) {
-					  if (!response.success) 
-					    alert(response.output.errorHttpCode);
-					}'*/
-                )
+	            'htmlOptions' => array('style' => 'text-align: right;'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'editable' => array(    //editable section
+                  	//'apply'      => '$data->user_status != 4', //can't edit deleted users
+                  	'url'        => $this->createUrl('lista/editableSaver'),
+                  	'params' => array("model"=>"Lista"),
+                  	//'showbuttons' => false,
+                  	//'inputclass' => 'input-mini',
+                  	//'placement'  => 'right',
+                  	'success' => 'js: function(response, newValue) {
+				       if(!response.success) return response.msg;
+				    }',
+				   	'options' => array(
+				    	'ajaxOptions' => array('dataType' => 'json')
+				   	), 
+				   	
+              	)
         	),
         	array(
 	            'name' => 'total',
 	            'header' => 'Total Destinatarios',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover'),
         	),
         	array(
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
 	            'template' => '{Editar}&#09;{Descargar}&#09;{Eliminar}',
-	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+	            'headerHtmlOptions' => array('class'=>'tableHover'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
 	            	'Editar'=>array(
@@ -182,15 +134,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 <?php $this->endWidget(); ?>
 
 <style type="text/css">
-    a:link, a:visited {
+    /*a:link, a:visited {
         color: white;
         text-decoration: none;
-    }
-
-    .test a:link, a:visited {
-        color: black;
-        text-decoration: block;
-    }
+    }*/
 </style>
 
 <script type="text/javascript">

@@ -95,7 +95,7 @@ $form = $this->beginWidget(
 					'booster.widgets.TbButton',
 					array(
 						'buttonType' => 'submit',
-						'context' => 'info',
+						'context' => 'primary',
 						'label' => 'Crear Lista',
 					)
 				); ?>
