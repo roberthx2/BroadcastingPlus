@@ -51,6 +51,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'value' => '$data["login"]',
 	            'header' => 'Usuario',
 	            'type' => 'raw',
+//	            'ajaxUpdate'=>true,
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class' => 'test'),
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'visible'=>Yii::app()->user->isAdmin()
@@ -70,17 +71,60 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	'title' => 'Ingrese el nombre',
 	            	//'text' => 'okno',
 	            	'disabled' =>true,
-	            	/*'params'=> function ($params, $data) {
-	            		$params["pk"] = $data["id_usuario"];
-	            		return $params;
-	            	},*/
+	            	'encode' => false,
+	            	//'params'=> array('id_usuario'=>'$data["id_usuario"]'),/*function ($params, $data) {
+	            	//	$params["pk"] = $data["id_usuario"];
+	            	//	return $params;
+	            	//},*/
                     //'url' => $this->owner->createUrl('example/editable'),
-                    'url'=>Yii::app()->controller->createUrl('lista/editableSaver'),
+                    //'url'=>Yii::app()->controller->createUrl('lista/editableSaver'),
                     'placement' => 'top',
                     'inputclass' => 'input-medium',
-                    'success'=>'js:function(response,newValue){
-						alert(response);
-					}',
+                    /*'validate' => 'js: function(value) {
+						  $.ajax({
+	                        url: "/BroadcastingPlus/index.php?r=lista/editableSaver",
+	                        type:"post", 
+	                        async:false,   
+	                        data:{nombre:value},
+	                        
+	                        complete: function()
+	                        {
+	                            return "enviando";
+	                        },
+	                        success: function(data)
+	                        {
+	                            return data.output;
+	                        },
+	                        error: function()
+	                        {
+	                          return "mal";  
+	                        }
+	                    });
+					}',*/
+					/*'display' => 'js: function(value, sourceData) {
+					  var escapedValue = $("<div>").text(value).html();
+					  $(this).html("<b>" + escapedValue + "</b>")
+					}',*/
+					/*'onInit' => 'js: function(event, editable) {
+					  console.debug("X-Editable field " + editable.options.name + " ready to serve.");
+					}',*/
+					/*'onShown' => 'js: function(event) {
+					  var tip = $(this).data("editableContainer").tip();
+					  tip.find("input").val("overwriting value of input.");
+					}',*/
+					/*'onHidden' => 'js: function(event, reason) {
+					  if (reason === "save" || reason === "cancel") {
+					    // auto-open next editable
+					    $(this).closest("tr").next().find(".editable").editable("show");
+					  }
+					}',*/
+					/*'onSave' => 'js: function(event, params) {
+					  console.debug("Saved value: " + params.newValue);
+					}'*/
+                    /*'success' => 'js: function(response, newValue) {
+					  if (!response.success) 
+					    alert(response.output.errorHttpCode);
+					}'*/
                 )
         	),
         	array(
@@ -93,16 +137,22 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         	array(
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
-	            'template' => '{Editar}&#09;{Eliminar}',
+	            'template' => '{Editar}&#09;{Descargar}&#09;{Eliminar}',
 	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
 	            	'Editar'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("#")',
+	            			'url'=>'Yii::app()->createUrl("lista/update", array("id"=>$data["id_lista"]))',
 	            			//'visible'=>'visibleConfirmar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'title'=>'Editar Lista', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modalConfirmar'),
+	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'title'=>'Editar Lista', 'style'=>'color:black;'),
                             ),
+	            	'Descargar'=>array(
+	            			'label'=>' ',
+	            			'url'=>'Yii::app()->createUrl("lista/descargarLista", array("nombre" => $data["nombre"], "id_lista" => $data["id_lista"]))',
+	            			//'visible'=>'visibleCancelar($data)',
+	            			'options'=>array('class'=>'glyphicon glyphicon-download-alt', 'title'=>'Descargar Lista', 'style'=>'color:black;',),
+	            			),
 	            	'Eliminar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("lista/viewDelete", array("id_lista" => $data["id_lista"]))',

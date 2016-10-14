@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver'),
+				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver','descargarLista', 'test'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -141,7 +141,7 @@ class ListaController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionUpdate($id)
+	/*public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
 
@@ -158,6 +158,27 @@ class ListaController extends Controller
 		$this->render('update',array(
 			'model'=>$model,
 		));
+	}*/
+
+	public function actionUpdate($id)
+	{
+		//$model_lista = $this->loadModel($id);
+		$criteria = new CDbCriteria;
+		$criteria->select = "t.id_lista, t.nombre, u.login AS login, COUNT(ld.id_lista) AS total ";
+		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
+		$criteria->compare("t.id_lista", $id);
+		$model_lista = Lista::model()->find($criteria);
+	//	$model_destinatarios = ListaDestinatarios::model()->findAll("id_lista = ".$id);
+		$model_destinatarios=new ListaDestinatarios('search');
+		$model_destinatarios->unsetAttributes();
+
+		if(isset($_GET['ListaDestinatarios']))
+			$model_destinatarios->buscar = $_GET['ListaDestinatarios']["buscar"];
+
+		$this->render('viewUpdate',array(
+			'model_lista'=>$model_lista, 'model_destinatarios' => $model_destinatarios
+		));
 	}
 
 	public function actionEditableSaver()
@@ -165,6 +186,9 @@ class ListaController extends Controller
 	    Yii::import('booster.widgets.TbEditableSaver');
 	    $es = new TbEditableSaver('Lista');
 	    $es->update();
+
+	    /*header('Content-Type: application/json; charset="UTF-8"');
+		echo CJSON::encode(array('output' => $formulario));*/
 	}
 
 	/**
@@ -287,6 +311,24 @@ class ListaController extends Controller
 		}
 
 		return $data;
+	}
+
+	public function actionDescargarLista($id_lista, $nombre)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(numero SEPARATOR ', ')  AS numero";
+		$criteria->compare("id_lista", $id_lista);
+		$lista = LIstaDestinatarios::model()->find($criteria);
+
+		return Yii::app()->getRequest()->sendFile(strtoupper($nombre).".txt", $lista->numero);
+	}
+
+	public function actionTest()
+	{
+		$formulario = "este es un mensaje";
+
+		header('Content-Type: application/json; charset="UTF-8"');
+		echo CJSON::encode(array('output' => $formulario));
 	}
 
 }

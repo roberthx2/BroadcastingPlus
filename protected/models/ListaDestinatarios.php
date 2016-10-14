@@ -16,6 +16,11 @@ class ListaDestinatarios extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+
+	public $buscar;
+	public $descripcion_oper;
+
+
 	public function tableName()
 	{
 		return 'lista_destinatarios';
@@ -86,6 +91,43 @@ class ListaDestinatarios extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	/*public function searchViewUpdate($id_lista)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id_lista',$id_lista);
+		$criteria->compare('numero',$this->numero,true);
+		$criteria->compare('id_operadora',$this->id_operadora);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function searchViewUpdate($id_lista)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_lista, t.numero, t.id_operadora, o.descripcion AS descripcion_oper";
+		$criteria->condition = "(t.id_lista = ".$id_lista.") AND ";
+		$criteria->condition .= "(numero LIKE '%". $this->buscar."%' OR ";
+		$criteria->condition .= "o.descripcion LIKE '%". $this->buscar."%')";
+		$criteria->join = "LEFT JOIN (SELECT id_operadora_bcnl, descripcion FROM operadoras_relacion GROUP BY id_operadora_bcnl) AS o ON t.id_operadora = o.id_operadora_bcnl";
+		//$criteria->group = "o.id_operadora_bcnl";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+        		'attributes'=>array(
+             		'numero', 'o.descripcion',
+        		),
+    		),
 		));
 	}
 
