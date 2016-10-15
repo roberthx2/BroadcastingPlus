@@ -123,7 +123,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     array('id' => 'modalEliminar')
 ); ?>
  
-    <div class="modal-header" style="background-color:#428bca">
+    <div class="modal-header" style="background-color:#d2322d">
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar Lista</h4>
     </div>
  	
@@ -132,13 +132,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     </div>
  
 <?php $this->endWidget(); ?>
-
-<style type="text/css">
-    /*a:link, a:visited {
-        color: white;
-        text-decoration: none;
-    }*/
-</style>
 
 <script type="text/javascript">
 	$(document).ready(function()

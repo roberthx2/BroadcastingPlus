@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver','descargarLista', 'test'),
+				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver','descargarLista', 'deleteNumero'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -220,6 +220,33 @@ class ListaController extends Controller
 		$model = Lista::model()->find($criteria);
 
 		$this->renderPartial('viewDelete',array("model"=>$model));
+	}
+
+	public function actionDeleteNumero()
+	{
+		$id_lista = $_POST['id_lista'];
+		//$numeros = "'".str_replace(",", "','", Yii::app()->request->post('numeros'))."'";
+		$numeros = explode(",", $_POST['numeros']);
+
+		$criteria = new CDbCriteria;
+		$criteria->compare("id_lista", $id_lista);
+		$criteria->addInCondition("numero", $numeros);
+		$msj = ListaDestinatarios::model()->deleteAll($criteria);
+
+		/*if ($msj != 0)
+		{
+			$total = ListaDestinatarios::model()->count("id_lista=".$id_lista);
+
+			if ($total == 0)
+			{
+				$this->loadModel($id_lista)->delete();
+				Yii::app()->user->setFlash("success", "La lista y los números fueron eliminados correctamente");
+				$this->redirect(array("admin"));
+			}
+		}*/
+
+		header('Content-Type: application/json; charset="UTF-8"');
+		echo CJSON::encode(array('salida' => $msj));
 	}
 
 	/**

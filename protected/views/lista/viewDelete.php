@@ -19,7 +19,7 @@ $this->widget(
     <?php $this->widget(
         'booster.widgets.TbButton',
         array(
-            'context' => 'primary',
+            'context' => 'danger',
             'label' => 'Confirmar',
             'buttonType' =>'link',
             'url' => Yii::app()->controller->createUrl("deleteLista", array("id" => $model->id_lista)),

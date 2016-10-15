@@ -19,7 +19,7 @@ class ListaDestinatarios extends CActiveRecord
 
 	public $buscar;
 	public $descripcion_oper;
-	public $id;
+	//public $id;
 
 	public function tableName()
 	{
