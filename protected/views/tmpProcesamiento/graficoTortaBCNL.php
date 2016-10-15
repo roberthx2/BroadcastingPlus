@@ -25,8 +25,8 @@
                 'tooltip' => array(
                     //'pointFormat' => '<b>{series.name}:    {point.percentage:.1f}%</b>',
                     /*'formatter'=> 'js:function() { return "<b>" + this.point.name+": "+Math.round(this.point.percentage)+"</b>%"; }',*/
-                    'formatter'=> 'js:function() { return "<b>" + this.point.name+": "+this.point.y+" destinatarios</b>"; }',
-
+                    //'formatter'=> 'js:function() { return "<b>" + this.point.name+": "+this.point.y+" destinatarios</b>"; }',
+                    'formatter'=> 'js:function() { return "<b>" +this.point.y+" destinatarios</b>"; }',
                 ),
                 'chart' => array(
                     'plotBackgroundColor' => '#ffffff',
@@ -44,7 +44,7 @@
                         'cursor' => 'pointer',
                         'shadow' => true,
                         'center' => array('50%', '50%'),
-                        'size' => '60%',
+                        'size' => '70%',
                         'showInLegend'=>true,
                         //'colorByPoint' => true,
                         'dataLabels' => array(
@@ -60,7 +60,8 @@
                             'enabled' => true,
                             'formatter' => 'js:function()
                             {
-                                return ""+ this.point.name + ": " + Math.round(this.point.percentage) + "%";
+                                //return ""+ this.point.name + ": " + Math.round(this.point.percentage) + "%";
+                                return Math.round(this.point.percentage) + "%";
                             }'
                         ),
                     ),

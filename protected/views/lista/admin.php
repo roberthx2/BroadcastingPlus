@@ -61,7 +61,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'name' => 'nombre',
 	            'header' => 'Nombre',
 	            //'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: right;'),
+	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'editable' => array(    //editable section
                   	//'apply'      => '$data->user_status != 4', //can't edit deleted users

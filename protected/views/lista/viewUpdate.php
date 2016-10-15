@@ -1,4 +1,4 @@
-<div class="col-md-5">
+<div class="col-md-6">
 	<?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
 	<div class="panel-group" id="accordion">
 		<div class="panel panel-primary">
@@ -21,7 +21,7 @@
 								        'data' => $model_lista,
 								        'showbuttons' => false,
 								        'mode' => 'inline',
-								        'htmlOptions' => array('class' => 'color: black; text-decoration: none;'),
+								        'htmlOptions' => array('style' => 'text-align: right;'),
 								        'url' => $this->createUrl('lista/editableSaver'),
 								        'params' => array("model"=>"Lista"),
 								        'attributes' => array(
@@ -69,7 +69,7 @@
 	<?php $this->endWidget(); ?>
 </div>
 
-<div class="col-md-7">
+<div class="col-md-6">
 <?php 
 	$data = $this->actionReporteTorta($model_lista->id_lista);
 	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
@@ -97,7 +97,7 @@ $('.search-form form').submit(function(){
 <?php
 
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'listaUpdate-grid',
+        //'id'=>'listaUpdate-grid',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model_destinatarios->searchViewUpdate($model_lista->id_lista),
@@ -110,12 +110,12 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'bulkActions' => array(
 		    'actionButtons' => array(
 		        array(
-		            'buttonType' => 'button',
-		            'context' => 'primary',
-		            'size' => 'small',
-		            'label' => 'Testing Primary Bulk Actions',
-		            'click' => 'js:function(values){console.log(values);}',
-		            'id' => 'id_lista',
+			            'buttonType' => 'button',
+			            'context' => 'danger',
+			            'size' => 'small',
+			            'label' => 'Eliminar Numero(s)',
+			            'click' => 'js:function(values){console.log(values);}',
+			            'id' => 'boton_eliminar',
 		            )
 		    ),
 		        // if grid doesn't have a checkbox column type, it will attach

@@ -5,7 +5,7 @@
 	      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 	        <div class="alert alert-danger">
 	          <button type="button" class="close" data-dismiss="alert">&times;</button>
-	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo "Acceso Denegado" ?>
+	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo "Acceso Denegado"; ?>
 	        </div>
 	      </div>
 	    </div>
