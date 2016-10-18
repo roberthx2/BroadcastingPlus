@@ -23,9 +23,6 @@
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
                         <?php /*$this->widget(
                             'booster.widgets.TbButton',
                             array(
@@ -43,9 +40,6 @@
                             )
                         ); */?>
                         <?php echo $content; ?>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- /#page-content-wrapper -->
 
@@ -58,7 +52,7 @@
     $(".boton_menu").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
-        $(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
+        //$(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
         //$(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
     });
     </script>

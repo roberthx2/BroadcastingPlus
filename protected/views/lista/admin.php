@@ -28,7 +28,6 @@ $('.search-form form').submit(function(){
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
 </div><!-- search-form -->
 
-<div class="col-md-12">
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'lista-grid',
@@ -38,7 +37,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
-        'htmlOptions' => array('class' => 'trOverFlow'),
+        'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
        // 'filter'=> $model_procesamiento,
         'columns'=> array( 
         	array(
@@ -111,7 +110,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         ),
     ));
 ?>
-</div>
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',

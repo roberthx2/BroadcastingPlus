@@ -85,7 +85,7 @@
     $(".boton_menu").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
-        $(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
+        //$(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
         //$(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
     });
     </script>
