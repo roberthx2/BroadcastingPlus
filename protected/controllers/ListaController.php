@@ -32,7 +32,7 @@ class ListaController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver','descargarLista', 'deleteNumero'),
+				'actions'=>array('create','update', 'admin', 'deleteLista', 'reporteCrearLista', 'viewDelete', 'editableSaver','descargarLista', 'deleteNumero', 'agregarNumeros'),
 				'users'=>array('@'),
 			),
 			/*array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -181,6 +181,71 @@ class ListaController extends Controller
 		));
 	}
 
+	public function actionAgregarNumeros($id_lista)
+	{
+		//$model=$this->loadModel($id_lista);
+		$model=new ListaForm;
+		//$model->id_lista = $id_lista;
+
+		if(isset($_POST['ListaForm']))
+		{
+			$model->attributes=$_POST['ListaForm'];
+			
+			if ($model->validate())
+			{
+				$transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+	            try
+	            {
+					$id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+
+					//Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+					Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->numeros);
+
+					//Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+
+					//Updatea en estado 3 todos los numeros duplicados
+					Yii::app()->Filtros->filtrarDuplicados($id_proceso);
+
+					//Updatea en estado 3 todos los numeros duplicados que ya estan en la lista
+					$this->actionFiltarDuplicadosExistentes($id_lista, $id_proceso);
+
+					//Updatea a esatdo = 1 todos los numeros validos 
+					Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+					//Cantidad de destinatarios validos
+					$total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+					if ($total > 0)
+					{
+						$model_lista=$this->loadModel($id_lista);
+						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
+						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+						$transaction->commit();
+						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre));
+					}
+					else
+					{
+						$error = "No se agrego ningún destinatario ya que no contiene números validos";
+						Yii::app()->user->setFlash("danger", $error);
+						$transaction->rollBack();
+					}	            	
+            	} catch (Exception $e)
+					{
+						$error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+						Yii::app()->user->setFlash("danger", $error);
+	            		$transaction->rollBack();
+	        		}
+			}
+		}
+
+		$this->render('agregarNumeros',array(
+			'model'=>$model,
+		));
+	}
+
 	public function actionEditableSaver()
 	{
 	    $es = new EditableSaver($_POST["model"]);
@@ -198,6 +263,8 @@ class ListaController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
+
+	//Se ejecuta desde la vista Admin
 	public function actionDeleteLista($id)
 	{
 		$this->loadModel($id)->delete();
@@ -222,6 +289,7 @@ class ListaController extends Controller
 		$this->renderPartial('viewDelete',array("model"=>$model));
 	}
 
+	//Se ejecuta desde la vista viewDelete la cual tiene el detalle de la lista
 	public function actionDeleteNumero()
 	{
 		$id_lista = $_POST['id_lista'];
@@ -232,21 +300,31 @@ class ListaController extends Controller
 		$criteria->compare("id_lista", $id_lista);
 		$criteria->addInCondition("numero", $numeros);
 		$msj = ListaDestinatarios::model()->deleteAll($criteria);
+		$listaDelete = 'false';
 
-		/*if ($msj != 0)
+		if ($msj != 0)
 		{
 			$total = ListaDestinatarios::model()->count("id_lista=".$id_lista);
 
 			if ($total == 0)
 			{
-				$this->loadModel($id_lista)->delete();
+				//$this->loadModel($id_lista)->delete();
+				Lista::model()->deleteByPk($id_lista); 
 				Yii::app()->user->setFlash("success", "La lista y los números fueron eliminados correctamente");
-				$this->redirect(array("admin"));
+				$listaDelete = 'true';
 			}
-		}*/
+		}
 
 		header('Content-Type: application/json; charset="UTF-8"');
-		echo CJSON::encode(array('salida' => $msj));
+		echo CJSON::encode(array('salida' => $msj, 'listaDelete' => $listaDelete));
+	}
+
+	public function actionFiltarDuplicadosExistentes($id_lista, $id_proceso)
+	{
+		$sql = "UPDATE tmp_procesamiento SET estado = 3 
+				WHERE id_proceso =".$id_proceso." AND estado IS NULL AND numero IN (
+				SELECT numero FROM lista_destinatarios WHERE id_lista = ".$id_lista.")";
+		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 	}
 
 	/**
@@ -276,11 +354,6 @@ class ListaController extends Controller
 		else $id_usuario = Yii::app()->user->id;
 
 		$this->render('admin',array('model'=>$model, 'id_usuario'=>$id_usuario));
-	}
-	public function actionAdmin2()
-	{
-		$data = $this->actionReporteTorta(66);
-		$this->renderPartial("graficoTortaBCNL", array("data"=>$data), false, true);
 	}
 
 	/**

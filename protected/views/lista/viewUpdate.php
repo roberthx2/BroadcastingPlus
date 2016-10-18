@@ -1,4 +1,4 @@
-<div class="col-md-6">
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 	<?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
 	<div class="panel-group" id="accordion">
 		<div class="panel panel-primary">
@@ -69,106 +69,122 @@
 	<?php $this->endWidget(); ?>
 </div>
 
-<div class="col-md-6">
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 <?php 
 	$data = $this->actionReporteTorta($model_lista->id_lista);
 	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
 ?>
 </div>
+
 <div class="col-md-12">
 	<br>
-<?php
-Yii::app()->clientScript->registerScript('searchUpdateLista', "
+	<?php
+		Yii::app()->clientScript->registerScript('searchUpdateLista', "
 
-$('.search-form form').submit(function(){
-    $('#listaUpdate-grid').yiiGridView('update', {
-        data: $(this).serialize()
-    });
-    return false;
-});
+		$('.search-form form').submit(function(){
+		    $('#listaUpdate-grid').yiiGridView('update', {
+		        data: $(this).serialize()
+		    });
+		    return false;
+		});
 
-");
+		");
+	?>
+	<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	    <?php $this->renderPartial('_searchViewUpdate',array('model'=>$model_destinatarios, 'id_lista'=>$model_lista->id_lista)); ?>
+	</div><!-- search-form -->
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<?php 
+		$this->widget(
+            'booster.widgets.TbButton',
+            array(
+            	'id'=>'agregar',
+            	'buttonType' => 'link',
+                'context' => 'dafault',
+                'label' => 'Agregar Números',
+                'icon' => 'glyphicon glyphicon-plus',
+                'url' => Yii::app()->createUrl("lista/agregarNumeros", array("id_lista"=>$model_lista->id_lista)),
+                'htmlOptions' => array('class'=>'pull-right'),
+            )
+        ); 
+	?>
+	</div>
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<?php
 
-?>
-<div class="search-form">
-    <?php $this->renderPartial('_searchViewUpdate',array('model'=>$model_destinatarios, 'id_lista'=>$model_lista->id_lista)); ?>
-</div><!-- search-form -->
-<div class="col-md-12">
-<?php
-
-$this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'listaUpdate-grid',
-        'type'=>'striped bordered', 
-        'responsiveTable' => true,
-        'dataProvider' => $model_destinatarios->searchViewUpdate($model_lista->id_lista),
-        'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
-        //'template'=>"{items}\n{pager}",
-        'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
-        'htmlOptions' => array('class' => 'trOverFlow'),
-        'selectableRows' => 2,
-       // 'filter'=> $model_procesamiento,
-        'bulkActions' => array(
-		    'actionButtons' => array(
-		        array(
-			            'buttonType' => 'button',
-			            'context' => 'danger',
-			            'size' => 'small',
-			            'label' => 'Eliminar Numero(s)',
-			            'click' => 'js:confirmar',
-			            'id' => 'boton_eliminar',
-			            'icon' => 'glyphicon glyphicon-trash',
-			            'htmlOptions' => array('class'=>'visible-sm visible-md visible-lg','data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
-		            ),
-		        array(
-			            'buttonType' => 'button',
-			            'context' => 'danger',
-			            'size' => 'small',
-			            'label' => 'Eliminar',
-			            'click' => 'js:confirmar',
-			            'id' => 'boton_eliminar',
-			            'icon' => 'glyphicon glyphicon-trash',
-			            'htmlOptions' => array('class'=>'visible-xs','data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
-		            )
+	$this->widget( 'booster.widgets.TbExtendedGridView' , array (
+	        'id'=>'listaUpdate-grid',
+	        'type'=>'striped bordered', 
+	        'responsiveTable' => true,
+	        'dataProvider' => $model_destinatarios->searchViewUpdate($model_lista->id_lista),
+	        'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
+	        //'template'=>"{items}\n{pager}",
+	        'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
+	        'htmlOptions' => array('class' => 'trOverFlow'),
+	        'selectableRows' => 2,
+	       // 'filter'=> $model_procesamiento,
+	        'bulkActions' => array(
+			    'actionButtons' => array(
+			        array(
+				            'buttonType' => 'button',
+				            'context' => 'danger',
+				            'size' => 'small',
+				            'label' => 'Eliminar Numero(s)',
+				            'click' => 'js:confirmar',
+				            'id' => 'boton_eliminar',
+				            'icon' => 'glyphicon glyphicon-trash',
+				            'htmlOptions' => array('class'=>'visible-sm visible-md visible-lg','data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
+			            ),
+			        array(
+				            'buttonType' => 'button',
+				            'context' => 'danger',
+				            'size' => 'small',
+				            'label' => 'Eliminar',
+				            'click' => 'js:confirmar',
+				            'id' => 'boton_eliminar',
+				            'icon' => 'glyphicon glyphicon-trash',
+				            'htmlOptions' => array('class'=>'visible-xs','data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
+			            )
+			    ),
+			        // if grid doesn't have a checkbox column type, it will attach
+			        // one and this configuration will be part of it
+		        'checkBoxColumnConfig' => array(
+		            'name' => 'numero',
+		            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'col-xs-1 col-sm-1 col-md-1 col-lg-1'),
+		            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+		        ),
 		    ),
-		        // if grid doesn't have a checkbox column type, it will attach
-		        // one and this configuration will be part of it
-	        'checkBoxColumnConfig' => array(
-	            'name' => 'numero',
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'col-xs-1 col-sm-1 col-md-1 col-lg-1'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	        'columns'=> array( 
+	        	array(
+		            'name' => 'numero',
+		            'header' => 'Número',
+		            'type' => 'raw',
+		            'htmlOptions' => array('style' => 'text-align: center;'),
+		            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	        	),
+	        	array(
+		            'name' => 'o.descripcion',
+		            'header' => 'Operadora',
+	                'value' => function($data)
+	                {
+	                    $this->widget(
+	                        'booster.widgets.TbLabel',
+	                        array(
+	                            'context' => '',
+	                            // 'default', 'primary', 'success', 'info', 'warning', 'danger'
+	                            'label' => $data["descripcion_oper"],
+	                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($data["id_operadora"]).';'),    
+	                        )
+	                    );
+	                },
+		            'type' => 'raw',
+		            'htmlOptions' => array('style' => 'text-align: center;'),
+		            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	        	),
 	        ),
-	    ),
-        'columns'=> array( 
-        	array(
-	            'name' => 'numero',
-	            'header' => 'Número',
-	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
-        	array(
-	            'name' => 'o.descripcion',
-	            'header' => 'Operadora',
-                'value' => function($data)
-                {
-                    $this->widget(
-                        'booster.widgets.TbLabel',
-                        array(
-                            'context' => '',
-                            // 'default', 'primary', 'success', 'info', 'warning', 'danger'
-                            'label' => $data["descripcion_oper"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($data["id_operadora"]).';'),    
-                        )
-                    );
-                },
-	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
-        ),
-    ));
-?>
-</div>
+	    ));
+	?>
+	</div>
 </div>
 <input type="hidden" id="numeros_eliminar" value="">
 <?php $this->beginWidget(
@@ -258,14 +274,24 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 {
                 	if (data.salida !== 0)
                 	{
-                		var mensaje = "<center><strong>Los número(s) fueron eliminados correctamente</center></strong>";
+                		if (data.listaDelete == 'false')
+                		{
+                			var mensaje = "<center><strong>Número(s) fueron eliminado(s) correctamente</center></strong>";
+                			$("#listaUpdate-grid").yiiGridView("update"); 
+                		}
+                		else
+                		{
+                			var ruta = "<?php echo Yii::app()->createUrl('lista/admin'); ?>";
+                			var mensaje = "<center><strong>Redireccionando...</center></strong>";
+                			$(location).attr('href', ruta);
+                		}
+                		
                 	}
                 	else
                 	{
                 		var mensaje = "<center><strong>No se pudo eliminar ningún número, intente nuevamente</center></strong>";
                 	}
 
-                	$("#listaUpdate-grid").yiiGridView("update"); 
                     $("#divModalEliminar").html(mensaje);
                     $("#modal_footer").hide();
                 },

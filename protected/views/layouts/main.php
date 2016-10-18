@@ -54,6 +54,7 @@
 	        'type' => 'inverse',
 	        'brand' => Yii::app()->name,//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
 	        'brandUrl' => '#',
+	        'brandOptions' => array("class"=>"boton_menu"),
 	        'collapse' => true, // requires bootstrap-responsive.css
 	        'fixed' => 'top',
 	        'fluid' => true,
@@ -64,7 +65,7 @@
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest),
-		                    array('label' => 'CPEI', 'url' => '#', 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
+		                    array('label' => 'CPEI', 'url' => Yii::app()->createUrl('#'), 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
 		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => Yii::app()->createUrl('promocionesPremium/create'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
 		                    array('label'=>'Listas', 'icon'=>'glyphicon glyphicon-list','url'=>Yii::app()->createUrl('lista/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->listas),
 		                    array('label'=>'Exentos', 'icon'=>'glyphicon glyphicon-ban-circle','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest),

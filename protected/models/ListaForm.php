@@ -8,12 +8,19 @@ Class ListaForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array("nombre, numeros", "required","message"=>"{attribute} requerido"),
+			//Required
+			array("nombre, numeros", "required","message"=>"{attribute} requerido", "on"=>"create"),
+			array("numeros", "required","message"=>"{attribute} requerido", "on"=>"agregarNumeros"),
+			//Length
 			array('nombre', 'length', 'max'=>30),
+			//Safe
 			array("id_usuario", "safe"),
+			//array("nombre", "safe", "on"=>"agregarNumeros"),
+			//Filter
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
 			array("numeros","filter","filter"=>array($this, "limpiarNumeros")),
-			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
+			//Validaciones
+			array("nombre", "ext.ValidarNombre", "on"=>"create"), //Valida los caracteres
 			array("numeros", "ext.ValidarNumerosTexarea"), //Valida los caracteres
 			array("nombre", "existe", "usuario"=>$this->id_usuario)
 		);

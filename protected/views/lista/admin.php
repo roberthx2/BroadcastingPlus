@@ -12,18 +12,13 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<div class="col-md-12">
 <br>
 <?php if(Yii::app()->user->hasFlash('success')):?>
 	<br>
-    <div class="container-fluid">
-	      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-	        <div class="alert alert-success">
-	          <button type="button" class="close" data-dismiss="alert">&times;</button>
-	          <span class="glyphicon glyphicon-ok"></span> <?php echo Yii::app()->user->getFlash('success'); ?>
-	        </div>
-	      </div>
-	    </div>
+    <div class="container-fluid alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <span class="glyphicon glyphicon-ok"></span> <?php echo Yii::app()->user->getFlash('success'); ?>
+	</div>
 <?php endif; ?>
 
 <h1>Administrar Listas</h1>

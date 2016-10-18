@@ -12,7 +12,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Crear</a>
+                    <a href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear</a>
                 </li>
                 <li>
                     <a href="<?php echo Yii::app()->createUrl('lista/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Administrar</a>
@@ -26,7 +26,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <?php $this->widget(
+                        <?php /*$this->widget(
                             'booster.widgets.TbButton',
                             array(
                                 'url' => '#menu-toggle',
@@ -41,7 +41,7 @@
                                 'icon'=>'arrow-left star-empty',
                                 'htmlOptions' => array('class'=>'boton_menu visible-md visible-lg'),
                             )
-                        ); ?>
+                        ); */?>
                         <?php echo $content; ?>
                     </div>
                 </div>
