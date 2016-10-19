@@ -10,17 +10,18 @@
 	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
 ?>
 </div>
-<div class="col-md-12">
-	<?php $model_procesamiento = new TmpProcesamiento("searchReporteLista");
-		//$model_procesamiento->unsetAttributes();
-		if(isset($_GET['TmpProcesamiento'])){
-			//$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
-			$model_procesamiento->buscar = $_GET['TmpProcesamiento']["buscar"];
-		}
 
-		echo $this->renderPartial("/TmpProcesamiento/reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso), true);
+<div class="clearfix visible-xs-block"></div>
 
-	//TmpProcesamientoController::actionReporteCrearLista($id_proceso);
+<?php $model_procesamiento = new TmpProcesamiento("searchReporteLista");
+	//$model_procesamiento->unsetAttributes();
+	if(isset($_GET['TmpProcesamiento'])){
+		//$model_procesamiento->attributes=$_GET['TmpProcesamiento'];
+		$model_procesamiento->buscar = $_GET['TmpProcesamiento']["buscar"];
+	}
 
-		?>
-</div>
+	echo $this->renderPartial("/TmpProcesamiento/reporteCrearLista", array("model_procesamiento"=>$model_procesamiento,'id_proceso'=>$id_proceso), true);
+
+//TmpProcesamientoController::actionReporteCrearLista($id_proceso);
+
+?>

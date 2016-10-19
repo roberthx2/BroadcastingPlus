@@ -15,7 +15,7 @@ $('.search-form form').submit(function(){
 <div class="search-form">
     <?php $this->renderPartial('/TmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
 </div><!-- search-form -->
-<div class="col-md-12">
+
 <?php
 
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
@@ -26,7 +26,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
-        'htmlOptions' => array('class' => 'trOverFlow'),
+        'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
        // 'filter'=> $model_procesamiento,
         'columns'=> array( 
         	/*array(
@@ -86,7 +86,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         ),
     ));
 ?>
-</div>
+
 <?php
 
 function estado($estado, $descripcion_estado)

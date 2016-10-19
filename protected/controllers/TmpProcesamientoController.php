@@ -234,7 +234,11 @@ class TmpProcesamientoController extends Controller
 		{
 			if ($bandera == 0)
 			{
-          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+				if ($value["total"] > 0)
+				{
+          			$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+          		}
+          		
           		$bandera++;
 			}
           	else

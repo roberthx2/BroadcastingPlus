@@ -52,7 +52,7 @@
 	    'booster.widgets.TbNavbar',
 	    array(
 	        'type' => 'inverse',
-	        'brand' => Yii::app()->name.' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
+	        'brand' => /*Yii::app()->name.*/' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
 	        'brandUrl' => '#',
 	        'brandOptions' => array("class"=>"boton_menu"),
 	        'collapse' => true, // requires bootstrap-responsive.css
