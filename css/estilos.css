@@ -1,18 +1,107 @@
+/*Cambiar el colapso de la barra de navegacion*/
+
+@media (max-width: 950px) {
+    .navbar-header {
+        float: none;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+    .navbar-collapse {
+        border-top: 1px solid transparent;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .navbar-collapse.collapse {
+        display: none!important;
+    }
+    .navbar-nav {
+        float: none!important;
+        margin: 7.5px -15px;
+    }
+    .navbar-nav>li {
+        float: none;
+    }
+    .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .navbar-text {
+        float: none;
+        margin: 15px 0;
+    }
+    /* since 3.1.0 */
+    .navbar-collapse.collapse.in { 
+        display: block!important;
+    }
+    .collapsing {
+        overflow: hidden!important;
+    }
+}
+
+/*Menu superior*/
+@media (min-width: 768px) {
+	.menu_superior {
+	  	float: right;
+	}
+}
 
 /* Small devices (tablets, 768px and up) */
 @media (max-width: 768px) { 
 	.contenedor_principal {
-		margin-top: 20%; 
-		margin-bottom:25%;
+		padding-top: 0%; 
+		margin-bottom:0%;
+	}
+}
+
+@media (max-width: 400px) { 
+	#page-content-wrapper {
+		padding-top: 20%; 
+	}
+}
+
+@media (min-width: 401px) and (max-width: 768px){ 
+	#page-content-wrapper {
+		padding-top: 15%; 
+	}
+}
+
+@media (min-width: 769px) and (max-width: 992px){ 
+	#page-content-wrapper {
+		padding-top: 12%; 
+	}
+}
+
+@media (min-width: 992px){ 
+	#page-content-wrapper {
+		padding-top: 10%; 
 	}
 }
 
 /* Medium devices (desktops, 992px and up) */
-@media (min-width: 768px) {
+/*@media (min-width: 768px) {
 	.contenedor_principal {
 		margin-top: 6%; 
 		margin-bottom:5%;
 	}
+}*/
+
+.sidebar-nav .brandMenua {
+    content: "\f078";
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: middle;
+    float: right;
+}
+
+.sidebar-nav .subMenu{
+    list-style-type: none;
+    list-style-position:outside;
+    padding-left: 0px;
+}
+
+.sub-menu {
+    -webkit-padding-start: 0px;
 }
 
 .trOverFlow {

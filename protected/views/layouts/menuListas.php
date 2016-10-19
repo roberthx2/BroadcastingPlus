@@ -23,23 +23,7 @@
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-                        <?php /*$this->widget(
-                            'booster.widgets.TbButton',
-                            array(
-                                'url' => '#menu-toggle',
-                                'icon'=>'share-alt',
-                                'htmlOptions' => array('class'=>'boton_menu visible-xs'),
-                            )
-                        ); ?>
-                        <?php $this->widget(
-                            'booster.widgets.TbButton',
-                            array(
-                                'url' => '#menu-toggle',
-                                'icon'=>'arrow-left star-empty',
-                                'htmlOptions' => array('class'=>'boton_menu visible-md visible-lg'),
-                            )
-                        ); */?>
-                        <?php echo $content; ?>
+            <?php echo $content; ?>
         </div>
         <!-- /#page-content-wrapper -->
 
@@ -52,26 +36,7 @@
     $(".boton_menu").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
-        //$(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
-        //$(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
     });
     </script>
 
 <?php $this->endContent(); ?>
-
-<style type="text/css">
-	@media (max-width: 768px) { 
-		.contenedor_principal {
-			margin-top: 11%; 
-			margin-bottom:25%;
-		}
-	}
-
-	/* Medium devices (desktops, 992px and up) */
-	@media (min-width: 768px) {
-		.contenedor_principal {
-			margin-top: 3%; 
-			margin-bottom:5%;
-		}
-	}
-</style>

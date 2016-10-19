@@ -1,3 +1,4 @@
+<div  id="page-content-wrapper">
 <?php 
 	if($error == true ): ?>
 		
@@ -76,3 +77,4 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 
 	</div><!-- form -->
 <?php $this->endWidget(); ?>
+</div>

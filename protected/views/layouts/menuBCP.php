@@ -50,29 +50,7 @@
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <?php /*$this->widget(
-                            'booster.widgets.TbButton',
-                            array(
-                                'url' => '#menu-toggle',
-                                'icon'=>'share-alt',
-                                'htmlOptions' => array('class'=>'boton_menu visible-xs'),
-                            )
-                        );?>
-                        <?php $this->widget(
-                            'booster.widgets.TbButton',
-                            array(
-                                'url' => '#menu-toggle',
-                                'icon'=>'arrow-left star-empty',
-                                'htmlOptions' => array('class'=>'boton_menu visible-md visible-lg'),
-                            )
-                        ); */?>
-                        <?php echo $content; ?>
-                    </div>
-                </div>
-            </div>
+            <?php echo $content; ?>
         </div>
         <!-- /#page-content-wrapper -->
 
@@ -85,46 +63,7 @@
     $(".boton_menu").click(function(e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
-        //$(this).find(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
-        //$(".glyphicon").toggleClass('glyphicon-arrow-left glyphicon-share-alt');
     });
     </script>
 
 <?php $this->endContent(); ?>
-
-<style type="text/css">
-
-    .sidebar-nav .brandMenua {
-        content: "\f078";
-        display: inline-block;
-        padding-left: 10px;
-        padding-right: 10px;
-        vertical-align: middle;
-        float: right;
-    }
-
-    .sidebar-nav .subMenu{
-        list-style-type: none;
-        list-style-position:outside;
-        padding-left: 0px;
-    }
-
-    .sub-menu {
-        -webkit-padding-start: 0px;
-    }
-
-	@media (max-width: 768px) { 
-		.contenedor_principal {
-			margin-top: 11%; 
-			margin-bottom:25%;
-		}
-	}
-
-	/* Medium devices (desktops, 992px and up) */
-	@media (min-width: 768px) {
-		.contenedor_principal {
-			margin-top: 3%; 
-			margin-bottom:5%;
-		}
-	}
-</style>

@@ -28,20 +28,6 @@
 	?>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-
-<style type="text/css">
-	/*@media (max-width: 768px) {
-	 	.menu_superior {
-		  	float: left;
-		}
-	}*/
-
-	@media (min-width: 768px) {
-		.menu_superior {
-		  	float: right;
-		}
-	}
-</style>
 </head>
 
 <body>
@@ -52,7 +38,7 @@
 	    'booster.widgets.TbNavbar',
 	    array(
 	        'type' => 'inverse',
-	        'brand' => /*Yii::app()->name.*/' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
+	        'brand' => Yii::app()->name.' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
 	        'brandUrl' => '#',
 	        'brandOptions' => array("class"=>"boton_menu"),
 	        'collapse' => true, // requires bootstrap-responsive.css
@@ -64,13 +50,13 @@
 	                'type'  => 'navbar',
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
-		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest),
-		                    array('label' => 'CPEI', 'url' => Yii::app()->createUrl('#'), 'icon'=>'glyphicon glyphicon-tag','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
-		                    array('label' => 'Broadcasting Premium', 'icon'=>'glyphicon glyphicon-tags','url' => Yii::app()->createUrl('promocionesPremium/create'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
+		                    //array('label' => 'Home', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest, 'style'=>'bg-color:red;'),
+		                    //array('label' => 'CPEI', 'url' => Yii::app()->createUrl('#'), 'icon'=>'glyphicon glyphicon-send','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
+		                    //array('label' => 'BCP', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocionesPremium/create'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
 		                    array('label'=>'Listas', 'icon'=>'glyphicon glyphicon-list','url'=>Yii::app()->createUrl('lista/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->listas),
-		                    array('label'=>'Exentos', 'icon'=>'glyphicon glyphicon-ban-circle','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest),
+		                    //array('label'=>'Exentos', 'icon'=>'glyphicon glyphicon-ban-circle','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
-		                    array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
+		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array(
 		                        'label' => Yii::app()->user->name,
 		                        'url' => '#',

@@ -1,3 +1,4 @@
+<div id="page-content-wrapper">
 <?php
 echo "<h3>Promociones del dia</h3>";
 
@@ -18,3 +19,4 @@ $this->widget(
     )
 );
 ?>
+</div>
