@@ -50,13 +50,11 @@
 	                'type'  => 'navbar',
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
-		                    //array('label' => 'Home', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest),
-		                    //array('label' => 'CPEI', 'url' => Yii::app()->createUrl('#'), 'icon'=>'glyphicon glyphicon-send','visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesos()->broadcasting_lite),
-		                    //array('label' => 'BCP', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocionesPremium/create'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->broadcasting_premium),
-		                    array('label'=>'Listas', 'icon'=>'glyphicon glyphicon-list','url'=>Yii::app()->createUrl('lista/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->listas),
-		                    //array('label'=>'Exentos', 'icon'=>'glyphicon glyphicon-ban-circle','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label' => 'Home', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('app/index'), 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getAccesosBCP()->listas),
+		                    array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
-		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array(
 		                        'label' => Yii::app()->user->name,
 		                        'url' => '#',
