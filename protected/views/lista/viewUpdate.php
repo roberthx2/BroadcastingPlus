@@ -19,7 +19,7 @@
 								    array(
 								        'id' => 'region-details',
 								        'data' => $model_lista,
-								        'showbuttons' => false,
+								        //'showbuttons' => false,
 								        'mode' => 'inline',
 								        'htmlOptions' => array('style' => 'text-align: right;'),
 								        'url' => $this->createUrl('lista/editableSaver'),

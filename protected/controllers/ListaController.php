@@ -228,7 +228,7 @@ class ListaController extends Controller
 					}
 					else
 					{
-						$error = "No se agrego ningún destinatario ya que no contiene números validos";
+						$error = "No se agrego ningún destinatario ya que no contiene números validos o son números duplicados";
 						Yii::app()->user->setFlash("danger", $error);
 						$transaction->rollBack();
 					}	            	
