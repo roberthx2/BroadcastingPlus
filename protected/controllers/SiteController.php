@@ -106,7 +106,7 @@ class SiteController extends Controller
 			// validate user input and redirect to the previous page if valid
 			if($model->validate() && $model->login())
 			{
-				if(Yii::app()->user->getAccesos()->broadcasting == 1)
+				if(Yii::app()->user->getPermisos()->acceso_sistema == 1 && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei))
 				{
 					$this->redirect(Yii::app()->createUrl('home/index'));
 				}

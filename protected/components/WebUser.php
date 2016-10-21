@@ -32,17 +32,17 @@ class WebUser extends CWebUser
         return $this->_model;
     }
 
-    public function getAccesos()
+    public function getPermisos()
     {
-        $this->_model = Accesos::model()->findByPk(Yii::app()->user->id);
+        $this->_model = Permisos::model()->findByPk(Yii::app()->user->id);
         return $this->_model;
     }
 
-    public function getAccesosBCP()
+    /*public function getAccesosBCP()
     {
         $this->_model = AccesosBcp::model()->findByPk(Yii::app()->user->id);
         return $this->_model;
-    }
+    }*/
 
     public function isAdmin()
     {

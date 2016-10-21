@@ -32,7 +32,7 @@ class HomeController extends Controller
 		if(isset($_GET['PromocionesPremium']))
 			$model->attributes=$_GET['PromocionesPremium'];*/
 
-		if (Yii::app()->user->getAccesosBCP()->broadcasting_premium)
+		if (Yii::app()->user->getPermisos()->broadcasting_premium)
 		{
 			$modelBCP = new PromocionesPremium('searchHome');
 			$modelBCP->unsetAttributes();
