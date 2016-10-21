@@ -21,7 +21,7 @@ Class PromocionForm extends CFormModel
 			array("id_cliente, nombre, mensaje, fecha, hora_inicio, hora_fin", "required", "message"=>"{attribute} requerido", "on"=>"create"),
 			//Length
 			array('nombre', 'length', 'max'=>30),
-			array('mensaje', 'length', 'max'=>160),
+			array('mensaje', 'length', 'max'=>158),
 			//Safe
 			//array("id_usuario", "safe"),
 			//array("nombre", "safe", "on"=>"agregarNumeros"),

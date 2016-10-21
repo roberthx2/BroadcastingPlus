@@ -15,13 +15,13 @@
 	<!--<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">-->
 
-	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/menuLista.css">
+	<!--<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/menuLista.css">-->
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/simple-sidebar.css">
 
 	<?php  
 	 $baseUrl = Yii::app()->baseUrl; 
 	  Yii::app()->clientScript->registerCssFile($baseUrl.'/css/estilos.css');  
-	 /* Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/bootstrap.min.js');
+	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/funciones.js');/*
 	  $cs = Yii::app()->getClientScript();
 	  $cs->registerScriptFile($baseUrl.'/js/bootstrap-editable.js');
 	  $cs->registerCssFile($baseUrl.'/css/bootstrap-editable.css');*/
@@ -79,9 +79,48 @@
 	<?php echo $content; ?>
 	<div class="clear"></div>
 </div>
-<br><br>
-<!--<div class="footer visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="height: 145px; cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/images/footerIzquierda.png')">
+<!--<div class="footer"></div>
+<br><br>-->
+<!--<div id="footer" class=" visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png'); background-repeat: no-repeat">
 </div>-->
+
 
 </body>
 </html>
+
+<style type="text/css">
+	#eedfooter {
+	width: 100%;
+	height: 10%;
+	background: #333;
+	border-top: 0px solid #000;
+	position: absolute;
+	bottom: 0;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  padding-top: 10px;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 10%;
+  text-align: center;
+  color: white;
+  background: url("<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png");
+  /* background-color: #3F3E3E; */
+}
+
+/*************************************************/
+
+</style>

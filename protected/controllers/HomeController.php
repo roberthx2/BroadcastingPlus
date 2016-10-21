@@ -27,10 +27,16 @@ class HomeController extends Controller
 
 	public function actionIndex()
 	{
-		/*$model = new Promociones('search');
-		$model->unsetAttributes();
-		if(isset($_GET['PromocionesPremium']))
-			$model->attributes=$_GET['PromocionesPremium'];*/
+		$modelBCNL = array();
+		$modelBCP = array();
+
+		if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
+		{
+			$modelBCNL = new Promociones('search');
+			$modelBCNL->unsetAttributes();
+			if(isset($_GET['Promociones']))
+				$modelBCNL->attributes=$_GET['Promociones'];
+		}
 
 		if (Yii::app()->user->getPermisos()->broadcasting_premium)
 		{
@@ -40,7 +46,7 @@ class HomeController extends Controller
 				$modelBCP->attributes=$_GET['PromocionesPremium'];
 		}
 
-		$this->render('index', array('modelBCP'=>$modelBCP));
+		$this->render('index', array('modelBCNL'=> $modelBCNL,'modelBCP'=>$modelBCP));
 	}
 
 	// Uncomment the following methods and override them if needed

@@ -28,6 +28,7 @@ class PromocionController extends Controller
     public function actionCreate()
     {
         $model = new PromocionForm;
+        $model_lista = array();
         $dataTipo = array();
 
         if (Yii::app()->user->getPermisos()->broadcasting && Yii::app()->user->getPermisos()->crear_promo_bcnl)
@@ -37,7 +38,21 @@ class PromocionController extends Controller
         if (Yii::app()->user->getPermisos()->broadcasting_cpei)
             array_push($dataTipo, "CPEI");
 
-        $this->render("create", array('model' => $model, 'dataTipo' => $dataTipo));
+        if (Yii::app()->user->getPermisos()->modulo_listas)
+        {
+            $model_lista = Lista::model()->findAll("id_usuario = ".Yii::app()->user->id);
+            $listas = array();
+            foreach ($model_lista as $value)
+            {
+
+                $listas[$value["id_lista"]] = $value["nombre"];
+                //$listas[] = $value["nombre"];
+            }
+
+            //$model->listas = $listas;
+        }
+
+        $this->render("create", array('model' => $model, 'dataTipo' => $dataTipo, 'listas' => $listas));
     }
 }
 
