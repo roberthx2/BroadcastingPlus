@@ -2,9 +2,15 @@
 	$form = $this->beginWidget(
 		'booster.widgets.TbActiveForm',
 		array(
-			'id' => 'horizontalForm',
+			'id' => 'promocion-form',
 			'type' => 'vertical',
-			//'enableAjaxValidation'=>true,
+			'enableAjaxValidation'=>true,
+			'enableClientValidation'=>true,
+            'clientOptions' => array(
+                'validateOnSubmit'=>true,
+                'validateOnChange'=>true,
+                'validateOnType'=>true,     
+            ),
 		)
 	); ?>
 	 
@@ -22,210 +28,311 @@
 				),
 				'widgetOptions' => array(
 					'data' => $dataTipo,
-					'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					'htmlOptions' => array('prompt' => 'Seleccionar...', /*'onchange'=>'js:test();'*/
+					'ajax' => array(
+                        'type'=>'POST', //request type
+                        'dataType' => 'json',
+                        'url'=>Yii::app()->createUrl('/promocion/getCliente'), //url to call.
+                        'data' => array('tipo' => 'js:$("#PromocionForm_tipo").val()'),
+                        'success' => 'function(response){
+                                if (response.error == "false")
+                                {
+                                    $("#'.CHTML::activeId($model,'id_cliente').'").empty();
+                                    var cliente = response.data;
+                                    $.each(cliente, function(i, value) {
+                                        $("#'.CHTML::activeId($model,'id_cliente').'").append($("<option>").text(value.descripcion).attr("value",value.id_cliente));
+                                    });
+                                    $("#cupo").val(response.cupo);
+                                    hideShowFormPromocion($("#PromocionForm_tipo").val());
+                                }
+                                else
+                                {
+                                    $("#'.CHTML::activeId($model,'id_cliente').'").empty();
+                                    hideShowFormPromocion($("#PromocionForm_tipo").val());
+                                    console.log(response.status);
+                                }
+                            }'
+                		),
+                    ), //col-xs-12 col-sm-4 col-md-4 col-lg-4
 				),
-				'prepend' => '<i class="glyphicon glyphicon-check"></i>'
+				'prepend' => '<i class="glyphicon glyphicon-check"></i>',
 			)
 		); ?>
 
-		<?php echo $form->dropDownListGroup(
-			$model,
-			'id_cliente',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'widgetOptions' => array(
-					'data' => $dataTipo,
-					'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
-				),
-				'prepend' => '<i class="glyphicon glyphicon-user"></i>'
-			)
-		); ?>
+		<div id="div_id_cliente" style="display:none;">
+			<?php echo $form->dropDownListGroup(
+				$model,
+				'id_cliente',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+						'style'=>'display: none;',
+					),
+					'widgetOptions' => array(
+						'data' => array(),
+						'value' => 'null',
+						'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
+				)
+			); ?>
+			<div style="float: right; font: bold 13px Arial;"><strong>Cupo disponible:</strong>
+				<?php echo CHTML::textField('cupo','',array('size'=>4 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
+		</div>
 
-		<?php echo $form->textFieldGroup(
-			$model,
-			'nombre',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
-			)
-		); ?>
-
-		<?php echo $form->textAreaGroup(
-			$model,
-			'mensaje',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'widgetOptions' => array(
-					'htmlOptions' => array('rows' => 5, 'maxlength' => 158, 'style'=> 'resize:none;','onMouseDown' => 'contarCaracterPromocion()', 'onChange' => 'contarCaracterPromocion()', 'onBlur' => 'contarCaracterPromocion()','onKeyDown' => 'contarCaracterPromocion()','onFocus' => 'contarCaracterPromocion()','onKeyUp' => 'contarCaracterPromocion()'),
-				),
-				'prepend' => '<i class="glyphicon glyphicon-envelope"></i>'
-			)
-		); ?>
-
-		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xs-push-6 col-sm-push-6 col-md-push-6 col-lg-push-6" style="font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
-			<?php echo CHTML::textField('caracteres',158,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
 		<div class="clearfix visible-xs-block"></div>
 
-		<?php echo $form->datePickerGroup(
-			$model,
-			'fecha',
-			array(
-				'widgetOptions' => array(
-					'options' => array(
-						'language' => 'es',
-					),
-				),
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
-				),
-				//'hint' => 'Click inside! This is a super cool date field.',
-				'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
-			)
-		); ?>
-
-		<?php echo $form->timePickerGroup(
-			$model,
-			'hora_inicio',
-			array(
-				'widgetOptions' => array(
+		<div id="div_nombre" style="display:none;">
+			<?php echo $form->textFieldGroup(
+				$model,
+				'nombre',
+				array(
 					'wrapperHtmlOptions' => array(
-						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 					),
-				),
-				//'hint' => 'Nice bootstrap time picker',
-			)
-		); ?>
+					'widgetOptions' => array(
+						'htmlOptions' => array('maxlength' => 25, 'autocomplete' => 'off'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
+				)
+			); ?>
+		</div>
 
-		<?php echo $form->timePickerGroup(
-			$model,
-			'hora_fin',
-			array(
-				'widgetOptions' => array(
+		<div id="div_mensaje" style="display:none;">
+			<?php echo $form->textAreaGroup(
+				$model,
+				'mensaje',
+				array(
 					'wrapperHtmlOptions' => array(
-						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 					),
-				),
-				//'hint' => 'Nice bootstrap time picker',
-			)
-		); ?>
+					'widgetOptions' => array(
+						'htmlOptions' => array('rows' => 5, 'maxlength' => 158, 'style'=> 'resize:none;','onMouseDown' => 'contarCaracterPromocion()', 'onChange' => 'contarCaracterPromocion()', 'onBlur' => 'contarCaracterPromocion()','onKeyDown' => 'contarCaracterPromocion()','onFocus' => 'contarCaracterPromocion()','onKeyUp' => 'contarCaracterPromocion()'),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-envelope"></i>'
+				)
+			); ?>
 
-	</div>
+			<div style="float: right; font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
+				<?php echo CHTML::textField('caracteres',158,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
+		</div>
+
+		<div class="clearfix visible-xs-block"></div>
+
+		<div id="div_fecha" style="display:none;">
+			<?php echo $form->datePickerGroup(
+				$model,
+				'fecha',
+				array(
+					//'value' => date("Y-m-d"),
+					'widgetOptions' => array(
+						'options' => array(
+							'language' => 'es',
+							'format' => 'yyyy-mm-dd',
+							'startDate' => date("Y-m-d"),
+							'endDate' => date('Y-m-d' , strtotime('+1 month', strtotime(date("Y-m-d")))),
+							'autoclose' => true,
+						),
+						'htmlOptions' => array('value'=>date("Y-m-d"), 'readonly'=>true, 'style'=>'background-color: white;'),
+					),
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+					),
+					//'hint' => 'Click inside! This is a super cool date field.',
+					'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
+				)
+			); ?>
+		</div>
+
+		<div id="div_hora_inicio" style="display:none;">
+			<?php echo $form->timePickerGroup(
+				$model,
+				'hora_inicio',
+				array(
+					'widgetOptions' => array(
+						'options' => array(
+							'defaultTime' => date("H:i"),
+							'showMeridian' => false,
+							'showSeconds' => false,
+						),
+						'wrapperHtmlOptions' => array(
+							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
+						),
+						'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
+					),
+					//'hint' => 'Nice bootstrap time picker',
+				)
+			); ?>
+		</div>
+
+		<div id="div_hora_fin" style="display:none;">
+			<?php echo $form->timePickerGroup(
+				$model,
+				'hora_fin',
+				array(
+					'widgetOptions' => array(
+						'options' => array(
+							'defaultTime' => date('H:i' , strtotime('+1 hours', strtotime(date("H:i")))),
+							'showMeridian' => false,
+							'showSeconds' => false,
+						),
+						'wrapperHtmlOptions' => array(
+							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
+						),
+						'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
+					),
+					//'hint' => 'Nice bootstrap time picker',
+				)
+			); ?>
+		</div>	
+
+		<div id="div_duracion" style="display:none;">
+			<?php echo $form->dropDownListGroup(
+				$model,
+				'duracion',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+					),
+					'widgetOptions' => array(
+						'data' => array('20'=>'20', '25'=>'25','30'=>'30','35'=>'35','40'=>'40','45'=>'45','50'=>'50','60'=>'60'),
+						'htmlOptions' => array(),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-time"></i>'
+				)
+			); ?>
+		</div>		
+
+	</div> <!--Cierre de la columna #1-->
 
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
-		<?php echo $form->select2Group(
-			$model,
-			'puertos',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'widgetOptions' => array(
-					'asDropDownList' => true,
-					//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
-					'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
-					'options' => array(
-						//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
-						'placeholder' => 'Seleccione sus listas...',
-						'allowClear'=>true,
-						/* 'width' => '40%', */
-						'tokenSeparators' => array(',', ' ')
+		<div id="div_puertos" style="display:none;">
+			<?php echo $form->select2Group(
+				$model,
+				'puertos',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 					),
-					'htmlOptions'=>array(
-						'multiple'=>'multiple',
+					'widgetOptions' => array(
+						'asDropDownList' => true,
+						//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
+						'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
+						'options' => array(
+							//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
+							'placeholder' => 'Seleccione sus listas...',
+							'allowClear'=>true,
+							/* 'width' => '40%', */
+							'tokenSeparators' => array(',', ' ')
+						),
+						'htmlOptions'=>array(
+							'multiple'=>'multiple',
+							'disabled'=>true,
+						),
 					),
-				),
-				//'prepend' => '<i class="glyphicon glyphicon-random"></i>',
-				'prepend' =>  '<strong>Todos</strong> '.CHtml::CheckBox('all_puertos',false, array('value'=>'true','title'=>'Seleccionar todos', 'onclick'=>'js:disabledPuertos();')),
-			)
-		);?>
-
-		<?php echo $form->textAreaGroup(
-			$model,
-			'destinatarios',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'widgetOptions' => array(
-					'htmlOptions' => array('onKeyPress' => 'return processKeydown(event);', 'rows' => 5, 'placeholder' => '4160000000,4260000000,4140000000,4240000000,4120000000'),
-				),
-				'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
-			)
-		); ?>
-
-		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xs-push-8 col-sm-push-8 col-md-push-8 col-lg-push-8" style="font: bold 13px Arial;"><strong>Total: </strong>
-			<?php echo CHTML::textField('total',0,array('size'=>2 ,'style'=>'margin-left:10px; border:0;', 'readonly' => true)); ?>
+					//'prepend' => '<i class="glyphicon glyphicon-random"></i>',
+					'prepend' =>  '<strong>Todos</strong> '.CHtml::CheckBox('all_puertos',false, array('disabled' => true, 'value'=>'true','title'=>'Seleccionar todos', 'onclick'=>'js:disabledPuertos();')),
+				)
+			);?>
 		</div>
+
+		<div id="div_destinatarios" style="display:none;">
+			<?php echo $form->textAreaGroup(
+				$model,
+				'destinatarios',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+					),
+					'widgetOptions' => array(
+						'htmlOptions' => array('onKeyPress' => 'return processKeydown(event);', 'rows' => 5, 'placeholder' => '4160000000,4260000000,4140000000,4240000000,4120000000'),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
+				)
+			); ?>
+
+			<div style="float: right; font: bold 13px Arial;"><strong>Total: </strong>
+				<?php echo CHTML::textField('total',0,array('size'=>2 ,'style'=>'margin-left:10px; border:0;', 'readonly' => true)); ?>
+			</div>
+		</div>
+
 		<div class="clearfix visible-xs-block"></div>
 
-		<?php echo $form->select2Group(
-			$model,
-			'listas',
-			array(
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				'widgetOptions' => array(
-					'asDropDownList' => true,
-					//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
-					'data'=>$listas,
-					'options' => array(
-						//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
-						'placeholder' => 'Seleccione sus listas...',
-						'allowClear'=>true,
-						/* 'width' => '40%', */
-						'tokenSeparators' => array(',', ' ')
-					),
-					'htmlOptions'=>array(
-						'multiple'=>'multiple',
-					),
-				),
-				'prepend' => '<i class="glyphicon glyphicon-th-list"></i>'
-			)
-		);?>
-
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <div align="center" style="padding: 30px 0 0px 0px;">
-			<?php
-                echo $this->renderPartial('/btl/index',false,true);
-            ?>
-            </div>
-            <div id="numerosBTLDiv" style="display: none;" >
-                <?php 
-                echo $form->textAreaGroup(
-						$model,
-						'btl',
-						array(
-							'wrapperHtmlOptions' => array(
-								//'class' => 'col-sm-5',
+		<div id="div_listas" style="display:none;">
+			<?php 
+			//Visible si tiene permisos al modulo de listas
+			if (Yii::app()->user->getPermisos()->modulo_listas)
+			{
+				echo $form->select2Group(
+					$model,
+					'listas',
+					array(
+						'wrapperHtmlOptions' => array(
+							'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+						),
+						'widgetOptions' => array(
+							'asDropDownList' => true,
+							//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
+							'data'=>$listas,
+							'options' => array(
+								//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
+								'placeholder' => 'Seleccione sus listas...',
+								'allowClear'=>true,
+								/* 'width' => '40%', */
+								'tokenSeparators' => array(',', ' ')
 							),
-							'widgetOptions' => array(
-								'htmlOptions' => array('rows' => 5, 'onKeyPress' => 'return processKeydown(event);'),
-							)
-						)
-					); 
-                ?>
-            </div>
+							'htmlOptions'=>array(
+								'multiple'=>'multiple',
+							),
+						),
+						'prepend' => '<i class="glyphicon glyphicon-th-list"></i>'
+					)
+				);
+			} ?>
 		</div>
 
+		<?php
+		//Visible si tiene permisos al modulo de btl
+		if (Yii::app()->user->getPermisos()->modulo_btl)
+		{ ?>
+			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
+	            <div align="center" style="padding: 30px 0 0px 0px;">
+				<?php
+	                echo $this->renderPartial('/btl/index',false,true);
+	            ?>
+	            </div>
+	            <div id="numerosBTLDiv" style="display: none;" >
+	                <?php 
+	                echo $form->textAreaGroup(
+							$model,
+							'btl',
+							array(
+								'wrapperHtmlOptions' => array(
+									//'class' => 'col-sm-5',
+								),
+								'widgetOptions' => array(
+									'htmlOptions' => array('rows' => 5, 'onKeyPress' => 'return processKeydown(event);'),
+								)
+							)
+						); 
+	                ?>
+	            </div>
+			</div>
+		<?php }	?>
 	</div>
 
 	</fieldset>
 	<br><br>
-	<div class="form-actions col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xs-push-4 col-sm-push-5 col-md-push-5 col-lg-push-5">
+	<div id="div_botones" class="form-actions col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
+		<center>
 		<?php $this->widget(
 			'booster.widgets.TbButton',
 			array(
 				'buttonType' => 'submit',
 				'context' => 'success',
-				'label' => 'Crear'
+				'label' => 'Crear',
+				'htmlOptions' => array(),
 			)
 		); ?>
 
@@ -233,9 +340,18 @@
 			'booster.widgets.TbButton',
 			array('buttonType' => 'reset', 'label' => 'Reset')
 		); ?>
+		</center>
 	</div>
 
 	<?php
 		$this->endWidget();
 		unset($form);
 	?>
+
+<script type="text/javascript">
+	$(document).ready(function() 
+    {
+		//enableFormPromocion($("#PromocionForm_tipo").val());
+        hideShowFormPromocion($("#PromocionForm_tipo").val());
+	});
+</script>

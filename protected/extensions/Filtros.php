@@ -20,8 +20,9 @@ class Filtros extends CApplicationComponent
 
 		$criteria = new CDbCriteria;
 		$criteria->select = "id_operadora_bcp AS id_operadora, prefijo, descripcion";
-		$criteria->addCondition("id_operadora_bcp != ".$digitel);
+		$criteria->addCondition("id_operadora_bcp != :id_operadora_bcp");
 		$criteria->order = "id_operadora_bcp ASC";
+		$criteria->params = array(":id_operadora_bcp"=>$digitel);
 
 		return OperadorasRelacion::model()->findAll($criteria);
 	}
@@ -30,12 +31,16 @@ class Filtros extends CApplicationComponent
 	{
 		foreach ($operadoras as $value)
 		{
-			$sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = ".$id_proceso." AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
-            Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+			$sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = :id_proceso AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
+			$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+        	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+        	$sql->execute();
 		}
 
-		$sql = "UPDATE tmp_procesamiento SET estado = 2 WHERE id_proceso = ".$id_proceso." AND id_operadora IS NULL";
-        Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		$sql = "UPDATE tmp_procesamiento SET estado = 2 WHERE id_proceso = :id_proceso AND id_operadora IS NULL";
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->execute();
 	}
 
 	//$tipo = 1 (BCNL) / 2 (BCP).... $alfanumerico (DIGITEL) = true / false
@@ -61,12 +66,14 @@ class Filtros extends CApplicationComponent
 		//NO USE CRITERIA PORQUE NO QUISO FUNCIONAR :@
 		$sql = "SELECT COUNT(numero) - 1 AS total, GROUP_CONCAT(id) AS ids
 				FROM tmp_procesamiento 
-				WHERE id_proceso = ".$id_proceso." 
+				WHERE id_proceso = :id_proceso  
 				GROUP BY numero
 				HAVING total > 0";
-				
-		$model = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$model = $sql->queryAll();
+				
 		foreach ($model as $value)
 		{
 			$sql = "UPDATE tmp_procesamiento SET estado = 3 WHERE id IN (".$value["ids"].") LIMIT ".$value["total"];
@@ -76,8 +83,10 @@ class Filtros extends CApplicationComponent
 
 	public function filtrarAceptados($id_proceso)
 	{
-		$sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = ".$id_proceso." AND estado IS NULL";
-		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		$sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->execute();
 	}
 }
 

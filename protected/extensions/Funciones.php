@@ -12,6 +12,52 @@ class Funciones extends CApplicationComponent
 		return strtoupper(trim(preg_replace('/\s{2,}/', " ", $cadena)));
 	}
 
+	public function limpiarMensaje($sms)
+    {
+        $sms = str_replace(
+            array('á', 'à', 'ä', 'â', 'ª', 'Á', 'À', 'Â', 'Ä'),
+            array('a', 'a', 'a', 'a', 'a', 'A', 'A', 'A', 'A'),
+            $sms
+        );
+
+        $sms = str_replace(
+            array('é', 'è', 'ë', 'ê', 'É', 'È', 'Ê', 'Ë'),
+            array('e', 'e', 'e', 'e', 'E', 'E', 'E', 'E'),
+            $sms
+        );
+
+        $sms = str_replace(
+            array('í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î'),
+            array('i', 'i', 'i', 'i', 'I', 'I', 'I', 'I'),
+            $sms
+        );
+
+        $sms = str_replace(
+            array('ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô'),
+            array('o', 'o', 'o', 'o', 'O', 'O', 'O', 'O'),
+            $sms
+        );
+
+        $sms = str_replace(
+            array('ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Û', 'Ü'),
+            array('u', 'u', 'u', 'u', 'U', 'U', 'U', 'U'),
+            $sms
+        );
+
+        $sms = str_replace(
+            array('ñ', 'Ñ', 'ç', 'Ç'),
+            array('n', 'N', 'c', 'C',),
+            $sms
+        );
+
+        //Esta parte se encarga de eliminar cualquier caracter extraño
+        $sms = str_replace(
+            array("¨", "º", "~", "|","·","¿","^", "`","´"),'',$sms);
+        
+        //Elimina multiples espacios en blanco
+        return trim(preg_replace('/\s{2,}/', " ", $sms));
+    }
+
 	public function getColorOperadoraBCNL($id_operadora)
 	{
 		if ($id_operadora == 2) //Movistar

@@ -107,3 +107,115 @@ function countNumber() {
     //countSpan.html(num);
 
 }
+
+function enableFormPromocion(tipo)
+{
+    //BCNL
+    if (tipo == 1)
+    {
+        $("#PromocionForm_fecha").prop('disabled', false);
+        $("input[name='PromocionForm[hora_inicio]']" ).prop('disabled', false);
+        $("input[name='PromocionForm[hora_fin]']" ).prop('disabled', false);
+        $("#PromocionForm_duracion").prop('disabled', true);
+        $("#PromocionForm_puertos").prop('disabled', false); 
+        $("#all_puertos").prop('disabled', false);      
+    }
+    //CPEI
+    else if (tipo == 2)
+    {
+        $("#PromocionForm_fecha").prop('disabled', true);
+        $("input[name='PromocionForm[hora_inicio]']" ).prop('disabled', true);
+        $("input[name='PromocionForm[hora_fin]']" ).prop('disabled', true);
+        $("#PromocionForm_duracion").prop('disabled', false);
+        $("#PromocionForm_puertos").prop('disabled', false);
+        $("#all_puertos").prop('disabled', false);            
+    }   
+    //BCP
+    else if (tipo == 3)
+    {
+        $("#PromocionForm_fecha").prop('disabled', false);
+        $("input[name='PromocionForm[hora_inicio]']" ).prop('disabled', false);
+        $("input[name='PromocionForm[hora_fin]']" ).prop('disabled', false);
+        $("#PromocionForm_duracion").prop('disabled', true);
+        $("#PromocionForm_puertos").prop('disabled', true);
+        $("#all_puertos").prop('disabled', true);       
+    }
+    //Desconocida
+    else
+    {
+        $("#PromocionForm_fecha").prop('disabled', true);
+        $("input[name='PromocionForm[hora_inicio]']" ).prop('disabled', true);
+        $("input[name='PromocionForm[hora_fin]']" ).prop('disabled', true);
+        $("#PromocionForm_duracion").prop('disabled', true);
+        $("#PromocionForm_puertos").prop('disabled', true);
+        $("#all_puertos").prop('disabled', true);
+    }      
+}
+
+function hideShowFormPromocion(tipo)
+{
+    //BCL
+    if (tipo == 1)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_mensaje").show();
+        $("#div_fecha").show();
+        $("#div_hora_inicio").show();
+        $("#div_hora_fin").show();
+        $("#div_duracion").hide();
+        $("#div_puertos").show();
+        $("#div_destinatarios").show();
+        $("#div_listas").show();
+        $("#div_btl").show();
+        $("#div_botones").show();
+    }
+    //CPEI
+    else if (tipo == 2)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_mensaje").show();
+        $("#div_fecha").hide();
+        $("#div_hora_inicio").hide();
+        $("#div_hora_fin").hide();
+        $("#div_duracion").show();
+        $("#div_puertos").show();
+        $("#div_destinatarios").show();
+        $("#div_listas").show();
+        $("#div_btl").show();
+        $("#div_botones").show();
+    }
+    //BCP
+    else if (tipo == 3)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_mensaje").show();
+        $("#div_fecha").show();
+        $("#div_hora_inicio").show();
+        $("#div_hora_fin").show();
+        $("#div_duracion").hide();
+        $("#div_puertos").hide();
+        $("#div_destinatarios").show();
+        $("#div_listas").show();
+        $("#div_btl").show();
+        $("#div_botones").show();
+    }
+    //Desconocido
+    else
+    {       
+        $("#div_id_cliente").hide();
+        $("#div_nombre").hide();
+        $("#div_mensaje").hide();
+        $("#div_fecha").hide();
+        $("#div_hora_inicio").hide();
+        $("#div_hora_fin").hide();
+        $("#div_duracion").hide();
+        $("#div_puertos").hide();
+        $("#div_destinatarios").hide();
+        $("#div_listas").hide();
+        $("#div_btl").hide();
+        $("#div_botones").hide();
+    }
+}

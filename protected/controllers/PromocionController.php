@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create'),
+                'actions' => array('create', 'getCliente'),
                 'users' => array('@'),
             ),
 
@@ -25,34 +25,105 @@ class PromocionController extends Controller
         ));
     }
 
+    protected function performAjaxValidation($model)
+    {
+        if(isset($_POST['ajax']) && $_POST['ajax']==='promocion-form')
+        {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+    }
+
     public function actionCreate()
     {
         $model = new PromocionForm;
-        $model_lista = array();
+        $listas = array();
         $dataTipo = array();
 
+        $this->performAjaxValidation($model);
+
+        if(isset($_POST['PromocionForm']))
+        {
+            $model->attributes=$_POST['PromocionForm'];
+
+            if ($model->validate())
+            {
+                $this->redirect(array("lista/admin"));
+                //print_r($model);
+                //exit;
+            }
+            //$this->redirect(array("lista/admin"));
+        }
+
         if (Yii::app()->user->getPermisos()->broadcasting && Yii::app()->user->getPermisos()->crear_promo_bcnl)
-            array_push($dataTipo, "BCNL");
-        if (Yii::app()->user->getPermisos()->broadcasting_premium && Yii::app()->user->getPermisos()->crear_promo_bcp)
-            array_push($dataTipo, "BCP");
+            $dataTipo[1] = "BCNL";
         if (Yii::app()->user->getPermisos()->broadcasting_cpei)
-            array_push($dataTipo, "CPEI");
+            $dataTipo[2] = "CPEI";
+        if (Yii::app()->user->getPermisos()->broadcasting_premium && Yii::app()->user->getPermisos()->crear_promo_bcp)
+            $dataTipo[3] = "BCP";
 
         if (Yii::app()->user->getPermisos()->modulo_listas)
         {
             $model_lista = Lista::model()->findAll("id_usuario = ".Yii::app()->user->id);
-            $listas = array();
+            
             foreach ($model_lista as $value)
             {
-
                 $listas[$value["id_lista"]] = $value["nombre"];
-                //$listas[] = $value["nombre"];
             }
-
-            //$model->listas = $listas;
         }
 
         $this->render("create", array('model' => $model, 'dataTipo' => $dataTipo, 'listas' => $listas));
+    }
+
+    public function actionGetCliente()
+    {
+        $tipo = Yii::app()->request->getParam('tipo');
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if ($tipo == '') {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => 'Tipo de promoción invalida'
+                ));
+                Yii::app()->end();
+            } else {   
+                if ($tipo == 1 || $tipo == 2) //BCNL o CPEI
+                {
+                    $data = Yii::app()->Procedimientos->getClientesBCNL(Yii::app()->user->id);
+                    $cupo = 0;
+                }
+                else if ($tipo == 3) //BCP
+                {
+                    $data = Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id);
+                    $model_cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+                    $cupo = 0;
+                    
+                    if ($model_cupo)
+                    {
+                        $cupo = $model_cupo->disponible;
+                    }
+                }
+
+                if($data) {
+                    echo CJSON::encode(array(
+                                            'error' => 'false',
+                                            'status' => 'Clientes obtenidos correctamente',
+                                            'data' => $data,
+                                            'cupo' => $cupo
+                                       )                                
+                         );
+                    Yii::app()->end();
+                } else {
+                    echo CJSON::encode(array(
+                        'error' => 'true',
+                        'status' => 'No posee cliente asociado'
+                    ));
+                    Yii::app()->end();
+                }
+            }
+            
+        }
+        
     }
 }
 
