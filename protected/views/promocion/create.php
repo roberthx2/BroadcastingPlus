@@ -149,6 +149,7 @@
 				$model,
 				'hora_inicio',
 				array(
+					'id'=>'PromocionesForm_hora_inicio',
 					'widgetOptions' => array(
 						'options' => array(
 							'defaultTime' => date("H:i"),
@@ -158,7 +159,7 @@
 						'wrapperHtmlOptions' => array(
 							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
 						),
-						'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
+						'htmlOptions' => array( 'readonly'=>true, 'style'=>'background-color: white;'),
 					),
 					//'hint' => 'Nice bootstrap time picker',
 				)
