@@ -14,6 +14,7 @@ Class PromocionForm extends CFormModel
 	public $listas;
 	public $btl;
 	public $puertos;
+	public $all_puertos;
 
 	public function rules()
 	{
@@ -39,9 +40,11 @@ Class PromocionForm extends CFormModel
 			array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas 
 			array("mensaje", "scEnSMS"), //Valida que el Short Code este en el mensaje (Para clientes hipicos y loteros)
 			array("mensaje", "numerosTelefonicos"), //Valida si existen numeros telefonicos o sc en el mensaje (Para clientes hipicos y loteros)
-			array("hora_inicio", "horaMinima"),
-			array("hora_fin", "horaMaxima"),
-
+			array("hora_inicio, hora_fin", "compararHoras"), //Valida que la hora inicio sea menor que la hora fin
+			array("hora_inicio, hora_fin", "horarioPermitido"), //Valida que la hora este en el rango permitido para la carga de promociones
+			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
+			array("destinatarios, listas, btl", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
+			
 			//array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
 			
 		);
@@ -61,6 +64,7 @@ Class PromocionForm extends CFormModel
 			'listas' => 'Listas',
 			'btl' => 'BTL',
 			'puertos' => 'Puertos',
+			'all_puertos' => 'Todos',
 			'duracion' => 'Duración',
 		);
 	}
@@ -163,11 +167,14 @@ Class PromocionForm extends CFormModel
         		$cadena_sc = $sql->queryRow();
 
         		$cadena_sc = trim(preg_replace('/,{2,}/', ",", $cadena_sc["cadena_sc"]), ",");
+
+        		if ($cadena_sc == "")
+        			$cadena_sc = "null";
         		
         		$sql = "SELECT DISTINCT(sc_id) AS sc FROM sc_id WHERE id_sc IN(".$cadena_sc.")";
         		$sql_sc = Yii::app()->db_sms->createCommand($sql)->queryAll();
 
-        		$sql = "SELECT valor FROM configuracion_broadcasting_premium WHERE propiedad = 'sc_en_n_caracteres'";
+        		$sql = "SELECT valor FROM configuracion_sistema WHERE propiedad = 'sc_en_n_caracteres'";
 		        $caracteres = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 		        $mensaje = strtoupper(substr($this->$attribute, 0, $caracteres["valor"]));
@@ -187,7 +194,7 @@ Class PromocionForm extends CFormModel
 
 		        if (!$valido)
 		        {
-		        	$this->addError($attribute, "El mensaje debe incluir su Short Code en los primeros ".$caracteres["valor"]." caracteres.");
+		        	$this->addError($attribute, "El mensaje debe incluir su Short Code en los primeros ".$caracteres["valor"]." caracteres");
 		        }
 	    	}						
 		}
@@ -197,7 +204,7 @@ Class PromocionForm extends CFormModel
 
 	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($cliente_alarmas->id_cliente_sms))
 	    	{
-		        $sql = "SELECT valor FROM configuracion_broadcasting_premium WHERE propiedad = 'sc_en_n_caracteres'";
+		        $sql = "SELECT valor FROM configuracion_sistema WHERE propiedad = 'sc_en_n_caracteres'";
 		        $caracteres = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 		        $mensaje = strtoupper(substr($this->$attribute, 0, $caracteres["valor"]));
@@ -208,7 +215,7 @@ Class PromocionForm extends CFormModel
 
 		        if (!in_array($cliente_alarmas->sc, $mensaje_partes[0]))
 		        {
-		            $this->addError($attribute, "El mensaje debe incluir el Short Code seleccionado en los primeros ".$caracteres["valor"]." caracteres.");
+		            $this->addError($attribute, "El mensaje debe incluir el Short Code seleccionado en los primeros ".$caracteres["valor"]." caracteres");
 		        }
 		    }
 		}
@@ -227,6 +234,9 @@ Class PromocionForm extends CFormModel
 
         		$cadena_sc = trim(preg_replace('/,{2,}/', ",", $cadena_sc["cadena_sc"]), ",");
         		
+        		if ($cadena_sc == "")
+        			$cadena_sc = "null";
+
         		$sql = "SELECT DISTINCT(sc_id) AS sc FROM sc_id WHERE id_sc IN(".$cadena_sc.")";
         		$sql_sc = Yii::app()->db_sms->createCommand($sql)->queryAll();
 
@@ -276,7 +286,19 @@ Class PromocionForm extends CFormModel
 	    }
     }
 
-    public function horaMinima($attribute, $params)
+    public function compararHoras($attribute, $params)
+    {
+    	if (strtotime($this->hora_inicio) == strtotime($this->hora_fin))
+    	{
+    		$this->addError($attribute, "La hora inicio y hora fin deben ser diferentes");
+    	}
+    	else if (strtotime($this->hora_inicio) > strtotime($this->hora_fin))
+    	{
+    		$this->addError($attribute, "La hora inicio debe ser mayor que la hora fin");
+    	}
+    }
+
+    public function horarioPermitido($attribute, $params)
     {
     	if ($this->tipo == 1 || $this->tipo == 2) //BCNL / CPEI
 		{
@@ -286,50 +308,55 @@ Class PromocionForm extends CFormModel
 		{
 			$criteria = new CDbCriteria;
 			$criteria->select = "propiedad, valor";
-			$criteria->addInCondition("propiedad", array('hora_inicio_promocion', 'hora_fin_promocion'));
-			$resultado = ConfiguracionBroadcastingPremium::model()->findAll($criteria);
+			$criteria->addInCondition("propiedad", array('hora_inicio_bcp', 'hora_fin_bcp'));
+			$resultado = ConfiguracionSistema::model()->findAll($criteria);
 			
 			foreach ($resultado as $value)
 			{
-				if ($value["propiedad"] == 'hora_inicio_promocion')
+				if ($value["propiedad"] == 'hora_inicio_bcp')
 					$hora_inicio = $value["valor"];
-				else if ($value["propiedad"] == 'hora_fin_promocion')
+				else if ($value["propiedad"] == 'hora_fin_bcp')
 					$hora_fin = $value["valor"];
 			}
 
 			if (strtotime($this->$attribute) < strtotime($hora_inicio) || strtotime($this->$attribute) > strtotime($hora_fin))
 			{
-				$this->addError("hora_inicio", "El horario permitido para el envio de promociones es de : ".$hora_inicio." a ".$hora_fin);
+				$hora_inicio = new DateTime($hora_inicio);
+				$hora_inicio = $hora_inicio->format("h:i a");
+
+				$hora_fin = new DateTime($hora_fin);
+				$hora_fin = $hora_fin->format("h:i a");
+				
+				$this->addError($attribute, "El horario permitido para el envio de promociones es de : ".$hora_inicio." a ".$hora_fin);
 			}
 		}
     }
 
-    public function horaMaxima($attribute, $params)
+    public function puertosSeleccionados($attribute, $params)
     {
     	if ($this->tipo == 1 || $this->tipo == 2) //BCNL / CPEI
 		{
-
-		}
-	    else if ($this->tipo == 3) //BCP
-		{
-			$criteria = new CDbCriteria;
-			$criteria->select = "propiedad, valor";
-			$criteria->addInCondition("propiedad", array('hora_inicio_promocion', 'hora_fin_promocion'));
-			$resultado = ConfiguracionBroadcastingPremium::model()->findAll($criteria);
-			
-			foreach ($resultado as $value)
+			if ($this->$attribute == "" && $this->all_puertos == 0)
 			{
-				if ($value["propiedad"] == 'hora_inicio_promocion')
-					$hora_inicio = $value["valor"];
-				else if ($value["propiedad"] == 'hora_fin_promocion')
-					$hora_fin = $value["valor"];
-			}
-
-			if (strtotime($this->$attribute) < strtotime($hora_inicio) || strtotime($this->$attribute) > strtotime($hora_fin))
-			{
-				$this->addError("hora_fin", "El horario permitido para el envio de promociones es de : ".$hora_inicio." a ".$hora_fin);
-			}
+				$this->addError($attribute, "Debe seleccionar sus puertos");
+			}	
 		}
+    }
+
+    public function ingresarDestinatarios($attribute, $params)
+    {
+    	$condicion = $this->destinatarios." == '' ";
+
+    	if (isset($this->listas))
+			$condicion .= " && ".COUNT($this->listas)." == 0 ";
+
+		if (isset($this->btl))
+			$condicion .= " && ".$this->btl." == '' ";
+
+    	if ($condicion)
+    	{
+    		$this->addError($attribute, "Debe ingresar algún destinatario");
+    	}	
     }
 }
 ?>

@@ -1,22 +1,22 @@
 <?php
 
 /**
- * This is the model class for table "configuracion_broadcasting_premium".
+ * This is the model class for table "broadcasting_modulos".
  *
- * The followings are the available columns in table 'configuracion_broadcasting_premium':
- * @property string $id
- * @property string $propiedad
- * @property string $valor
- * @property string $descripcion
+ * The followings are the available columns in table 'broadcasting_modulos':
+ * @property integer $id_modulo
+ * @property string $descripcion_corta
+ * @property string $descripcion_larga
+ * @property integer $estado
  */
-class ConfiguracionBroadcastingPremium extends CActiveRecord
+class BroadcastingModulos extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'configuracion_broadcasting_premium';
+		return 'broadcasting_modulos';
 	}
 
 	/**
@@ -27,13 +27,13 @@ class ConfiguracionBroadcastingPremium extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('propiedad, valor', 'required'),
-			array('propiedad', 'length', 'max'=>100),
-			array('valor', 'length', 'max'=>235),
-			array('descripcion', 'length', 'max'=>255),
+			array('id_modulo, descripcion_corta, descripcion_larga', 'required'),
+			array('id_modulo, estado', 'numerical', 'integerOnly'=>true),
+			array('descripcion_corta', 'length', 'max'=>10),
+			array('descripcion_larga', 'length', 'max'=>50),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, propiedad, valor, descripcion', 'safe', 'on'=>'search'),
+			array('id_modulo, descripcion_corta, descripcion_larga, estado', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,10 +54,10 @@ class ConfiguracionBroadcastingPremium extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
-			'propiedad' => 'Propiedad',
-			'valor' => 'Valor',
-			'descripcion' => 'Descripcion',
+			'id_modulo' => 'Id Modulo',
+			'descripcion_corta' => 'Descripcion Corta',
+			'descripcion_larga' => 'Descripcion Larga',
+			'estado' => 'Estado',
 		);
 	}
 
@@ -79,10 +79,10 @@ class ConfiguracionBroadcastingPremium extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('propiedad',$this->propiedad,true);
-		$criteria->compare('valor',$this->valor,true);
-		$criteria->compare('descripcion',$this->descripcion,true);
+		$criteria->compare('id_modulo',$this->id_modulo);
+		$criteria->compare('descripcion_corta',$this->descripcion_corta,true);
+		$criteria->compare('descripcion_larga',$this->descripcion_larga,true);
+		$criteria->compare('estado',$this->estado);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -101,7 +101,7 @@ class ConfiguracionBroadcastingPremium extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return ConfiguracionBroadcastingPremium the static model class
+	 * @return BroadcastingModulos the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
