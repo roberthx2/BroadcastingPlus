@@ -48,8 +48,10 @@ class Procedimientos extends CApplicationComponent
 
 	public function getClientesBCNL($id_usuario)
 	{
+		//Solo trae los clientes activos
 		$sql = "SELECT c.id_cliente AS id_cliente, c.Des_cliente AS descripcion FROM cliente c "
-				. "WHERE c.id_cliente IN (".$this->getClienteBCNLHerencia($id_usuario).") "
+				. "INNER JOIN cliente_fechas f ON c.id_cliente = f.id_cliente "
+				. "WHERE c.id_cliente IN (".$this->getClienteBCNLHerencia($id_usuario).") AND f.fecha_fin = '0000-00-00' "
 				. "ORDER BY c.Des_cliente ASC";
 
 		$model = Yii::app()->db_sms->createCommand($sql)->queryAll();
