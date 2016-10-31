@@ -196,17 +196,25 @@ class TmpProcesamientoController extends Controller
 
 		foreach ($sql as $value)
 		{
-			if ($bandera == 1) //Aceptados
+			if ($bandera == 1) //Rechazado
 			{
 				$arr_aux = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
 			}
 			else
 			{
-				$objeto[] = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
-
-				if ($bandera == 2)
+				if ($bandera == 2 && $value["descripcion"] == "Aceptado")
+				{
+					$objeto[] = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
+					$objeto[] = $arr_aux;
+				}
+				else if ($bandera == 2 && $value["descripcion"] != "Aceptado")
 				{
 					$objeto[] = $arr_aux;
+					$objeto[] = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
+				}
+				else
+				{
+					$objeto[] = array('descripcion'=>$value["descripcion"], 'total'=>$value["total"]);
 				}
 			}
 
@@ -243,6 +251,38 @@ class TmpProcesamientoController extends Controller
 			}
           	else
           		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]));
+		}
+
+		return $data;
+	}
+
+	public function actionReporteTortaBCP($id_proceso)
+	{
+		$sql = "SELECT 'INVALIDOS' AS descripcion, COUNT(*) AS total, 0 AS id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado <> 1
+				UNION
+				SELECT o.descripcion, COUNT(*) AS total, t.id_operadora FROM tmp_procesamiento t 
+				INNER JOIN (SELECT id_operadora_bcp, descripcion FROM operadoras_relacion) o ON t.id_operadora = o.id_operadora_bcp 
+				WHERE t.id_proceso = ".$id_proceso." AND t.estado = 1 
+				GROUP BY id_operadora";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		$data = array();
+		$bandera = 0;
+
+		foreach ($sql as $value)
+		{
+			if ($bandera == 0)
+			{
+				if ($value["total"] > 0)
+				{
+          			$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCP($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+          		}
+          		
+          		$bandera++;
+			}
+          	else
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCP($value["id_operadora"]));
 		}
 
 		return $data;

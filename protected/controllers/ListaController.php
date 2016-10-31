@@ -92,7 +92,7 @@ class ListaController extends Controller
 					//Updatea en estado 3 todos los numeros duplicados
 					Yii::app()->Filtros->filtrarDuplicados($id_proceso);
 
-					//Updatea a esatdo = 1 todos los numeros validos 
+					//Updatea a estado = 1 todos los numeros validos 
 					Yii::app()->Filtros->filtrarAceptados($id_proceso);
 
 					//Cantidad de destinatarios validos

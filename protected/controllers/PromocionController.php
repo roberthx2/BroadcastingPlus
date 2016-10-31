@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create', 'getCliente'),
+                'actions' => array('create', 'getCliente', 'reporteCreate'),
                 'users' => array('@'),
             ),
 
@@ -48,9 +48,156 @@ class PromocionController extends Controller
 
             if ($model->validate())
             {
-                $this->redirect(array("lista/admin"));
+                //$this->redirect(array("lista/admin"));
                 //print_r($model);
                 //exit;
+                $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+                try
+                {
+                    $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+
+                    //BCNL / CPEI
+                    if ($model->tipo == 1 || $model->tipo == 2)
+                    {
+                        //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+                        if (isset($model->destinatarios) && $model->destinatarios != "") 
+                            Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->destinatarios);
+
+                        //Entra si selecciono por lo menos 1 lista
+                        if (isset($model->listas) && COUNT($model->listas) > 0)
+                        {
+                            $listas_destinatarios = $this->actionGetNumerosListas($model->listas, $model->tipo, null);
+                                //Guarda los numeros de las listas en la tabla de procesamiento
+                            Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $listas_destinatarios);
+                        }
+
+                        //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+                    }
+
+                    //BCP
+                    if ($model->tipo == 3)
+                    {
+                        $operadorasPermitidasBCP = $this->actionGetOperadorasPermitidasBCP(Yii::app()->user->id, $model->id_cliente);
+                        $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
+                        $cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+
+                        if(is_numeric($clienteBCP->sc))
+                            $alfanumerico = false;
+                        else
+                            $alfanumerico = true; //En caso de ser alfanumerico
+
+                        //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+                        if (isset($model->destinatarios) && $model->destinatarios != "") 
+                            Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->destinatarios);
+
+                        //Entra si selecciono por lo menos 1 lista
+                        if (isset($model->listas) && COUNT($model->listas) > 0)
+                        {
+                            $listas_destinatarios = $this->actionGetNumerosListas($model->listas, $model->tipo, $operadorasPermitidasBCP);
+                            //Guarda los numeros de las listas en la tabla de procesamiento
+                            Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $listas_destinatarios);
+                        }
+
+                        //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 2, $alfanumerico);
+
+                        //Updatea en estado 3 todos los números duplicados
+                        Yii::app()->Filtros->filtrarDuplicados($id_proceso);
+
+                        //Updatea en estado 6 todos los numeros con id_operadora no permitido
+                        Yii::app()->Filtros->filtrarOperadoraPermitida($id_proceso, $operadorasPermitidasBCP);
+
+                        //Update en estado 4 todos los numeros exentos
+                        Yii::app()->Filtros->filtrarExentos($id_proceso);
+
+                        if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
+                        {
+                            //Update en estado 5 todos los numeros que no tienen trafico suficiente
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
+
+                            //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
+                            Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
+                        }
+
+                        //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
+                        Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo->disponible);
+
+                        //Updatea a estado = 1 todos los numeros validos 
+                        Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+                        //Cantidad de destinatarios validos
+                        $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+                        $id_promo = 0;
+
+                        //En caso de existir numeros validos procedo a crear la promocion
+                        if ($total > 0)
+                        {
+                            $sql = "SELECT id FROM evento WHERE cliente = :id_cliente";
+                            $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+                            $sql->bindParam(":id_cliente", $model->id_cliente, PDO::PARAM_STR);
+                            $evento = $sql->queryRow();
+
+                            $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $operadorasPermitidasBCP);
+
+                            $model_promocion = new PromocionesPremium;
+                            $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $clienteBCP->sc, $model->nombre, $model->fecha);
+                            $model_promocion->id_cliente = $model->id_cliente;
+                            $model_promocion->estado = 0;
+                            $model_promocion->fecha = $model->fecha;
+                            $model_promocion->hora = $model->hora_inicio;
+                            $model_promocion->loaded_by = Yii::app()->user->id;
+                            $model_promocion->contenido = $model->mensaje;
+                            $model_promocion->fecha_cargada = date("Y-m-d");
+                            $model_promocion->hora_cargada = date("H:i:s");
+                            $model_promocion->save();
+                            $id_promo = $model_promocion->primaryKey;
+
+                            $model_deadline = new DeadlineOutgoingPremium;
+                            $model_deadline->id_promo = $id_promo;
+                            $model_deadline->fecha_limite = $model->fecha;
+                            $model_deadline->hora_limite = $model->hora_fin;
+                            $model_deadline->save();
+
+                            $sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                            
+                            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                            $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
+                            $sql->bindParam(":mensaje", $model->mensaje, PDO::PARAM_STR);
+                            $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
+                            $sql->bindParam(":hora", $model->hora_inicio, PDO::PARAM_STR);
+                            $sql->bindParam(":evento", $evento["id"], PDO::PARAM_STR);
+                            $sql->bindParam(":id_cliente", $model->id_cliente, PDO::PARAM_STR);
+                            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+                            $sql->execute();
+
+                            $model_cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+                            $model_cupo->disponible = $model_cupo->disponible - $total;
+                            $model_cupo->save();
+
+                            //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
+                            $sql = "INSERT INTO numeros_cargados_por_dia (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+                            $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
+                            $sql->execute();
+                        }
+                    }
+
+                    $transaction->commit();
+
+                    $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "id_promo" => $id_promo));
+
+                } catch (Exception $e)
+                    {
+                        $error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+                        Yii::app()->user->setFlash("danger", $error);
+                        $transaction->rollBack();
+                    }
+
+                
             }
             //$this->redirect(array("lista/admin"));
         }
@@ -124,6 +271,103 @@ class PromocionController extends Controller
             
         }
         
+    }
+
+    public function actionGetOperadorasPermitidasBCP($id_usuario, $id_cliente)
+    {
+        $sql = "SELECT * FROM usuario_cliente_operadora WHERE id_usuario = :id_usuario AND id_cliente = :id_cliente";
+        $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+        $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_STR);
+        $sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_STR);
+        //print_r($sql);
+        //exit;
+        $sql = $sql->queryAll();
+
+        foreach ($sql as $oper)
+        {
+            if ($oper["movistar"] == 1) //Movistar
+            {
+                $operadoras[] = 1; //0414
+                $operadoras[] = 2; //0424
+            }
+            if ($oper["movilnet"] == 1) //Movilnet
+            {
+                $operadoras[] = 3; //0416
+                $operadoras[] = 4; //0426
+            }
+            if ($oper["digitel"] == 1) //Digitel
+            {
+                $operadoras[] = 5; //0412
+            }
+            if($oper["digitel_alfanumerico"] == 1) //Digitel alfanumerico
+            {
+                $operadoras[] = 6; //SC alfanumerico
+            }
+        }
+
+        $operadoras = implode(",",$operadoras);
+
+        return $operadoras;
+    }
+
+    public function actionGetNumerosListas($id_listas, $tipo, $operadorasPermitidasBCP)
+    {
+        if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
+        {
+            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") ";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+        }
+
+        else if ($tipo == 3) //BCP
+        {
+            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidasBCP.") ";
+            $operadorasPermitidas = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND id_operadora IN(".$operadorasPermitidas["id_operadora"].")";
+
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+        }
+
+        return $sql["numeros"];   
+    }
+
+    public function actionGetNombrePromo($id_cliente_sms, $tipo, $sc, $nombre, $fecha)
+    {
+        if ($tipo == 3) //BCP
+        {
+            $criteria = new CDbCriteria;
+            $criteria->select = "SUBSTRING(iniciales_cliente, 1, 4) AS iniciales_cliente";
+            $criteria->compare("id_cliente", $id_cliente_sms);
+            $cliente = ClienteSms::model()->find($criteria);
+            $nombre_completo = strtoupper(str_replace(" ", "_", str_replace("-", "", $fecha)."_BCP_".$cliente->iniciales_cliente."_".$sc."_".$nombre));
+        }
+
+        return $nombre_completo;
+    }
+
+    public function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $operadorasPermitidasBCP)
+    {
+        $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".$operadorasPermitidasBCP.")";
+        $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
+        
+        foreach ($sql as $value)
+        {
+            $operadoras[] = array("id_operadora" => $value["id"], "prefijo" => $value["prefijo"]);
+        }
+        
+        foreach ($operadoras as $value)
+        {
+            $sql = "UPDATE tmp_procesamiento SET id_insignia_alarmas = CONCAT('".$descripcion_cliente.$value["prefijo"]."', SUBSTRING(numero,4,7)) WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora = :id_operadora";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+            $sql->bindParam(":id_operadora", $value["id_operadora"], PDO::PARAM_STR);
+            $sql->execute();
+        }
+    }
+
+    public function actionReporteCreate($id_proceso, $nombre, $id_promo)
+    {
+        $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'id_promo'=>$id_promo));
     }
 }
 

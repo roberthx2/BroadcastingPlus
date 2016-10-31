@@ -147,6 +147,33 @@ class TmpProcesamiento extends CActiveRecord
 		));
 	}
 
+	public function searchReporteBCP($id_proceso)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_proceso, t.numero, t.id_operadora, (CASE WHEN o.descripcion != '' THEN o.descripcion ELSE 'INVALIDO' END) AS descripcion_oper, t.estado, e.descripcion AS descripcion_estado";
+		$criteria->condition = "(id_proceso = ".$id_proceso.") AND ";
+		$this->numero = $this->buscar;
+		$this->descripcion_oper = $this->buscar;
+		$this->descripcion_estado = $this->buscar;
+		$criteria->condition .= "(numero LIKE '%".$this->numero."%' OR ";
+		$criteria->condition .= "o.descripcion LIKE '%".$this->descripcion_oper."%' OR ";
+		$criteria->condition .= "e.descripcion LIKE '%".$this->descripcion_estado."%')";
+		$criteria->join = "LEFT JOIN tmp_procesamiento_estado e ON t.estado = e.id_estado 
+						   LEFT JOIN (SELECT id_operadora_bcp, descripcion from operadoras_relacion) as o ON t.id_operadora = o.id_operadora_bcp";
+		//$criteria->group = "o.id_operadora_bcnl";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+        		'attributes'=>array(
+             		'numero', 'o.descripcion', 'e.descripcion'
+        		),
+    		),
+		));
+	}
+
 
 	/**
 	 * @return CDbConnection the database connection used for this class

@@ -1,3 +1,14 @@
+
+<?php if(Yii::app()->user->hasFlash('danger')):?>
+	<br>
+    <div class="container-fluid">
+	        <div class="alert alert-danger">
+	          <button type="button" class="close" data-dismiss="alert">&times;</button>
+	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo Yii::app()->user->getFlash('danger'); ?>
+	        </div>
+	    </div>
+<?php endif; ?>
+
 <?php /** @var TbActiveForm $form */
 	$form = $this->beginWidget(
 		'booster.widgets.TbActiveForm',
@@ -69,8 +80,8 @@
 						'style'=>'display: none;',
 					),
 					'widgetOptions' => array(
-						'data' => array(),
-						'value' => 'null',
+						//'data' => test(),
+						//'value' => 'null',
 						'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
 					),
 					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
@@ -229,11 +240,11 @@
 						),
 						'htmlOptions'=>array(
 							'multiple'=>'multiple',
-							'disabled'=>true,
+							//'disabled'=>true,
 						),
 					),
 					//'prepend' => '<i class="glyphicon glyphicon-random"></i>',
-					'prepend' =>  '<strong>Todos</strong> '.$form->CheckBox($model, 'all_puertos', array('value'=>'true','title'=>'Seleccionar todos', 'onclick'=>'js:disabledPuertos();')),
+					'prepend' =>  '<strong>Todos</strong> '.$form->CheckBox($model, 'all_puertos', array('title'=>'Seleccionar todos', 'onclick'=>'js:disabledPuertos();')),
 				)
 			);?>
 		</div>
@@ -354,41 +365,51 @@
     {
 		//enableFormPromocion($("#PromocionForm_tipo").val());
         hideShowFormPromocion($("#PromocionForm_tipo").val());
+        contarCaracterPromocion();
+		//processKeydown(-1);
 
-        /*$.ajax({
-            url: "<?php //echo Yii::app()->createUrl('/promocion/getCliente'); ?>",
-            type: "POST",
-            dataType: 'json',    
-            data:{tipo:$("#PromocionForm_tipo").val()},
-            
-            complete: function()
-            {
-                
-            },
-            success: function(response)
-            {
-            	if (response.error == "false")
-                {
-                    $("#'.CHTML::activeId($model,'id_cliente').'").empty();
-                    var cliente = response.data;
-                    $.each(cliente, function(i, value) {
-                        $("#'.CHTML::activeId($model,'id_cliente').'").append($("<option>").text(value.descripcion).attr("value",value.id_cliente));
-                    });
-                    $("#cupo").val(response.cupo);
-                    hideShowFormPromocion($("#PromocionForm_tipo").val());
-                }
-                else
-                {
-                    $("#'.CHTML::activeId($model,'id_cliente').'").empty();
-                    hideShowFormPromocion($("#PromocionForm_tipo").val());
-                    console.log(response.status);
-                }
-            },
-            error: function()
-            {
-                alert("Ocurrio un error al cargar los clientes")
-            }
-        });
-	});*/
+		if ($("#PromocionForm_tipo").val() != "")
+		{
+			if ($("#PromocionForm_all_puertos").is(":checked"))
+			{
+				$("#PromocionForm_puertos").prop('disabled', true);
+			}
+
+	        $.ajax({
+	            url: "<?php echo Yii::app()->createUrl('/promocion/getCliente'); ?>",
+	            type: "POST",
+	            dataType: 'json',    
+	            data:{tipo:$("#PromocionForm_tipo").val()},
+	            
+	            complete: function()
+	            {
+	                
+	            },
+	            success: function(response)
+	            {
+	            	if (response.error == "false")
+	                {
+	                    $("#PromocionForm_id_cliente").empty();
+	                    var cliente = response.data;
+	                    $.each(cliente, function(i, value) {
+	                        $("#PromocionForm_id_cliente").append($("<option>").text(value.descripcion).attr("value",value.id_cliente));
+	                    });
+	                    $("#cupo").val(response.cupo);
+	                    hideShowFormPromocion($("#PromocionForm_tipo").val());
+	                }
+	                else
+	                {
+	                    $("#PromocionForm_id_cliente").empty();
+	                    hideShowFormPromocion($("#PromocionForm_tipo").val());
+	                    console.log(response.status);
+	                }
+	            },
+	            error: function()
+	            {
+	                alert("Ocurrio un error al cargar los clientes")
+	            }
+	        });
+	    }
+	});
 
 </script>

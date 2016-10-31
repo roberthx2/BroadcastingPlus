@@ -21,8 +21,14 @@
             if ($bandera == 2)
                 $context = "background-color: #5bc0de; color: white";
             if ($bandera == 3)
-                $context = "background-color: #5cb85c; color: white";
-            if ($bandera == 4)
+            {
+                if ($value["descripcion"] == "Aceptado")
+                    $context = "background-color: #5cb85c; color: white";
+                if ($value["descripcion"] == "Rechazado")
+                    $context = "background-color: #d9534f; color: white";
+            }
+
+            if ($bandera == 4 && $value["descripcion"] == "Rechazado")
                 $context = "background-color: #d9534f; color: white";
             ?>
             <li class="list-group-item">

@@ -26,12 +26,12 @@ Class PromocionForm extends CFormModel
 			array('mensaje', 'length', 'max'=>158),
 			//Safe
 			array("puertos, destinatarios, listas, btl", "safe"),
-
+			array('all_puertos', 'boolean'),
 			array('fecha', 'date', 'format'=>'yyyy-M-d'),
 			//Filter
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
 			array("mensaje","filter","filter"=>array($this, "limpiarMensaje")),
-			//array("destinatarios","filter","filter"=>array($this, "limpiarNumeros")),
+			array("destinatarios","filter","filter"=>array($this, "limpiarNumeros")),
 			//Validaciones
 			//Nombre
 			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
@@ -44,8 +44,7 @@ Class PromocionForm extends CFormModel
 			array("hora_inicio, hora_fin", "horarioPermitido"), //Valida que la hora este en el rango permitido para la carga de promociones
 			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
 			array("destinatarios, listas, btl", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
-			
-			//array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
+			array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
 			
 		);
 	}
@@ -161,18 +160,8 @@ Class PromocionForm extends CFormModel
 		{
 			if (Yii::app()->Procedimientos->clienteIsHipicoLotero($this->id_cliente))
 	    	{
-	    		$sql = "SELECT GROUP_CONCAT(cadena_sc) AS cadena_sc FROM usuario WHERE id_cliente = :id_cliente";
-	    		$sql = Yii::app()->db_sms->createCommand($sql);
-        		$sql->bindParam(":id_cliente", $this->id_cliente, PDO::PARAM_STR);
-        		$cadena_sc = $sql->queryRow();
-
-        		$cadena_sc = trim(preg_replace('/,{2,}/', ",", $cadena_sc["cadena_sc"]), ",");
-
-        		if ($cadena_sc == "")
-        			$cadena_sc = "null";
-        		
-        		$sql = "SELECT DISTINCT(sc_id) AS sc FROM sc_id WHERE id_sc IN(".$cadena_sc.")";
-        		$sql_sc = Yii::app()->db_sms->createCommand($sql)->queryAll();
+        		$cadena_sc = Yii::app()->Procedimientos->getScClienteBCNL($this->id_cliente);
+        		$cadena_sc = explode(",", $cadena_sc);
 
         		$sql = "SELECT valor FROM configuracion_sistema WHERE propiedad = 'sc_en_n_caracteres'";
 		        $caracteres = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
@@ -183,9 +172,9 @@ Class PromocionForm extends CFormModel
 
 		        $valido = false;
 
-		        foreach ($sql_sc as $value)
+		        foreach ($cadena_sc as $value)
 		        {
-		        	if (in_array($value["sc"], $mensaje_partes[0]))
+		        	if (in_array($value, $mensaje_partes[0]))
 			        {
 			        	$valido = true;
 			            break;
@@ -302,7 +291,18 @@ Class PromocionForm extends CFormModel
     {
     	if ($this->tipo == 1 || $this->tipo == 2) //BCNL / CPEI
 		{
-
+			$criteria = new CDbCriteria;
+			$criteria->select = "propiedad, valor";
+			$criteria->addInCondition("propiedad", array('hora_inicio_bcnl', 'hora_fin_bcnl'));
+			$resultado = ConfiguracionSistema::model()->findAll($criteria);
+			
+			foreach ($resultado as $value)
+			{
+				if ($value["propiedad"] == 'hora_inicio_bcnl')
+					$hora_inicio = $value["valor"];
+				else if ($value["propiedad"] == 'hora_fin_bcnl')
+					$hora_fin = $value["valor"];
+			}
 		}
 	    else if ($this->tipo == 3) //BCP
 		{
@@ -318,17 +318,17 @@ Class PromocionForm extends CFormModel
 				else if ($value["propiedad"] == 'hora_fin_bcp')
 					$hora_fin = $value["valor"];
 			}
+		}
 
-			if (strtotime($this->$attribute) < strtotime($hora_inicio) || strtotime($this->$attribute) > strtotime($hora_fin))
-			{
-				$hora_inicio = new DateTime($hora_inicio);
-				$hora_inicio = $hora_inicio->format("h:i a");
+		if (strtotime($this->$attribute) < strtotime($hora_inicio) || strtotime($this->$attribute) > strtotime($hora_fin))
+		{
+			$hora_inicio = new DateTime($hora_inicio);
+			$hora_inicio = $hora_inicio->format("h:i a");
 
-				$hora_fin = new DateTime($hora_fin);
-				$hora_fin = $hora_fin->format("h:i a");
-				
-				$this->addError($attribute, "El horario permitido para el envio de promociones es de : ".$hora_inicio." a ".$hora_fin);
-			}
+			$hora_fin = new DateTime($hora_fin);
+			$hora_fin = $hora_fin->format("h:i a");
+			
+			$this->addError($attribute, "El horario permitido para el envio de promociones es de : ".$hora_inicio." a ".$hora_fin);
 		}
     }
 
@@ -336,7 +336,7 @@ Class PromocionForm extends CFormModel
     {
     	if ($this->tipo == 1 || $this->tipo == 2) //BCNL / CPEI
 		{
-			if ($this->$attribute == "" && $this->all_puertos == 0)
+			if (COUNT($this->$attribute) == 0 && $this->all_puertos == 0)
 			{
 				$this->addError($attribute, "Debe seleccionar sus puertos");
 			}	
@@ -345,18 +345,43 @@ Class PromocionForm extends CFormModel
 
     public function ingresarDestinatarios($attribute, $params)
     {
-    	$condicion = $this->destinatarios." == '' ";
-
-    	if (isset($this->listas))
-			$condicion .= " && ".COUNT($this->listas)." == 0 ";
-
-		if (isset($this->btl))
-			$condicion .= " && ".$this->btl." == '' ";
-
-    	if ($condicion)
+    	if ($this->destinatariosIsset() && $this->listasIsset() && $this->btlIsset())
     	{
     		$this->addError($attribute, "Debe ingresar algún destinatario");
     	}	
+    }
+
+    public function destinatariosIsset()
+    {
+    	//Retorna true para no tomarlo en cuenta
+    	if (!isset($this->destinatarios))
+    		return true;
+    	if (isset($this->destinatarios) && $this->destinatarios == "")
+    		return true;
+    	if (isset($this->destinatarios) && $this->destinatarios != "")
+    		return false;
+    }
+
+    public function listasIsset()
+    {
+    	//Retorna true para no tomarlo en cuenta
+    	if (!isset($this->listas))
+    		return true;
+    	if (isset($this->listas) && COUNT($this->listas) == 0)
+    		return true;
+    	if (isset($this->listas) && COUNT($this->listas) != 0)
+    		return false;
+    }
+
+    public function btlIsset()
+    {
+    	//Retorna true para no tomarlo en cuenta
+    	if (!isset($this->btl))
+    		return true;
+    	if (isset($this->btl) && $this->btl == "")
+    		return true;
+    	if (isset($this->btl) && $this->btl != "")
+    		return false;
     }
 }
 ?>

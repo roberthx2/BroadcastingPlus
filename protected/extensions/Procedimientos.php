@@ -16,6 +16,7 @@ class Procedimientos extends CApplicationComponent
 			{
 				$model = new ProcesosActivos;
 				$model->id_proceso = $proceso;
+				$model->hora = date("H:i:s");
 				$model->save();
 				$valido = false;
 			}
@@ -48,10 +49,10 @@ class Procedimientos extends CApplicationComponent
 
 	public function getClientesBCNL($id_usuario)
 	{
-		//Solo trae los clientes activos
+		//Solo trae los clientes activos YA NO
 		$sql = "SELECT c.id_cliente AS id_cliente, c.Des_cliente AS descripcion FROM cliente c "
-				. "INNER JOIN cliente_fechas f ON c.id_cliente = f.id_cliente "
-				. "WHERE c.id_cliente IN (".$this->getClienteBCNLHerencia($id_usuario).") AND f.fecha_fin = '0000-00-00' "
+				//. "INNER JOIN cliente_fechas f ON c.id_cliente = f.id_cliente "
+				. "WHERE c.id_cliente IN (".$this->getClienteBCNLHerencia($id_usuario).") " /*AND f.fecha_fin = '0000-00-00'*/ 
 				. "ORDER BY c.Des_cliente ASC";
 
 		$model = Yii::app()->db_sms->createCommand($sql)->queryAll();
@@ -119,6 +120,26 @@ class Procedimientos extends CApplicationComponent
         if ($sql["t"] > 0)
         	return true;
         else return false;
+	}
+
+	public function getScClienteBCNL($id_cliente)
+	{
+		$sql = "SELECT GROUP_CONCAT(DISTINCT(p.id_sc)) AS cadena_sc FROM producto p "
+	            . "INNER JOIN cliente c on p.cliente = c.Id_cliente "
+	            . "WHERE c.id_cliente = :id_cliente "
+	            . "AND p.desc_producto NOT LIKE 'CERRADO%' ";
+	    $sql = Yii::app()->db_sms->createCommand($sql);
+	    $sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_STR);
+        $sql = $sql->queryRow();
+	    $cadena_sc = trim(preg_replace('/,{2,}/', ",", $sql["cadena_sc"]), ",");
+	    
+	    if ($cadena_sc == "")
+	    	$cadena_sc = "null"; //Esto evita que el query explote en caso de no tener productos asociados al cliente
+
+	    $sql = "SELECT GROUP_CONCAT(DISTINCT(sc_id)) AS cadena_sc FROM sc_id WHERE id_sc IN (".$cadena_sc.")";
+	    $cadena_sc = Yii::app()->db_sms->createCommand($sql)->queryRow();
+
+	    return $cadena_sc["cadena_sc"];
 	}
 }
 
