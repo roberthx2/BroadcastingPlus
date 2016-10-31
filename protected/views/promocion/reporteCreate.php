@@ -1,7 +1,7 @@
 <div class="col-md-5">
 	<?php 
 		$objeto = TmpProcesamientoController::actionResumenGeneral($id_proceso, $nombre);
-		echo $this->renderPartial("/TmpProcesamiento/resumenGeneral", array("objeto"=>$objeto), true); 
+		echo $this->renderPartial("/TmpProcesamiento/resumenGeneralPromocion", array("objeto"=>$objeto, "url_confirmar"=>$url_confirmar), true); 
 	?>
 </div>
 <div class="col-md-7">
@@ -10,23 +10,6 @@
 	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
 </div>
-
-<div class="clearfix visible-xs-block"></div>
-
-<?php 
-	$this->widget(
-        'booster.widgets.TbButton',
-        array(
-        	'id'=>'agregar',
-        	'buttonType' => 'link',
-            'context' => 'dafault',
-            'label' => 'Confirmar',
-            'icon' => 'glyphicon glyphicon-plus',
-            'url' => Yii::app()->createUrl("lista/agregarNumeros", array()),
-            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6', 'style'=>'float:rigth;'),
-        )
-    ); 
-?>
 
 <div class="clearfix visible-xs-block"></div>
 

@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create', 'getCliente', 'reporteCreate'),
+                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP'),
                 'users' => array('@'),
             ),
 
@@ -115,7 +115,7 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
+                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
                             Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
@@ -177,18 +177,32 @@ class PromocionController extends Controller
                             $model_cupo->disponible = $model_cupo->disponible - $total;
                             $model_cupo->save();
 
+                            $descripcion_historial = "PROMOCION BCP CREADA con nombre ".$model_promocion->nombrePromo." para (".$total.") destinatarios";
+
+                            $model_cupo_historial = new UsuarioCupoHistoricoPremium;
+                            $model_cupo_historial->id_usuario = Yii::app()->user->id;
+                            $model_cupo_historial->id_cliente = $clienteBCP->id_cliente_sms;
+                            $model_cupo_historial->cantidad = $total;
+                            $model_cupo_historial->descripcion = $descripcion_historial;
+                            $model_cupo_historial->fecha = date("Y-m-d");
+                            $model_cupo_historial->hora = date("H:i:s");
+                            $model_cupo_historial->tipo_operacion = 3; //Consumido
+                            $model_cupo_historial->save();
+
                             //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
                             $sql = "INSERT INTO numeros_cargados_por_dia (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
                             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
                             $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
                             $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
                             $sql->execute();
+
+                            $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
                         }
                     }
 
                     $transaction->commit();
 
-                    $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "id_promo" => $id_promo));
+                    $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar));
 
                 } catch (Exception $e)
                     {
@@ -339,7 +353,7 @@ class PromocionController extends Controller
             $criteria->select = "SUBSTRING(iniciales_cliente, 1, 4) AS iniciales_cliente";
             $criteria->compare("id_cliente", $id_cliente_sms);
             $cliente = ClienteSms::model()->find($criteria);
-            $nombre_completo = strtoupper(str_replace(" ", "_", str_replace("-", "", $fecha)."_BCP_".$cliente->iniciales_cliente."_".$sc."_".$nombre));
+            $nombre_completo = preg_replace('/_{2,}/', "_", strtoupper(str_replace(" ", "_", str_replace("-", "", $fecha)."_BCP_".$cliente->iniciales_cliente."_".$sc."_".$nombre)));
         }
 
         return $nombre_completo;
@@ -365,9 +379,37 @@ class PromocionController extends Controller
         }
     }
 
-    public function actionReporteCreate($id_proceso, $nombre, $id_promo)
+    public function actionConfirmarBCP()
     {
-        $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'id_promo'=>$id_promo));
+        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $id_promo = $_GET["id_promo"];
+            $model_promocion = PromocionesPremium::model()->findByPk($id_promo);
+            $model_promocion->estado = 2;
+            $model_promocion->save();
+
+            $sql = "UPDATE outgoing_premium SET status = 2 WHERE id_promo = :id_promo";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+            $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
+            $sql->execute();
+
+            $transaction->commit();
+            $error = 'false';
+        } catch (Exception $e)
+            {
+                $error = "true";
+                $transaction->rollBack();
+            }
+
+        header('Content-Type: application/json; charset="UTF-8"');
+        echo CJSON::encode(array('error' => $error));
+    }
+
+    public function actionReporteCreate($id_proceso, $nombre, $url_confirmar)
+    {
+        $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar));
     }
 }
 
