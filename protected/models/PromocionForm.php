@@ -40,6 +40,7 @@ Class PromocionForm extends CFormModel
 			array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas 
 			array("mensaje", "scEnSMS"), //Valida que el Short Code este en el mensaje (Para clientes hipicos y loteros)
 			array("mensaje", "numerosTelefonicos"), //Valida si existen numeros telefonicos o sc en el mensaje (Para clientes hipicos y loteros)
+			array("hora_fin", "horaActual"), //Valida que la hora fin sea mayor que la hora actual
 			array("hora_inicio, hora_fin", "compararHoras"), //Valida que la hora inicio sea menor que la hora fin
 			array("hora_inicio, hora_fin", "horarioPermitido"), //Valida que la hora este en el rango permitido para la carga de promociones
 			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
@@ -273,6 +274,14 @@ Class PromocionForm extends CFormModel
 		        }
 	    	}
 	    }
+    }
+
+    public function horaActual($attribute, $params)
+    {
+    	if (strtotime($this->$attribute) < strtotime(date("H:i")))
+    	{
+    		$this->addError($attribute, "La hora fin debe ser mayor que la hora actual");
+    	}
     }
 
     public function compararHoras($attribute, $params)

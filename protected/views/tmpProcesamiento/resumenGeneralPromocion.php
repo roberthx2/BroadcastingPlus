@@ -99,7 +99,7 @@
         array(
             'id'=>'confirmar',
             'context' => 'success',
-            'label' => 'Confirmar',
+            'label' => 'Aceptar',
             //'buttonType' =>'link',
             //'url' => '#',//Yii::app()->controller->createUrl("deleteLista", array("id" => $model->id_lista)),
             'icon' => 'glyphicon glyphicon-ok',

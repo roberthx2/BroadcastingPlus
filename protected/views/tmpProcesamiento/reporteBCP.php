@@ -89,7 +89,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 <?php
 
-function estado($estado, $descripcion_estado)
+/*function estado($estado, $descripcion_estado)
 {
     $objeto = array();
 
@@ -101,6 +101,6 @@ function estado($estado, $descripcion_estado)
     }
 
     return $objeto;
-}
+}*/
 
 ?>

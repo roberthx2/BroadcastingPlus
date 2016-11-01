@@ -115,7 +115,7 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
                             Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
@@ -191,7 +191,7 @@ class PromocionController extends Controller
                             $model_cupo_historial->save();
 
                             //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
-                            $sql = "INSERT INTO numeros_cargados_por_dia (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                            $sql = "INSERT INTO numeros_cargados_por_dia_temp (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
                             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
                             $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
                             $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
@@ -212,6 +212,7 @@ class PromocionController extends Controller
                     {
                         $error = "Ocurrio un error al procesar los datos, intente nuevamente.";
                         Yii::app()->user->setFlash("danger", $error);
+                        print_r($e);
                         $transaction->rollBack();
                     }
 
@@ -399,7 +400,7 @@ class PromocionController extends Controller
             $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
             $sql->execute();
 
-            $log = "PROMOCION CONFIRMADA | id_promo: ".$id_promo." | id_cliente_bcp: ".$model_promocion->id_cliente;
+            $log = "PROMOCION CONFIRMADA BCP | id_promo: ".$id_promo." | id_cliente_bcp: ".$model_promocion->id_cliente;
             Yii::app()->Procedimientos->setLog($log);
 
             $transaction->commit();
