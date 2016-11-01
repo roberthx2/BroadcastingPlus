@@ -131,6 +131,7 @@ class PromocionController extends Controller
                         $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
 
                         $id_promo = 0;
+                        $url_confirmar = null;
 
                         //En caso de existir numeros validos procedo a crear la promocion
                         if ($total > 0)
@@ -197,6 +198,9 @@ class PromocionController extends Controller
                             $sql->execute();
 
                             $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
+
+                            $log = "PROMOCION BCP CREADA | id_promo: ".$id_promo." | id_cliente_sms: ".$clienteBCP->id_cliente_sms." | id_cliente_bcp: ".$model->id_cliente." | Destinatarios: ".$total;
+                            Yii::app()->Procedimientos->setLog($log);
                         }
                     }
 
@@ -394,6 +398,9 @@ class PromocionController extends Controller
             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
             $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
             $sql->execute();
+
+            $log = "PROMOCION CONFIRMADA | id_promo: ".$id_promo." | id_cliente_bcp: ".$model_promocion->id_cliente;
+            Yii::app()->Procedimientos->setLog($log);
 
             $transaction->commit();
             $error = 'false';

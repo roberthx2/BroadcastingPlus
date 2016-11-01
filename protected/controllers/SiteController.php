@@ -110,10 +110,15 @@ class SiteController extends Controller
 				{
 					if(Yii::app()->user->getPermisos()->acceso_sistema == 1 && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei))
 					{
+						$log = "Login exitoso del usuario: ".Yii::app()->user->name;
+						Yii::app()->Procedimientos->setLog($log);
 						$this->redirect(Yii::app()->createUrl('home/index'));
 					}
 				}
 				
+				$log = "Login fallido del usuario: ".Yii::app()->user->name." debido a que no posee acceso al sistema";
+				Yii::app()->Procedimientos->setLog($log);
+
 				Yii::app()->user->logout();
 				$error = true;
 			}

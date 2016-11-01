@@ -46,7 +46,7 @@
         <?php 
         $bandera += 1; } ?>
 
-        <?php if ($url_confirmar != null)
+        <?php if ($url_confirmar != null && $url_confirmar != 'CPEI')
         { ?>
             <li id="div_agregar" class="list-group-item">
                 <center>
@@ -67,7 +67,7 @@
                 </center> 
             </li>
         <?php }
-              else
+              else if ($url_confirmar == 'CPEI')
                 {?>
                     <li id="div_agregar" class="list-group-item">
                         <stong><center style='color:#5cb85c; font-size: 16px;'>Confirmada</center></stong>
@@ -146,22 +146,30 @@
             
             complete: function()
             {
-                //alert("termine");
+                $("#modal_footer").hide();
             },
             success: function(data)
             {
                 if (data.error == 'false')
                 {
-                    var mensaje = "<center><strong>Promoción confirmada correctamente</center></strong>";
+                    var mensaje = "<strong><center>Promoción confirmada correctamente</center> <br><br> <center>Redireccionando...</center></strong>";
+
                     $("#div_agregar").html("<stong><center style='color:#5cb85c; font-size: 16px;'>Confirmada</center></stong>");
+                    $("#divModalConfirmar").html(mensaje);
+ 
+                    setTimeout(function () {
+                        var url = "<?php echo Yii::app()->createUrl('home/index'); ?>";
+                        $(location).attr('href', url);
+                    }, 3000);
+
+
                 }
                 else
                 {
                     var mensaje = "<center><strong>NO se pudo confirmar la promoción</center></strong>";
+                    $("#divModalConfirmar").html(mensaje);
+                
                 }
-
-                $("#divModalConfirmar").html(mensaje);
-                $("#modal_footer").hide();
             },
 
             error: function()

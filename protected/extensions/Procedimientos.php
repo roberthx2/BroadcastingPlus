@@ -141,6 +141,19 @@ class Procedimientos extends CApplicationComponent
 
 	    return $cadena_sc["cadena_sc"];
 	}
+
+	public function setLog($descripcion)
+	{
+		$model = new Log();
+		$model->id_usuario = Yii::app()->user->id;
+		$model->ip_usuario = Yii::app()->request->userHostAddress;
+		$model->ip_servidor = Yii::app()->request->serverName;
+		$model->fecha = date("Y-m-d");
+		$model->hora = date("H:i:s");
+		$model->descripcion = $descripcion;
+		$model->controller_action = Yii::app()->request->queryString;
+		$model->save();
+	}
 }
 
 ?>
