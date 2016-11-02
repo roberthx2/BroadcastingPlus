@@ -117,6 +117,24 @@ class Procedimientos extends CApplicationComponent
         else return "null";
 	}
 
+	public function getUsuariosBCNLHerenciaInversa($id_usuario)
+	{
+		$model_sms = UsuarioSms::model()->findByPk($id_usuario);
+		$ids_usuarios[] = $model_sms->id_usuario;
+
+		$sql = "SELECT id_usuario, creado FROM usuario WHERE id_usuario = ".$model_sms->creado;
+        $sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+
+        while ($sql["id_usuario"] != "") //Goadmin
+        {
+        	$ids_usuarios[] = $sql["id_usuario"];
+        	$sql = "SELECT id_usuario, creado FROM usuario WHERE id_usuario = ".$sql["creado"];
+        	$sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+        }
+
+        return implode(",", $ids_usuarios);
+	}
+
 	public function clienteIsHipicoLotero($id_cliente)
 	{
 		$sql = "SELECT COUNT(*) t FROM clientes_tipos AS t, clientes_etiquetas AS e 

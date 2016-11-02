@@ -47,8 +47,9 @@ class PromocionController extends Controller
             $model->attributes=$_POST['PromocionForm'];
 
             if ($model->validate())
-            {
-                $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+            {exit;
+                $transaction = Yii::app()->db->beginTransaction(); //Insignia_masivo
+                $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
 
                 try
                 {
@@ -97,9 +98,30 @@ class PromocionController extends Controller
                         //En caso de existir numeros validos procedo a crear la promocion
                         if ($total > 0)
                         {
+                            if ($model->tipo == 1) //BCNL
+                            {
+                                $estado = 0;
+                                $prefijo = "BCNL";
+                            }
+                            else if ($model->tipo == 2) //CPEI
+                            {
+                                $estado = 2;
+                                $prefijo = "CPEI";
+                                $model->hora_inicio = date("H:i:s");
+                                $hora_fin = strtotime( '+'. $model->duracion.' minute' , strtotime($model->hora_inicio));
+                                $hora_fin = date('H:i:s' , $hora_fin);
+                                
+                            }
+
+                            if ($model->all_puertos == true)
+                            {
+                                //BUSCO TODOS LOS PUERTOS DEL USUARIO
+                            }
+
                             $model_promocion = new Promociones;
                             $model_promocion->nombrePromo = $this->actionGetNombrePromo($model->id_cliente, $model->tipo, null, $model->nombre, $model->fecha);
                             $model_promocion->cadena_usuarios = Yii::app()->user->id;
+                            $model_promocion->estado = $estado;
                             $model_promocion->contenido = $model->mensaje;
                             $model_promocion->fecha = $model->fecha;
                             $model_promocion->hora = $model->hora_inicio;
@@ -113,15 +135,51 @@ class PromocionController extends Controller
                             $model_deadline->hora_limite = $model->hora_fin;
                             $model_deadline->save();
 
-                            $model_usuario = UsuarioMasivo::model()->findByPk(Yii::app()->user->id);
-                            $model_usuario->cadena_promo = $model_usuario->cadena_promo.",".$id_promo;
-                            $model_usuario->save();
+                            $sql = "UPDATE usuario SET cadena_promo = CONCAT(cadena_promo, ',', '".$id_promo."') 
+                                    WHERE id_usuario IN(".Yii::app()->Procedimientos->getUsuariosBCNLHerenciaInversa(Yii::app()->user->id).")";
+                            Yii::app()->db->createCommand($sql)->execute();
 
-                            //REGISTRAR PUERTOS EN puerto_usu_promo
+                            //Puertos
+                            foreach ($model->puertos as $value)
+                            {
+                                $puertos[] = "(".Yii::app()->user->id.", ".$id_promo.", '".$value."',".$value.")";
+                            }
 
+                            $sql = "INSERT INTO puerto_usu_promo VALUES ".implode(",", $puertos);
+                            Yii::app()->db->createCommand($sql)->execute();
+                            
                             //Registro los mensajes en outgoing
 
-                            $log = "PROMOCION BCNL CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
+                            $count_puertos = count($model->puertos);
+                            $sms_x_modem = $total/$count_puertos;
+                            $sms_x_modem = ceil($sms_x_modem); //Redondea el valor hacia arriba Ej: 4.2 = 5
+                            $limite_inferio = 0;
+                            $id_usuario = Yii::app()->user->id;
+
+                            foreach ($model->puertos as $value)
+                            {
+                                $sql = "INSERT INTO insignia_masivo.outgoing (id_promo, number, status, frecuency, date_loaded, time_loaded, loaded_by, date_program, time_program, content, id_cliente) SELECT :id_promo, CONCAT('0',numero), :estado, :puerto, :fecha_cargada, :hora_cargada, :id_usuario, :fecha_envio, :hora_envio, :mensaje, :id_cliente FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 LIMIT :limite_inferio , :limite_superior";
+                            
+                                $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                                $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
+                                $sql->bindParam(":estado", $estado, PDO::PARAM_INT);
+                                $sql->bindParam(":puerto", $value, PDO::PARAM_INT);
+                                $sql->bindParam(":fecha_cargada", date("Y-m-d"), PDO::PARAM_STR);
+                                $sql->bindParam(":hora_cargada", date("H:i:s"), PDO::PARAM_STR);
+                                $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
+                                $sql->bindParam(":fecha_envio", $model->fecha, PDO::PARAM_STR);
+                                $sql->bindParam(":hora_envio", $model->hora_inicio, PDO::PARAM_STR);
+                                $sql->bindParam(":mensaje", $model->mensaje, PDO::PARAM_STR);
+                                $sql->bindParam(":id_cliente", $model->id_cliente, PDO::PARAM_INT);
+                                $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+                                $sql->bindParam(":limite_inferio", $limite_inferio, PDO::PARAM_INT);
+                                $sql->bindParam(":limite_superior", $sms_x_modem, PDO::PARAM_INT);
+                                $sql->execute();
+
+                                $limite_inferio = $limite_inferio + $sms_x_modem;
+                            }
+
+                            $log = "PROMOCION ".$prefijo." CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
                             Yii::app()->Procedimientos->setLog($log);
                         }
                     }
@@ -230,6 +288,7 @@ class PromocionController extends Controller
                             $model_cupo_historial = new UsuarioCupoHistoricoPremium;
                             $model_cupo_historial->id_usuario = Yii::app()->user->id;
                             $model_cupo_historial->id_cliente = $clienteBCP->id_cliente_sms;
+                            $model_cupo_historial->ejecutado_por = Yii::app()->user->id;
                             $model_cupo_historial->cantidad = $total;
                             $model_cupo_historial->descripcion = $descripcion_historial;
                             $model_cupo_historial->fecha = date("Y-m-d");
@@ -252,6 +311,7 @@ class PromocionController extends Controller
                     }
 
                     $transaction->commit();
+                    $transaction2->commit();
 
                     $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar));
 
@@ -261,6 +321,7 @@ class PromocionController extends Controller
                         Yii::app()->user->setFlash("danger", $error);
                         print_r($e);
                         $transaction->rollBack();
+                        $transaction2->rollBack();
                     }   
             }
         }

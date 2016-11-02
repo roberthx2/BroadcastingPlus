@@ -278,10 +278,13 @@ Class PromocionForm extends CFormModel
 
     public function horaActual($attribute, $params)
     {
-    	if (strtotime($this->$attribute) < strtotime(date("H:i")))
+    	if ($this->tipo == 1 || $this->tipo == 3) //BCNL o BCP
     	{
-    		$this->addError($attribute, "La hora fin debe ser mayor que la hora actual");
-    	}
+	    	if (strtotime($this->$attribute) < strtotime(date("H:i")))
+	    	{
+	    		$this->addError($attribute, "La hora fin debe ser mayor que la hora actual");
+	    	}
+	    }
     }
 
     public function compararHoras($attribute, $params)

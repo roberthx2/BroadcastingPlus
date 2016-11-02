@@ -1,27 +1,22 @@
 <?php
 
 /**
- * This is the model class for table "usuario_cupo_historico_premium".
+ * This is the model class for table "puerto_usu_promo".
  *
- * The followings are the available columns in table 'usuario_cupo_historico_premium':
- * @property integer $id
- * @property integer $id_usuario
- * @property integer $id_cliente
- * @property integer $ejecutado_por
- * @property integer $cantidad
- * @property string $descripcion
- * @property string $fecha
- * @property string $hora
- * @property integer $tipo_operacion
+ * The followings are the available columns in table 'puerto_usu_promo':
+ * @property string $id_usuario
+ * @property string $id_promo
+ * @property string $id_modem
+ * @property string $modem_principal
  */
-class UsuarioCupoHistoricoPremium extends CActiveRecord
+class PuertoUsuPromo extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'usuario_cupo_historico_premium';
+		return 'puerto_usu_promo';
 	}
 
 	/**
@@ -32,12 +27,12 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario, id_cliente, cantidad, descripcion, fecha, hora, tipo_operacion', 'required'),
-			array('id_usuario, id_cliente, ejecutado_por, cantidad, tipo_operacion', 'numerical', 'integerOnly'=>true),
-			array('descripcion', 'length', 'max'=>256),
+			array('id_usuario, id_promo, id_modem, modem_principal', 'required'),
+			array('id_usuario, id_promo, modem_principal', 'length', 'max'=>10),
+			array('id_modem', 'length', 'max'=>40),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_usuario, id_cliente, ejecutado_por, cantidad, descripcion, fecha, hora, tipo_operacion', 'safe', 'on'=>'search'),
+			array('id_usuario, id_promo, id_modem, modem_principal', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,15 +53,10 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
 			'id_usuario' => 'Id Usuario',
-			'id_cliente' => 'Id Cliente',
-			'ejecutado_por' => 'Ejecutado Por',
-			'cantidad' => 'Cantidad',
-			'descripcion' => 'Descripcion',
-			'fecha' => 'Fecha',
-			'hora' => 'Hora',
-			'tipo_operacion' => 'Tipo Operacion',
+			'id_promo' => 'Id Promo',
+			'id_modem' => 'Id Modem',
+			'modem_principal' => 'Modem Principal',
 		);
 	}
 
@@ -88,15 +78,10 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id',$this->id);
-		$criteria->compare('id_usuario',$this->id_usuario);
-		$criteria->compare('id_cliente',$this->id_cliente);
-		$criteria->compare('ejecutado_por',$this->ejecutado_por);
-		$criteria->compare('cantidad',$this->cantidad);
-		$criteria->compare('descripcion',$this->descripcion,true);
-		$criteria->compare('fecha',$this->fecha,true);
-		$criteria->compare('hora',$this->hora,true);
-		$criteria->compare('tipo_operacion',$this->tipo_operacion);
+		$criteria->compare('id_usuario',$this->id_usuario,true);
+		$criteria->compare('id_promo',$this->id_promo,true);
+		$criteria->compare('id_modem',$this->id_modem,true);
+		$criteria->compare('modem_principal',$this->modem_principal,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -104,18 +89,10 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 	}
 
 	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->db_masivo_premium;
-	}
-
-	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return UsuarioCupoHistoricoPremium the static model class
+	 * @return PuertoUsuPromo the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

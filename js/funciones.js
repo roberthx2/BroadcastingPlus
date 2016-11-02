@@ -181,6 +181,8 @@ function hideShowFormPromocion(tipo)
         $("#div_hora_fin").hide();
         $("#div_duracion").show();
         $("#div_puertos").show();
+        $("#PromocionForm_all_puertos").prop("checked", true);
+        $("#PromocionForm_puertos").prop('disabled', true);
         $("#div_destinatarios").show();
         $("#div_listas").show();
         $("#div_btl").show();
