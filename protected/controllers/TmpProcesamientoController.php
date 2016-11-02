@@ -258,12 +258,14 @@ class TmpProcesamientoController extends Controller
 
 	public function actionReporteTortaBCP($id_proceso)
 	{
-		$sql = "SELECT 'INVALIDOS' AS descripcion, COUNT(*) AS total, 0 AS id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado <> 1
+		$sql = "SELECT descripcion, SUM(total) AS total, id_operadora FROM (
+				SELECT 'INVALIDOS' AS descripcion, COUNT(*) AS total, 0 AS id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado <> 1
 				UNION
 				SELECT o.descripcion, COUNT(*) AS total, t.id_operadora FROM tmp_procesamiento t 
 				INNER JOIN (SELECT id_operadora_bcp, descripcion FROM operadoras_relacion) o ON t.id_operadora = o.id_operadora_bcp 
 				WHERE t.id_proceso = ".$id_proceso." AND t.estado = 1 
-				GROUP BY id_operadora";
+				GROUP BY id_operadora) AS tabla 
+				GROUP BY descripcion ORDER BY id_operadora";
 
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 

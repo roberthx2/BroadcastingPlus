@@ -60,6 +60,15 @@ class Procedimientos extends CApplicationComponent
         return $model;
 	}
 
+	public function getClienteCPEI($id_usuario)
+	{
+		$sql = "SELECT c.id_cliente AS id_cliente, c.Des_cliente AS descripcion FROM cliente c WHERE id_cliente = ".Yii::app()->user->modelSMS()->id_cliente;
+
+		$model = Yii::app()->db_sms->createCommand($sql)->queryAll();
+
+        return $model;
+	}
+
 	public function getClientesBCP($id_usuario)
 	{
 		$sql = "SELECT c.id AS id_cliente, REPLACE(c.descripcion, '@', '') AS descripcion FROM usuario_cliente_operadora u "

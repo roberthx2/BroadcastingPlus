@@ -48,14 +48,12 @@ class PromocionController extends Controller
 
             if ($model->validate())
             {
-                //$this->redirect(array("lista/admin"));
-                //print_r($model);
-                //exit;
                 $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
                 try
                 {
                     $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+                    $url_confirmar = null;
 
                     //BCNL / CPEI
                     if ($model->tipo == 1 || $model->tipo == 2)
@@ -74,6 +72,58 @@ class PromocionController extends Controller
 
                         //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
                         Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+
+                        //Updatea en estado 3 todos los números duplicados
+                        Yii::app()->Filtros->filtrarDuplicados($id_proceso);
+
+                        //Update en estado 4 todos los numeros exentos
+                        Yii::app()->Filtros->filtrarExentos($id_proceso);
+
+                        if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
+                        {
+                            //Update en estado 5 todos los numeros que no tienen trafico suficiente
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
+                        }
+
+                        //FILTRO DE PORCENTAJE POR OPERADORA (USUARIO Y CLIENTE)
+                        //FILTRO DE CUPO
+
+                        //Updatea a estado = 1 todos los numeros validos 
+                        Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+                        //Cantidad de destinatarios validos
+                        $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+                        //En caso de existir numeros validos procedo a crear la promocion
+                        if ($total > 0)
+                        {
+                            $model_promocion = new Promociones;
+                            $model_promocion->nombrePromo = $this->actionGetNombrePromo($model->id_cliente, $model->tipo, null, $model->nombre, $model->fecha);
+                            $model_promocion->cadena_usuarios = Yii::app()->user->id;
+                            $model_promocion->contenido = $model->mensaje;
+                            $model_promocion->fecha = $model->fecha;
+                            $model_promocion->hora = $model->hora_inicio;
+                            $model_promocion->cliente = $model->id_cliente;
+                            $model_promocion->save();
+                            $id_promo = $model_promocion->primaryKey;
+
+                            $model_deadline = new DeadlineOutgoing;
+                            $model_deadline->id_promo = $id_promo;
+                            $model_deadline->fecha_limite = $model->fecha;
+                            $model_deadline->hora_limite = $model->hora_fin;
+                            $model_deadline->save();
+
+                            $model_usuario = UsuarioMasivo::model()->findByPk(Yii::app()->user->id);
+                            $model_usuario->cadena_promo = $model_usuario->cadena_promo.",".$id_promo;
+                            $model_usuario->save();
+
+                            //REGISTRAR PUERTOS EN puerto_usu_promo
+
+                            //Registro los mensajes en outgoing
+
+                            $log = "PROMOCION BCNL CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
+                            Yii::app()->Procedimientos->setLog($log);
+                        }
                     }
 
                     //BCP
@@ -129,9 +179,6 @@ class PromocionController extends Controller
 
                         //Cantidad de destinatarios validos
                         $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
-
-                        $id_promo = 0;
-                        $url_confirmar = null;
 
                         //En caso de existir numeros validos procedo a crear la promocion
                         if ($total > 0)
@@ -214,11 +261,8 @@ class PromocionController extends Controller
                         Yii::app()->user->setFlash("danger", $error);
                         print_r($e);
                         $transaction->rollBack();
-                    }
-
-                
+                    }   
             }
-            //$this->redirect(array("lista/admin"));
         }
 
         if (Yii::app()->user->getPermisos()->broadcasting && Yii::app()->user->getPermisos()->crear_promo_bcnl)
@@ -253,9 +297,14 @@ class PromocionController extends Controller
                 ));
                 Yii::app()->end();
             } else {   
-                if ($tipo == 1 || $tipo == 2) //BCNL o CPEI
+                if ($tipo == 1) //BCNL o CPEI
                 {
                     $data = Yii::app()->Procedimientos->getClientesBCNL(Yii::app()->user->id);
+                    $cupo = 0;
+                }
+                else if ($tipo == 2)
+                {
+                    $data = Yii::app()->Procedimientos->getClienteCPEI(Yii::app()->user->id);
                     $cupo = 0;
                 }
                 else if ($tipo == 3) //BCP
@@ -352,7 +401,25 @@ class PromocionController extends Controller
 
     public function actionGetNombrePromo($id_cliente_sms, $tipo, $sc, $nombre, $fecha)
     {
-        if ($tipo == 3) //BCP
+        if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
+        {
+            if ($tipo == 1)
+            {
+                $pref = "BCNL";
+            }
+            else 
+            {
+                $pref = "CPEI";
+                $fecha = date("Y-m-d");
+            }
+
+            $criteria = new CDbCriteria;
+            $criteria->select = "SUBSTRING(iniciales_cliente, 1, 4) AS iniciales_cliente";
+            $criteria->compare("id_cliente", $id_cliente_sms);
+            $cliente = ClienteSms::model()->find($criteria);
+            $nombre_completo = preg_replace('/_{2,}/', "_", strtoupper(str_replace(" ", "_", str_replace("-", "", $fecha)."_".$pref."_".$cliente->iniciales_cliente."_".$nombre)));
+        }
+        else if ($tipo == 3) //BCP
         {
             $criteria = new CDbCriteria;
             $criteria->select = "SUBSTRING(iniciales_cliente, 1, 4) AS iniciales_cliente";

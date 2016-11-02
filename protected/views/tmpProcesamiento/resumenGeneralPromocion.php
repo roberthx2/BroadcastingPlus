@@ -160,7 +160,7 @@
                     setTimeout(function () {
                         var url = "<?php echo Yii::app()->createUrl('home/index'); ?>";
                         $(location).attr('href', url);
-                    }, 3000);
+                    }, 2000);
 
 
                 }

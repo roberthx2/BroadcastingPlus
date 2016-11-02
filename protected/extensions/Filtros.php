@@ -183,7 +183,7 @@ class Filtros extends CApplicationComponent
 
 		if ($tipo == 1)
 		{
-			$sql = "UPDATE tmp_procesamiento SET estado = 5 WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp)";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp)";
 		}
 		else if ($tipo == 2)
 		{
@@ -191,16 +191,15 @@ class Filtros extends CApplicationComponent
             $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
-
-			$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-			$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-			$id = $sql->queryRow();
-
-			$sql = "UPDATE tmp_procesamiento SET estado = 5 WHERE id IN(".$id["ids"].")";
 		}
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+		$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+		$id = $sql->queryRow();
 
 		if ($id["ids"] != "")
 		{
+			$sql = "UPDATE tmp_procesamiento SET estado = 5 WHERE id IN(".$id["ids"].")";
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 		}
 	}
