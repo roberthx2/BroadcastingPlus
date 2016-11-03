@@ -4,6 +4,7 @@ Class PromocionForm extends CFormModel
 	//Tipo ---> 1. BCNL / 2. BCP / 3. CPEI
 	public $tipo;
 	public $id_cliente;
+	public $prefijo;
 	public $nombre;
 	public $mensaje;
 	public $fecha;
@@ -25,7 +26,7 @@ Class PromocionForm extends CFormModel
 			array('nombre', 'length', 'max'=>25),
 			array('mensaje', 'length', 'max'=>158),
 			//Safe
-			array("puertos, destinatarios, listas, btl", "safe"),
+			array("prefijo, puertos, destinatarios, listas, btl", "safe"),
 			array('all_puertos', 'boolean'),
 			array('fecha', 'date', 'format'=>'yyyy-M-d'),
 			//Filter

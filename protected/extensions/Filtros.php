@@ -294,6 +294,27 @@ class Filtros extends CApplicationComponent
         	Yii::app()->db_masivo_premium->createCommand($sql)->execute();
         }
 	}
+
+	public function filtrarPorcentajeOperadora($id_proceso, $id_cliente, $id_usuario)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "valor";
+		$criteria->addInCondition("propiedad", array('id_operadora_base_bcnl'));
+		$resultado = ConfiguracionSistema::model()->find($criteria);
+
+		//SELECT id_operadora, porcentaje FROM configuracion_envios_usuario where id_usuario=$id_usuario
+		$model_usuario = ConfiguracionEnviosUsuario::model()->findAll("id_usuario = ".$id_usuario);
+
+		if ($model_usuario == null)
+		{
+			$sql = "SELECT t.id_etiqueta AS tipo FROM clientes_tipos t, clientes_etiquetas e WHERE t.id_cliente = ".$id_cliente." AND t.id_etiqueta=e.id";
+			$tipo = Yii::app()->db_insignia_admin->createCommand($sql)->queryRow();
+			
+			//$sql = "SELECT id_operadora, porcentaje FROM configuracion_envios_tipo_cliente where id_etiqueta_cliente=$tipo_cliente";
+			$model_cliente = ConfiguracionEnviosTipoCliente::model()->findAll("id_etiqueta_cliente = ".$tipo["tipo"]);
+		}
+		
+	}
 }
 
 ?>

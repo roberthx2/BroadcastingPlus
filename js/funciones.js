@@ -159,6 +159,7 @@ function hideShowFormPromocion(tipo)
     {       
         $("#div_id_cliente").show();
         $("#div_nombre").show();
+        $("#div_prefijo").show();
         $("#div_mensaje").show();
         $("#div_fecha").show();
         $("#div_hora_inicio").show();
@@ -175,6 +176,7 @@ function hideShowFormPromocion(tipo)
     {       
         $("#div_id_cliente").show();
         $("#div_nombre").show();
+        $("#div_prefijo").show();
         $("#div_mensaje").show();
         $("#div_fecha").hide();
         $("#div_hora_inicio").hide();
@@ -193,6 +195,7 @@ function hideShowFormPromocion(tipo)
     {       
         $("#div_id_cliente").show();
         $("#div_nombre").show();
+        $("#div_prefijo").show();
         $("#div_mensaje").show();
         $("#div_fecha").show();
         $("#div_hora_inicio").show();
@@ -209,6 +212,7 @@ function hideShowFormPromocion(tipo)
     {       
         $("#div_id_cliente").hide();
         $("#div_nombre").hide();
+        $("#div_prefijo").hide();
         $("#div_mensaje").hide();
         $("#div_fecha").hide();
         $("#div_hora_inicio").hide();
@@ -219,5 +223,14 @@ function hideShowFormPromocion(tipo)
         $("#div_listas").hide();
         $("#div_btl").hide();
         $("#div_botones").hide();
+    }
+}
+
+function insertarPrefijo()
+{
+    if ($("#PromocionForm_prefijo").val() != "")
+    {
+        var mensaje = "("+$("#PromocionForm_prefijo").val()+") "+$("#PromocionForm_mensaje").val();
+        $("#PromocionForm_mensaje").val(mensaje);
     }
 }

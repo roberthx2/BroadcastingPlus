@@ -109,6 +109,29 @@
 			); ?>
 		</div>
 
+		<div id="div_prefijo" style="display:none;">
+			<?php //Visible si tiene permisos al modulo de prefijos
+			if (Yii::app()->user->getPermisos()->modulo_btl)
+			{
+				echo $form->dropDownListGroup(
+					$model,
+					'prefijo',
+					array(
+						'wrapperHtmlOptions' => array(
+							'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+							'style'=>'display: none;',
+						),
+						'widgetOptions' => array(
+							'data' => CHtml::listData(PrefijoPromocion::model()->findAll(array("condition"=>"id_usuario = ".Yii::app()->user->id,"order"=>"prefijo")), 'prefijo', 'prefijo'),
+							//'value' => 'null',
+							'htmlOptions' => array('prompt' => 'Seleccionar...', 'onChange' => 'js:insertarPrefijo();'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+						),
+						'prepend' => '<i class="glyphicon glyphicon-bookmark"></i>',
+					)
+				);
+			} ?>
+		</div>
+
 		<div id="div_mensaje" style="display:none;">
 			<?php echo $form->textAreaGroup(
 				$model,
@@ -128,8 +151,11 @@
 				<?php echo CHTML::textField('caracteres',158,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
 		</div>
 
-		<div class="clearfix visible-xs-block"></div>
+		<div class="clearfix visible-xs-block"></div>		
 
+	</div> <!--Cierre de la columna #1-->
+
+	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 		<div id="div_fecha" style="display:none;">
 			<?php echo $form->datePickerGroup(
 				$model,
@@ -154,7 +180,24 @@
 				)
 			); ?>
 		</div>
-
+	
+		<div id="div_duracion" style="display:none;">
+			<?php echo $form->dropDownListGroup(
+				$model,
+				'duracion',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+					),
+					'widgetOptions' => array(
+						'data' => array('20'=>'20', '25'=>'25','30'=>'30','35'=>'35','40'=>'40','45'=>'45','50'=>'50','60'=>'60'),
+						'htmlOptions' => array(),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-time"></i>'
+				)
+			); ?>
+		</div>
+		
 		<div id="div_hora_inicio" style="display:none;">
 			<?php echo $form->timePickerGroup(
 				$model,
@@ -196,28 +239,7 @@
 					//'hint' => 'Nice bootstrap time picker',
 				)
 			); ?>
-		</div>	
-
-		<div id="div_duracion" style="display:none;">
-			<?php echo $form->dropDownListGroup(
-				$model,
-				'duracion',
-				array(
-					'wrapperHtmlOptions' => array(
-						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
-					),
-					'widgetOptions' => array(
-						'data' => array('20'=>'20', '25'=>'25','30'=>'30','35'=>'35','40'=>'40','45'=>'45','50'=>'50','60'=>'60'),
-						'htmlOptions' => array(),
-					),
-					'prepend' => '<i class="glyphicon glyphicon-time"></i>'
-				)
-			); ?>
-		</div>		
-
-	</div> <!--Cierre de la columna #1-->
-
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+		</div>
 
 		<div id="div_puertos" style="display:none;">
 			<?php echo $form->select2Group(
