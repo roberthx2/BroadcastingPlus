@@ -295,25 +295,52 @@ class Filtros extends CApplicationComponent
         }
 	}
 
-	public function filtrarPorcentajeOperadora($id_proceso, $id_cliente, $id_usuario)
+	public function filtrarPorcentajeOperadora($id_proceso, $id_cliente)
 	{
 		$criteria = new CDbCriteria;
 		$criteria->select = "valor";
-		$criteria->addInCondition("propiedad", array('id_operadora_base_bcnl'));
+		$criteria->compare("propiedad","id_operadora_base_bcnl");
 		$resultado = ConfiguracionSistema::model()->find($criteria);
 
-		//SELECT id_operadora, porcentaje FROM configuracion_envios_usuario where id_usuario=$id_usuario
-		$model_usuario = ConfiguracionEnviosUsuario::model()->findAll("id_usuario = ".$id_usuario);
+		$model_porcentaje = ConfiguracionEnviosUsuario::model()->findAll("id_usuario = ".Yii::app()->user->id);
 
-		if ($model_usuario == null)
+		if ($model_porcentaje == null)
 		{
 			$sql = "SELECT t.id_etiqueta AS tipo FROM clientes_tipos t, clientes_etiquetas e WHERE t.id_cliente = ".$id_cliente." AND t.id_etiqueta=e.id";
 			$tipo = Yii::app()->db_insignia_admin->createCommand($sql)->queryRow();
-			
-			//$sql = "SELECT id_operadora, porcentaje FROM configuracion_envios_tipo_cliente where id_etiqueta_cliente=$tipo_cliente";
-			$model_cliente = ConfiguracionEnviosTipoCliente::model()->findAll("id_etiqueta_cliente = ".$tipo["tipo"]);
+
+			$model_porcentaje = ConfiguracionEnviosTipoCliente::model()->findAll("id_etiqueta_cliente = ".$tipo["tipo"]);
 		}
-		
+
+		$count_num_oper_base = TmpProcesamiento::model()->count("id_proceso=:id_proceso AND estado IS NULL AND id_operadora=:id_operadora", array("id_proceso" => $id_proceso, "id_operadora" => $resultado->valor));
+
+		$operadoas = $this->getOperadorasBCNL();
+		$ids = array();
+
+		foreach ($model_porcentaje as $value)
+		{	
+			//Si es diferente a la operadora base y es menor al 100% permitido realiza el filtrado  
+			if ( $value["id_operadora"] != $resultado->valor /*&& $value["porcentaje"] < 100 */) 
+			{
+				$max_x_oper = floor(($count_num_oper_base * $value["porcentaje"]) / 100);
+
+				$sql = "SELECT id FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado IS NULL AND id_operadora = ".$value["id_operadora"]." LIMIT ".$max_x_oper.", 9999999";
+	            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+            
+		        foreach ($sql as $key)
+		        {
+		            $ids[] = $key["id"];
+		        }
+			}
+		}
+
+		$ids = implode(",", $ids);
+
+        if ($ids != "")
+        {
+        	$sql = "UPDATE tmp_procesamiento SET estado = 8 WHERE id IN (".$ids.")";
+        	Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+        }
 	}
 }
 

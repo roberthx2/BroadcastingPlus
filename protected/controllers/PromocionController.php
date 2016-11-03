@@ -47,7 +47,7 @@ class PromocionController extends Controller
             $model->attributes=$_POST['PromocionForm'];
 
             if ($model->validate())
-            {exit;
+            {
                 $transaction = Yii::app()->db->beginTransaction(); //Insignia_masivo
                 $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
 
@@ -83,10 +83,12 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
+                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
                         }
 
-                        //FILTRO DE PORCENTAJE POR OPERADORA (USUARIO Y CLIENTE)
+                        //Update en estado 8 todos los numeros exentos
+                        Yii::app()->Filtros->filtrarPorcentajeOperadora($id_proceso, $model->id_cliente);
+                        
                         //FILTRO DE CUPO
 
                         //Updatea a estado = 1 todos los numeros validos 
