@@ -79,8 +79,11 @@
 	<?php echo $content; ?>
 	<div class="clear"></div>
 </div>
-<!--<div class="footer"></div>
-<br><br>-->
+<!--<div class="footer img-responsive" style="background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg')"></div>-->
+<div class="footer visible-md visible-lg">
+	<img class="img-responsive" src="<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg">
+</div>
+
 <!--<div id="footer" class=" visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png'); background-repeat: no-repeat">
 </div>-->
 
@@ -110,14 +113,15 @@ body {
 }
 .footer {
   position: absolute;
-  padding-top: 10px;
+  padding-top: 50px;
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 10%;
+  height: 7%;
   text-align: center;
   color: white;
-  background: url("<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png");
+  /*background: url("<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg");*/
+  background-repeat: no-repeat;
   /* background-color: #3F3E3E; */
 }
 

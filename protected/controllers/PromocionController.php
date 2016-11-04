@@ -54,6 +54,7 @@ class PromocionController extends Controller
                 try
                 {
                     $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+                    $cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
                     $url_confirmar = null;
 
                     //BCNL / CPEI
@@ -89,7 +90,8 @@ class PromocionController extends Controller
                         //Update en estado 8 todos los numeros exentos
                         Yii::app()->Filtros->filtrarPorcentajeOperadora($id_proceso, $model->id_cliente);
                         
-                        //FILTRO DE CUPO
+                        //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
+                        Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo->disponible);
 
                         //Updatea a estado = 1 todos los numeros validos 
                         Yii::app()->Filtros->filtrarAceptados($id_proceso);
@@ -315,7 +317,7 @@ class PromocionController extends Controller
                     $transaction->commit();
                     $transaction2->commit();
 
-                    $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar));
+                    $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
 
                 } catch (Exception $e)
                     {
@@ -363,23 +365,25 @@ class PromocionController extends Controller
                 if ($tipo == 1) //BCNL o CPEI
                 {
                     $data = Yii::app()->Procedimientos->getClientesBCNL(Yii::app()->user->id);
-                    $cupo = 0;
+                    $model_cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
+
                 }
                 else if ($tipo == 2)
                 {
                     $data = Yii::app()->Procedimientos->getClienteCPEI(Yii::app()->user->id);
-                    $cupo = 0;
+                    $model_cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
                 }
                 else if ($tipo == 3) //BCP
                 {
                     $data = Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id);
                     $model_cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
-                    $cupo = 0;
+                }
+
+                $cupo = 0;
                     
-                    if ($model_cupo)
-                    {
-                        $cupo = $model_cupo->disponible;
-                    }
+                if ($model_cupo)
+                {
+                    $cupo = $model_cupo->disponible;
                 }
 
                 if($data) {
@@ -545,9 +549,9 @@ class PromocionController extends Controller
         echo CJSON::encode(array('error' => $error));
     }
 
-    public function actionReporteCreate($id_proceso, $nombre, $url_confirmar)
+    public function actionReporteCreate($id_proceso, $nombre, $url_confirmar, $tipo)
     {
-        $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar));
+        $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar, 'tipo'=>$tipo));
     }
 }
 
