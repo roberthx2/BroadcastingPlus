@@ -5,19 +5,17 @@
  *
  * The followings are the available columns in table 'notificaciones':
  * @property integer $id_notificacion
- * @property string $id_usuario
+ * @property integer $id_usuario
  * @property string $asunto
  * @property string $mensaje
  * @property string $fecha
  * @property string $hora
  * @property integer $estado
- *
- * The followings are the available model relations:
- * @property Usuario $idUsuario
  */
 class Notificaciones extends CActiveRecord
 {
 	public $buscar;
+	
 	/**
 	 * @return string the associated database table name
 	 */
@@ -35,8 +33,7 @@ class Notificaciones extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_usuario, asunto, mensaje, fecha, hora', 'required'),
-			array('estado', 'numerical', 'integerOnly'=>true),
-			array('id_usuario', 'length', 'max'=>10),
+			array('id_usuario, estado', 'numerical', 'integerOnly'=>true),
 			array('asunto', 'length', 'max'=>50),
 			array('mensaje', 'length', 'max'=>1000),
 			// The following rule is used by search().
@@ -53,7 +50,6 @@ class Notificaciones extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'idUsuario' => array(self::BELONGS_TO, 'Usuario', 'id_usuario'),
 		);
 	}
 
@@ -92,7 +88,7 @@ class Notificaciones extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id_notificacion',$this->id_notificacion);
-		$criteria->compare('id_usuario',$this->id_usuario,true);
+		$criteria->compare('id_usuario',$this->id_usuario);
 		$criteria->compare('asunto',$this->asunto,true);
 		$criteria->compare('mensaje',$this->mensaje,true);
 		$criteria->compare('fecha',$this->fecha,true);

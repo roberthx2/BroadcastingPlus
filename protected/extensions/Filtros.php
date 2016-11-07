@@ -183,14 +183,14 @@ class Filtros extends CApplicationComponent
 
 		if ($tipo == 1)
 		{
-			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp)";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero)";
 		}
 		else if ($tipo == 2)
 		{
 			$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidas.") ";
             $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
-			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
 		}
 
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
@@ -249,7 +249,7 @@ class Filtros extends CApplicationComponent
         //Obtengo la cadena de numeros cargados para el dia en que se enviara la promocion.
         //Solo los numeros cuya operadora este permitida para el envio y que exedan el maximo permitido por dia.
         $sql = "SELECT GROUP_CONCAT(numero) AS numeros FROM ("
-                . "SELECT numero FROM numeros_cargados_por_dia_temp "
+                . "SELECT numero FROM tmp_numeros_cargados_por_dia "
                 . "WHERE fecha = '".$fecha."'  AND id_operadora IN(".$id_operadoras.") "
                 . "GROUP BY numero HAVING COUNT(id) >= ".$cant_sms["cantidad"].") AS tabla";
         $numeros_cargados = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();

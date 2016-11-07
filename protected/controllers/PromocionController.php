@@ -84,7 +84,7 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
                         }
 
                         //Update en estado 8 todos los numeros exentos
@@ -113,7 +113,7 @@ class PromocionController extends Controller
                                 $prefijo = "CPEI";
                                 $model->hora_inicio = date("H:i:s");
                                 $hora_fin = strtotime( '+'. $model->duracion.' minute' , strtotime($model->hora_inicio));
-                                $hora_fin = date('H:i:s' , $hora_fin);
+                                $model->hora_fin = date('H:i:s' , $hora_fin);
                                 
                             }
 
@@ -187,7 +187,10 @@ class PromocionController extends Controller
 
                             $this->actionRestarCupoBCL($id_promo, $total);
 
-                            $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCNL", array("id_promo"=>$id_promo));
+                            if ($model->tipo == 1) //BCNL
+                            {
+                                $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCNL", array("id_promo"=>$id_promo));
+                            }
 
                             $log = "PROMOCION ".$prefijo." CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
                             Yii::app()->Procedimientos->setLog($log);
@@ -307,7 +310,7 @@ class PromocionController extends Controller
                             $model_cupo_historial->save();
 
                             //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
-                            $sql = "INSERT INTO numeros_cargados_por_dia_temp (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                            $sql = "INSERT INTO tmp_numeros_cargados_por_dia (numero, id_operadora, fecha) SELECT numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
                             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
                             $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
                             $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);

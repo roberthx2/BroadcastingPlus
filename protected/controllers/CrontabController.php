@@ -338,6 +338,7 @@ class CrontabController extends Controller
         } catch (Exception $e)
                 {
                     print_r("Ocurrio un error al procesar los datos<br>");
+                    print_r($e);
                     $transaction->rollBack();
                     $transaction2->rollBack();
                 }
@@ -378,6 +379,100 @@ class CrontabController extends Controller
         }
 
         return $arreglo;
+    }
+
+    //Se ejecuta todos los dias a media noche luego de llenar la tabla original de smsxnumeros de insingia_masivo
+    public function actionServirTablaTmpSmsXnumero()
+    {
+         printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+
+        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $criteria = new CDbCriteria;
+            $criteria->select = "valor";
+            $criteria->compare("propiedad", 'cant_min_smsxnumero');
+            $cant_min_smsxnumero = ConfiguracionSistema::model()->find($criteria);
+
+            $sql = "SET SQL_BIG_SELECTS=1";
+            Yii::app()->db->createCommand($sql)->execute();
+
+            printf("Cantidad de sms mínimos enviados para el filtro de smsxnumero = ".$cant_min_smsxnumero->valor."<br>");
+
+            print_r("Obteniendo números de la tabla insignia_masivo.smsxnumeros<br>");
+
+            $sql = "SELECT AES_DECRYPT(telefono, concat('''', CURDATE(), '''')) AS telefonos FROM smsxnumeros WHERE sms_enviados >= ".$cant_min_smsxnumero->valor;
+            $sql = Yii::app()->db->createCommand($sql)->queryAll();
+
+            if ($sql)
+            {
+                print_r("Guardando los números en un array temporal<br>");
+
+                foreach ($sql as $value)
+                {
+                    $cadena_numeros[] = $value["telefonos"];
+                }
+
+                printf("Limpiando cadena para realizar el insert en insignia_masivo_premium.tmp_smsxnumero<br>");
+                //Concateno la cadena porm coma (,)
+                $cadena_numeros = implode(",", $cadena_numeros);
+                //Luego limpio las doble,triples,etc comas
+                $cadena_numeros = trim(preg_replace('/,{2,}/', ",", $cadena_numeros), ",");
+                //Armo el super insert
+                $cadena_numeros = "('".str_replace(",", "'),('", $cadena_numeros)."')";
+
+                print_r("Borrando la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
+
+                $sql = "DELETE FROM tmp_smsxnumero";
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                print_r("Insertando registros en la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
+
+                $sql = "INSERT INTO tmp_smsxnumero (numero) VALUES ".$cadena_numeros;
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                print_r("Asignando los prefijos de las operadoras correspondientes<br>");
+
+                $sql = "SELECT id_operadora_bcnl, CONCAT('^',GROUP_CONCAT(DISTINCT prefijo SEPARATOR '|^')) AS prefijo, GROUP_CONCAT(DISTINCT prefijo SEPARATOR ' | ') AS prefijo_print, descripcion FROM operadoras_relacion GROUP BY id_operadora_bcnl";
+                $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+                foreach ($operadoras as $value)
+                {
+                    print_r("Asignado prefijo para la operadora ".$value["descripcion"]." (".$value["prefijo_print"]."<br>");
+
+                    $sql = "UPDATE tmp_smsxnumero SET id_operadora = ".$value["id_operadora_bcnl"]." WHERE numero REGEXP '".$value["prefijo"]."'";
+                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                }
+
+                print_r("Eliminando de la tabla insignia_masivo_premium.tmp_smsxnumero todos los números que no posean una operadora valida<br>");
+
+                $sql = "DELETE FROM tmp_smsxnumero where id_operadora = 0";
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                $sql = "SELECT COUNT(id) AS total FROM tmp_smsxnumero";
+                $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+                print_r("Cantidad de registros insertados en la tabla insignia_masivo_premium.tmp_smsxnumero: ".$total["total"]."<br>");
+            }
+            else
+            {
+                print_r("No hay registros en la tabla insignia_masivo.smsxnumeros<br>");
+            }
+
+
+            $transaction->commit();
+
+        } catch (Exception $e)
+                {
+                    print_r("Ocurrio un error al procesar los datos<br>");
+                    print_r($e);
+                    $transaction->rollBack();
+                }
+
+        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+
+        print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");
     }
 }
 
