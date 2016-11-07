@@ -203,14 +203,14 @@ return array(
 			'charset' => 'utf8',
 		),
 
-		/*'db_supervision_modems'=>array(
+		'db_supervision_modems'=>array(
 			'class' => 'CDbConnection',
 			'connectionString' => 'mysql:host='.$host_F2.';dbname=supervision_modems',
 			'emulatePrepare' => true,
 			'username' => $user_F2,
 			'password' => $pwd_F2,
 			'charset' => 'utf8',
-		),*/
+		),
 
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors

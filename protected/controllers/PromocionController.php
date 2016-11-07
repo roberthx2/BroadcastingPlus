@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP'),
+                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP', 'confirmarBCNL'),
                 'users' => array('@'),
             ),
 
@@ -119,7 +119,9 @@ class PromocionController extends Controller
 
                             if ($model->all_puertos == true)
                             {
-                                //BUSCO TODOS LOS PUERTOS DEL USUARIO
+                                $sql = "SELECT puertos FROM usuario WHERE id_usuario = ".Yii::app()->user->id;
+                                $puertos_tmp = Yii::app()->db->createCommand($sql)->queryRow();
+                                $model->puertos = explode(",", $puertos_tmp["puertos"]);
                             }
 
                             $model_promocion = new Promociones;
@@ -168,8 +170,8 @@ class PromocionController extends Controller
                                 $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
                                 $sql->bindParam(":estado", $estado, PDO::PARAM_INT);
                                 $sql->bindParam(":puerto", $value, PDO::PARAM_INT);
-                                $sql->bindParam(":fecha_cargada", date("Y-m-d"), PDO::PARAM_STR);
-                                $sql->bindParam(":hora_cargada", date("H:i:s"), PDO::PARAM_STR);
+                                $sql->bindValue(":fecha_cargada", date("Y-m-d"), PDO::PARAM_STR);
+                                $sql->bindValue(":hora_cargada", date("H:i:s"), PDO::PARAM_STR);
                                 $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
                                 $sql->bindParam(":fecha_envio", $model->fecha, PDO::PARAM_STR);
                                 $sql->bindParam(":hora_envio", $model->hora_inicio, PDO::PARAM_STR);
@@ -182,6 +184,10 @@ class PromocionController extends Controller
 
                                 $limite_inferio = $limite_inferio + $sms_x_modem;
                             }
+
+                            $this->actionRestarCupoBCL($id_promo, $total);
+
+                            $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCNL", array("id_promo"=>$id_promo));
 
                             $log = "PROMOCION ".$prefijo." CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
                             Yii::app()->Procedimientos->setLog($log);
@@ -408,7 +414,7 @@ class PromocionController extends Controller
         
     }
 
-    public function actionGetOperadorasPermitidasBCP($id_usuario, $id_cliente)
+    protected function actionGetOperadorasPermitidasBCP($id_usuario, $id_cliente)
     {
         $sql = "SELECT * FROM usuario_cliente_operadora WHERE id_usuario = :id_usuario AND id_cliente = :id_cliente";
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
@@ -445,7 +451,7 @@ class PromocionController extends Controller
         return $operadoras;
     }
 
-    public function actionGetNumerosListas($id_listas, $tipo, $operadorasPermitidasBCP)
+    protected function actionGetNumerosListas($id_listas, $tipo, $operadorasPermitidasBCP)
     {
         if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
         {
@@ -466,7 +472,7 @@ class PromocionController extends Controller
         return $sql["numeros"];   
     }
 
-    public function actionGetNombrePromo($id_cliente_sms, $tipo, $sc, $nombre, $fecha)
+    protected function actionGetNombrePromo($id_cliente_sms, $tipo, $sc, $nombre, $fecha)
     {
         if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
         {
@@ -498,7 +504,7 @@ class PromocionController extends Controller
         return $nombre_completo;
     }
 
-    public function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $operadorasPermitidasBCP)
+    protected function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $operadorasPermitidasBCP)
     {
         $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".$operadorasPermitidasBCP.")";
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
@@ -547,6 +553,88 @@ class PromocionController extends Controller
 
         header('Content-Type: application/json; charset="UTF-8"');
         echo CJSON::encode(array('error' => $error));
+    }
+
+    public function actionConfirmarBCNL()
+    {
+        $transaction = Yii::app()->db->beginTransaction();
+        $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $id_promo = $_GET["id_promo"];
+            $model_promocion = Promociones::model()->findByPk($id_promo);
+            $model_promocion->estado = 2;
+            $model_promocion->save();
+
+            $sql = "UPDATE outgoing SET status = 2 WHERE id_promo = :id_promo";
+            $sql = Yii::app()->db->createCommand($sql);
+            $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
+            $sql->execute();
+
+            $log = "PROMOCION CONFIRMADA BCNL | id_promo: ".$id_promo." | id_cliente: ".$model_promocion->cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            $transaction->commit();
+            $transaction2->commit();
+            $error = 'false';
+        } catch (Exception $e)
+            {
+                $error = "true";
+                $transaction->rollBack();
+                $transaction2->rollBack();
+            }
+
+        header('Content-Type: application/json; charset="UTF-8"');
+        echo CJSON::encode(array('error' => $error));
+    }
+
+    protected function actionRestarCupoBCL($id_promo, $cupo_consumido)
+    {
+        $login = Yii::app()->user->name;
+
+        $sql = "SELECT IFNULL(MAX(id_transaccion),0)+1 AS id FROM historico_uso_cupo_usuario";
+        $id_transaccion = Yii::app()->db->createCommand($sql)->queryRow();
+        
+        //CAMBIO DE LA FECHA DE VENCIMIENTO Y EL .OR PARA QUITAR LA COMPARACION CON NULL
+        $sql = "SELECT id, fecha_vencimiento, cupo_asignado, cupo_consumido 
+                FROM control_cupo_usuario 
+                WHERE id_usuario = ".Yii::app()->user->id."   
+                AND (DATE(fecha_vencimiento) >= '".date("Y-m-d")."')
+                AND id >= (SELECT id FROM control_cupo_usuario WHERE id_usuario = ".Yii::app()->user->id." AND inicio_cupo = 1 ORDER BY id DESC LIMIT 1)
+                AND cupo_consumido < cupo_asignado 
+                ORDER BY fecha_asignacion ASC";
+
+        $resultado = Yii::app()->db->createCommand($sql)->queryAll();
+        $cupo_consumido_nuevo = $cupo_consumido;
+
+        foreach ($resultado as $value)
+        {
+            $cupo_consumido_nuevo = $value['cupo_consumido'] + $cupo_consumido_nuevo;
+
+            //Update la linea del cupo
+            $aux = ($cupo_consumido_nuevo > $value['cupo_asignado'] ? $value['cupo_asignado'] : $cupo_consumido_nuevo);
+            $model_cupo = ControlCupoUsuario::model()->findByPk($value["id"]);
+            $model_cupo->cupo_consumido = $aux;
+            $model_cupo->save();
+
+            //Insertar log de transaccion en historico_uso_cupo_usuario
+
+            $model_cupo_historial = new HistoricoUsoCupoUsuario;
+            $model_cupo_historial->id_transaccion = $id_transaccion["id"];
+            $model_cupo_historial->id_control_cupo_usuario = $value['id'];
+            $model_cupo_historial->accion = 'USAR - El usuario '.$login.' (id='.Yii::app()->user->id.') monto promocion id='.$id_promo.' de '.$cupo_consumido.' SMS. Uso '. ($aux - $value['cupo_consumido']) .' SMS de este cupo';
+            $model_cupo_historial->cupo_consumido_antes = $value['cupo_consumido'];
+            $model_cupo_historial->cupo_consumido_despues = $aux;
+            $model_cupo_historial->fecha = date("Y-m-d H:i:s");
+            $model_cupo_historial->entidad = Yii::app()->user->id;
+            $model_cupo_historial->save();
+
+            if ($cupo_consumido_nuevo > $value['cupo_asignado'])
+                $cupo_consumido_nuevo = $cupo_consumido_nuevo - $value['cupo_asignado'];
+            else
+                break;  //si ya no queda cupo por reintegrar ($cupo_consumido_nuevo >= 0), break
+        }
     }
 
     public function actionReporteCreate($id_proceso, $nombre, $url_confirmar, $tipo)

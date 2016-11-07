@@ -20,7 +20,8 @@
             'clientOptions' => array(
                 'validateOnSubmit'=>true,
                 'validateOnChange'=>true,
-                'validateOnType'=>true,     
+                'validateOnType'=>true,
+                //'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
             ),
 		)
 	); ?>
@@ -242,7 +243,16 @@
 		</div>
 
 		<div id="div_puertos" style="display:none;">
-			<?php echo $form->select2Group(
+			<?php
+
+			$puertos = array();
+			$sql = "SELECT puertos FROM usuario WHERE id_usuario = ".Yii::app()->user->id;
+			$sql = Yii::app()->db->createCommand($sql)->queryRow();
+
+			if($sql["puertos"] != "")
+				$puertos = explode(",", $sql["puertos"]);
+			
+			echo $form->select2Group(
 				$model,
 				'puertos',
 				array(
@@ -251,8 +261,9 @@
 					),
 					'widgetOptions' => array(
 						'asDropDownList' => true,
-						//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
-						'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
+						//'data'=>CHtml::listData(UsuarioMasivo::model()->find(array("condition"=>"id_usuario = ".Yii::app()->user->id)), 'puertos', 'puertos'),
+						'data'=> $puertos,
+						//'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
 						'options' => array(
 							//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
 							'placeholder' => 'Seleccione sus listas...',
@@ -365,15 +376,15 @@
 			array(
 				'buttonType' => 'submit',
 				'context' => 'success',
-				'label' => 'Crear',
+				'label' => 'Crear Promoción',
 				'htmlOptions' => array(),
 			)
 		); ?>
 
-		<?php $this->widget(
+		<?php /*$this->widget(
 			'booster.widgets.TbButton',
 			array('buttonType' => 'reset', 'label' => 'Reset')
-		); ?>
+		); */?>
 		</center>
 	</div>
 

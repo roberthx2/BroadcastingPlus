@@ -352,7 +352,17 @@ Class PromocionForm extends CFormModel
 			if (COUNT($this->$attribute) == 0 && $this->all_puertos == 0)
 			{
 				$this->addError($attribute, "Debe seleccionar sus puertos");
-			}	
+			}
+			else if	($this->all_puertos == 1)
+			{
+				$sql = "SELECT puertos FROM usuario WHERE id_usuario = ".Yii::app()->user->id;
+                $puertos_tmp = Yii::app()->db->createCommand($sql)->queryRow();
+
+                if ($puertos_tmp["puertos"] == "")
+                {
+             		$this->addError($attribute, "No posee puertos asociados");   	
+                }
+			}
 		}
     }
 

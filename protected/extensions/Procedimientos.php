@@ -181,6 +181,18 @@ class Procedimientos extends CApplicationComponent
 		$model->controller_action = Yii::app()->request->queryString;
 		$model->save();
 	}
+
+	public function setNotificacion($id_usuario, $asunto, $mensaje)
+	{
+		$model = new Notificaciones;
+		$model->id_usuario = $id_usuario;
+		$model->asunto = $asunto;
+		$model->mensaje = $mensaje;
+		$model->fecha = date("Y-m-d");
+		$model->hora = date("H:i:s");
+		$model->estado = 0;
+		$model->save();
+	}
 }
 
 ?>

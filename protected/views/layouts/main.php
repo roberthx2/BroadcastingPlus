@@ -31,9 +31,26 @@
 </head>
 
 <body>
+<?php
+	$color = "";
+	$label = "";
+	$total = Notificaciones::model()->count("id_usuario =:id_usuario AND estado = 0", array("id_usuario"=>Yii::app()->user->id));
+	
+	if ($total > 0)
+	{
+		$color = "info";
+		$label = $total;
+	}
+
+	$badge=$this->widget('booster.widgets.TbBadge', array(
+        'context' => $color,
+        // 'default', 'success', 'info', 'warning', 'danger'
+        'label' => $label,
+    ), true);
+?>
 
 <div class="container-fluid">
-	<?php
+		<?php		
 		$this->widget(
 	    'booster.widgets.TbNavbar',
 	    array(
@@ -61,11 +78,8 @@
 		                        'icon' => 'glyphicon glyphicon-user',
 		                        'visible'=>!Yii::app()->user->isGuest,
 		                        'items' => array(
-		                            array(
-		                            	'label'=>'Cerrar Sesión',
-		                            	'icon'=>'glyphicon glyphicon-off', 
-		                            	'url'=>Yii::app()->createUrl('/site/logout'), 
-		                        	)
+		                        	array('label'=>'Notificaciones '.$badge, 'encodeLabel'=> false, 'icon'=>'glyphicon glyphicon-bell', 'url'=>Yii::app()->createUrl('/notificaciones/index')),'---',
+		                            array('label'=>'Cerrar Sesión', 'icon'=>'glyphicon glyphicon-off', 'url'=>Yii::app()->createUrl('/site/logout'))
 		                   	 	),
 		                	),
 	    				),
@@ -80,7 +94,7 @@
 	<div class="clear"></div>
 </div>
 <!--<div class="footer img-responsive" style="background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg')"></div>-->
-<div class="footer visible-md visible-lg">
+<div style="position:fixed; right:0; left:0; z-index:1030; bottom:0; margin-bottom: 0; border-width:1px 0 0; border-radius: 0;">
 	<img class="img-responsive" src="<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg">
 </div>
 
@@ -113,7 +127,7 @@ body {
 }
 .footer {
   position: absolute;
-  padding-top: 50px;
+  padding-top: 0%;/*50px;*/
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
