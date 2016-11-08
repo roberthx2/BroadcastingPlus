@@ -384,7 +384,7 @@ class CrontabController extends Controller
     //Se ejecuta todos los dias a media noche luego de llenar la tabla original de smsxnumeros de insingia_masivo
     public function actionServirTablaTmpSmsXnumero()
     {
-         printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+        printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
 
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
@@ -395,8 +395,8 @@ class CrontabController extends Controller
             $criteria->compare("propiedad", 'cant_min_smsxnumero');
             $cant_min_smsxnumero = ConfiguracionSistema::model()->find($criteria);
 
-            $sql = "SET SQL_BIG_SELECTS=1";
-            Yii::app()->db->createCommand($sql)->execute();
+            //$sql = "SET SQL_BIG_SELECTS=1";
+            //Yii::app()->db->createCommand($sql)->execute();
 
             printf("Cantidad de sms mínimos enviados para el filtro de smsxnumero = ".$cant_min_smsxnumero->valor."<br>");
 
@@ -425,12 +425,12 @@ class CrontabController extends Controller
                 print_r("Borrando la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
                 $sql = "DELETE FROM tmp_smsxnumero";
-                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 print_r("Insertando registros en la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
                 $sql = "INSERT INTO tmp_smsxnumero (numero) VALUES ".$cadena_numeros;
-                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 print_r("Asignando los prefijos de las operadoras correspondientes<br>");
 
@@ -439,16 +439,16 @@ class CrontabController extends Controller
 
                 foreach ($operadoras as $value)
                 {
-                    print_r("Asignado prefijo para la operadora ".$value["descripcion"]." (".$value["prefijo_print"]."<br>");
+                    print_r("Asignado prefijo para la operadora ".$value["descripcion"]." (".$value["prefijo_print"].")<br>");
 
                     $sql = "UPDATE tmp_smsxnumero SET id_operadora = ".$value["id_operadora_bcnl"]." WHERE numero REGEXP '".$value["prefijo"]."'";
-                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                    //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
                 }
 
                 print_r("Eliminando de la tabla insignia_masivo_premium.tmp_smsxnumero todos los números que no posean una operadora valida<br>");
 
                 $sql = "DELETE FROM tmp_smsxnumero where id_operadora = 0";
-                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 $sql = "SELECT COUNT(id) AS total FROM tmp_smsxnumero";
                 $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
@@ -460,6 +460,106 @@ class CrontabController extends Controller
                 print_r("No hay registros en la tabla insignia_masivo.smsxnumeros<br>");
             }
 
+
+            $transaction->commit();
+
+        } catch (Exception $e)
+                {
+                    print_r("Ocurrio un error al procesar los datos<br>");
+                    print_r($e);
+                    $transaction->rollBack();
+                }
+
+        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+
+        print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");
+    }
+
+    //Se ejecuta todos los dias cada 10 minutos, verifica todas las promociones BCP que finalizaron y verifica cuantos sms no fuerón enviados para realizar el reintegro de cupo al usuario que creo la promoción
+    public function actionReintroCupoBCP()
+    {
+        printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+
+        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $fecha = date("Y-m-d");
+            $hora = date("H:i:s");
+
+            print_r("Buscando promociones finalizadas para realizar el reintegro de cupo<br>");
+
+            $sql = "SELECT p.id_promo, p.nombrePromo, p.loaded_by FROM promociones_premium p 
+                    INNER JOIN deadline_outgoing_premium d ON p.id_promo = d.id_promo 
+                    WHERE p.fecha = '".$fecha."' AND p.verificada = 0 AND d.hora_limite < '".$hora."'";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+            if ($sql)
+            {
+                foreach ($sql as $value)
+                {
+                    $usuario = "SELECT id_cliente, login FROM usuario WHERE id_usuario = ".$value["loaded_by"];
+                    $usuario = Yii::app()->db_sms->createCommand($usuario)->queryRow();
+
+                    printf("* Promocion con id_promo = ".$value["id_promo"]." | usuario = ".$usuario["login"]." |  ");
+
+                    $sql = "SELECT
+                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"].") AS total,
+                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status = 1) AS enviados,
+                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status != 1) AS no_enviados";
+
+                    $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+                    print_r("Total: ".$total["total"]." | Enviados: ".$total["enviados"]." | No enviados: ".$total["no_enviados"]);
+
+                    if ($total["no_enviados"] > 0)
+                    {
+                        print_r(" | Si aplica para reintegro de cupo<br>");
+
+                        print_r("Reintegrando cupo al usuario = ".$usuario["login"]." con id = ".$value["loaded_by"]."<br>");
+
+                        $model_cupo = UsuarioCupoPremium::model()->findByPk($value["loaded_by"]);
+                        $model_cupo->disponible = $model_cupo->disponible + $total["no_enviados"];
+                        $model_cupo->save();
+
+                        print_r("Guardando el historial correspondiente<br>");
+
+                        $descripcion_historial = "REINTEGRO - El sistema reintegro (".$total["no_enviados"].") SMS por la promoción BCP: ".$value["nombrePromo"];
+
+                        $model_cupo_historial = new UsuarioCupoHistoricoPremium;
+                        $model_cupo_historial->id_usuario = $value["loaded_by"];
+                        $model_cupo_historial->id_cliente = $usuario["id_cliente"];
+                        $model_cupo_historial->ejecutado_por = 0;
+                        $model_cupo_historial->cantidad = $total["no_enviados"];
+                        $model_cupo_historial->descripcion = $descripcion_historial;
+                        $model_cupo_historial->fecha = date("Y-m-d");
+                        $model_cupo_historial->hora = date("H:i:s");
+                        $model_cupo_historial->tipo_operacion = 2; //Reintegro
+                        $model_cupo_historial->save();
+
+                        $descripcion_historial = "REINTEGRO - El sistema reintegro <strong>(".$total["no_enviados"].") SMS</strong> por la promoción BCP: <strong>".$value["nombrePromo"]."</strong>";
+
+                        $asunto = "REINTEGRO DE CUPO BCP";
+                        Yii::app()->Procedimientos->setNotificacion($value["loaded_by"], $asunto, $descripcion_historial);
+
+                        $log = 'REINTEGRO - El sistema reintegro ('.$total["no_enviados"].') SMS al usuario '.$usuario["login"].' (id='.$value["loaded_by"].') por la promocion BCP (id_promo = '.$value["id_promo"].')';
+
+                        Yii::app()->Procedimientos->setLog($log);                      
+                    }   
+                    else
+                    {
+                        print_r(" | No aplica para reintegro de cupo<br>");
+                    }
+
+                    print_r("Marcando promoción como verificada<br>");
+                    $sql_verificada = "UPDATE promociones_premium SET verificada = 1 WHERE id_promo = ".$value["id_promo"];
+                    Yii::app()->db_masivo_premium->createCommand($sql_verificada)->execute();  
+                }
+            }
+            else
+            {
+                print_r("No hay promociones por analizar<br>");
+            }
 
             $transaction->commit();
 
