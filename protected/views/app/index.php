@@ -3,8 +3,3 @@
 	<img src="<?php echo Yii::app()->request->baseUrl; ?>/img/webconstruccion.jpg" class="img-responsive" alt="Responsive image">
 </center>
 </div>
-
-<?php 
-
-echo Yii::app()->request->queryString;
-?>

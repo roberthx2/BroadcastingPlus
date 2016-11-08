@@ -501,7 +501,7 @@ class CrontabController extends Controller
                     $usuario = "SELECT id_cliente, login FROM usuario WHERE id_usuario = ".$value["loaded_by"];
                     $usuario = Yii::app()->db_sms->createCommand($usuario)->queryRow();
 
-                    printf("* Promocion con id_promo = ".$value["id_promo"]." | usuario = ".$usuario["login"]." |  ");
+                    printf("* Promocion con id_promo: ".$value["id_promo"]." | usuario: ".$usuario["login"]." |  ");
 
                     $sql = "SELECT
                             (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"].") AS total,
@@ -516,7 +516,7 @@ class CrontabController extends Controller
                     {
                         print_r(" | Si aplica para reintegro de cupo<br>");
 
-                        print_r("Reintegrando cupo al usuario = ".$usuario["login"]." con id = ".$value["loaded_by"]."<br>");
+                        print_r("Reintegrando cupo al usuario: ".$usuario["login"]." con id: ".$value["loaded_by"]."<br>");
 
                         $model_cupo = UsuarioCupoPremium::model()->findByPk($value["loaded_by"]);
                         $model_cupo->disponible = $model_cupo->disponible + $total["no_enviados"];
