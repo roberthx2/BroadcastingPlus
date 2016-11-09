@@ -395,9 +395,6 @@ class CrontabController extends Controller
             $criteria->compare("propiedad", 'cant_min_smsxnumero');
             $cant_min_smsxnumero = ConfiguracionSistema::model()->find($criteria);
 
-            //$sql = "SET SQL_BIG_SELECTS=1";
-            //Yii::app()->db->createCommand($sql)->execute();
-
             printf("Cantidad de sms mínimos enviados para el filtro de smsxnumero = ".$cant_min_smsxnumero->valor."<br>");
 
             print_r("Obteniendo números de la tabla insignia_masivo.smsxnumeros<br>");
@@ -425,12 +422,12 @@ class CrontabController extends Controller
                 print_r("Borrando la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
                 $sql = "DELETE FROM tmp_smsxnumero";
-                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 print_r("Insertando registros en la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
                 $sql = "INSERT INTO tmp_smsxnumero (numero) VALUES ".$cadena_numeros;
-                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 print_r("Asignando los prefijos de las operadoras correspondientes<br>");
 
@@ -442,13 +439,13 @@ class CrontabController extends Controller
                     print_r("Asignado prefijo para la operadora ".$value["descripcion"]." (".$value["prefijo_print"].")<br>");
 
                     $sql = "UPDATE tmp_smsxnumero SET id_operadora = ".$value["id_operadora_bcnl"]." WHERE numero REGEXP '".$value["prefijo"]."'";
-                    //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
                 }
 
                 print_r("Eliminando de la tabla insignia_masivo_premium.tmp_smsxnumero todos los números que no posean una operadora valida<br>");
 
                 $sql = "DELETE FROM tmp_smsxnumero where id_operadora = 0";
-                //Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 $sql = "SELECT COUNT(id) AS total FROM tmp_smsxnumero";
                 $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
@@ -569,6 +566,45 @@ class CrontabController extends Controller
                     print_r($e);
                     $transaction->rollBack();
                 }
+
+        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+
+        print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");
+    }
+
+    public function actionReintroCupoBCNL()
+    {
+        printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+
+        $transaction = Yii::app()->db->beginTransaction();
+        $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $fecha = date("Y-m-d");
+            $hora = date("H:i:s");
+
+            print_r("Buscando promociones finalizadas para realizar el reintegro de cupo<br>");
+
+            if($sql)
+            {
+                
+            }
+            else
+            {
+                print_r("No hay promociones por analizar<br>");
+            }
+
+            $transaction->commit();
+            $transaction2->commit();
+
+        } catch (Exception $e)
+            {
+                print_r("Ocurrio un error al procesar los datos<br>");
+                print_r($e);
+                $transaction->rollBack();
+                $transaction2->rollBack();
+            }
 
         print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
 
