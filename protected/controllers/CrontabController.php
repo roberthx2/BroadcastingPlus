@@ -501,9 +501,9 @@ class CrontabController extends Controller
                     printf("* Promocion con id_promo: ".$value["id_promo"]." | usuario: ".$usuario["login"]." |  ");
 
                     $sql = "SELECT
-                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"].") AS total,
-                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status = 1) AS enviados,
-                            (SELECT COUNT(id) FROM insignia_masivo_premium.outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status != 1) AS no_enviados";
+                            (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = ".$value["id_promo"].") AS total,
+                            (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status = 1) AS enviados,
+                            (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = ".$value["id_promo"]." AND status != 1) AS no_enviados";
 
                     $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
@@ -574,6 +574,7 @@ class CrontabController extends Controller
 
     public function actionReintroCupoBCNL()
     {
+        //NO ES MI CULPA QUE ESTA BROMA QUEDARA ASI DE FEA, SOLO SEGUI LA LOGICA EN QUE HICIERON EL MANEJO DEL CUPO BCNL
         printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
 
         $transaction = Yii::app()->db->beginTransaction();
@@ -586,9 +587,104 @@ class CrontabController extends Controller
 
             print_r("Buscando promociones finalizadas para realizar el reintegro de cupo<br>");
 
+            $sql = "SELECT p.id_promo, p.nombrePromo, p.cadena_usuarios FROM promociones p 
+                    INNER JOIN deadline_outgoing d ON p.id_promo = d.id_promo 
+                    WHERE p.fecha = '".$fecha."' AND p.verificado = 0 AND d.hora_limite < '".$hora."'";
+            $sql = Yii::app()->db->createCommand($sql)->queryAll();
+
             if($sql)
             {
-                
+                foreach ($sql as $value)
+                {
+                    $usuario = "SELECT id_cliente, login FROM usuario WHERE id_usuario = ".$value["cadena_usuarios"];
+                    $usuario = Yii::app()->db_sms->createCommand($usuario)->queryRow();
+
+                    printf("* Promocion con id_promo: ".$value["id_promo"]." | usuario: ".$usuario["login"]." |  ");
+
+                    $sql = "SELECT
+                            (SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = ".$value["id_promo"].") AS total,
+                            (SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = ".$value["id_promo"]." AND status = 3) AS enviados,
+                            (SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = ".$value["id_promo"]." AND status != 3) AS no_enviados";
+
+                    $total = Yii::app()->db->createCommand($sql)->queryRow();
+
+                    print_r("Total: ".$total["total"]." | Enviados: ".$total["enviados"]." | No enviados: ".$total["no_enviados"]);
+
+                    if ($total["no_enviados"] > 0)
+                    {
+                        print_r(" | Si aplica para reintegro de cupo<br>");
+
+                        print_r("Reintegrando cupo al usuario: ".$usuario["login"]." con id: ".$value["cadena_usuarios"]."<br>");
+
+                        $sql = "SELECT IFNULL(MAX(id_transaccion),0)+1 AS id FROM historico_uso_cupo_usuario";
+                        $id_transaccion = Yii::app()->db->createCommand($sql)->queryRow();
+
+                        $sql = "SELECT id, fecha_vencimiento, cupo_asignado, cupo_consumido 
+                                    FROM control_cupo_usuario 
+                                    WHERE id_usuario = ".$value["cadena_usuarios"]." 
+                                    AND (DATE(fecha_vencimiento) >='".$fecha."')
+                                    AND id>=(SELECT id FROM control_cupo_usuario WHERE id_usuario = ".$value["cadena_usuarios"]." AND inicio_cupo=1 ORDER BY id desc LIMIT 1)
+                                    AND cupo_consumido <> 0 
+                                    ORDER BY fecha_asignacion DESC";
+
+                        $resultado = Yii::app()->db->createCommand($sql)->queryAll();
+                        $cupo_consumido_nuevo = $total["no_enviados"];
+
+                        print_r("Guardando el historial correspondiente<br>");
+
+                        foreach ($resultado as $key)
+                        {
+                            $cupo_consumido_nuevo = $key['cupo_consumido'] - $cupo_consumido_nuevo;
+
+                            //Update la linea del cupo
+                            $aux = ($cupo_consumido_nuevo < 0 ? 0 : $cupo_consumido_nuevo);
+                            $model_cupo = ControlCupoUsuario::model()->findByPk($key["id"]);
+                            $model_cupo->cupo_consumido = $aux;
+                            print_r($model_cupo);
+                            print_r("<br>");
+                            //$model_cupo->save();
+
+                            //Insertar log de transaccion en historico_uso_cupo_usuario
+
+                            $model_cupo_historial = new HistoricoUsoCupoUsuario;
+                            $model_cupo_historial->id_transaccion = $id_transaccion["id"];
+                            $model_cupo_historial->id_control_cupo_usuario = $key['id'];
+                            $model_cupo_historial->accion = 'REINTEGRAR - El sistema reintegro '.$total["no_enviados"].' SMS a usuario '.$usuario["login"].' (id='.$value["cadena_usuarios"].') por las promociones ('.$value["id_promo"].'). Reintegro '.($key['cupo_consumido'] - $aux).' a este cupo.';
+                            $model_cupo_historial->cupo_consumido_antes = $key['cupo_consumido'];
+                            $model_cupo_historial->cupo_consumido_despues = $aux;
+                            $model_cupo_historial->fecha = date("Y-m-d H:i:s");
+                            $model_cupo_historial->entidad = 'SISTEMA';
+                            print_r($model_cupo_historial);
+                            print_r("<br>");
+                            //$model_cupo_historial->save();
+
+                            print_r($cupo_consumido_nuevo);
+                            print_r("<br>");
+                            exit;
+                            if ($cupo_consumido_nuevo < 0)
+                                $cupo_consumido_nuevo = abs($cupo_consumido_nuevo);
+                            else
+                                break;  //si ya no queda cupo por reintegrar ($cupo_consumido_nuevo >= 0), break
+                        }
+                        
+                        $descripcion_historial = "REINTEGRO - El sistema reintegro <strong>(".$total["no_enviados"].") SMS</strong> por la promoción BCNL: <strong>".$value["nombrePromo"]."</strong>";
+
+                        $asunto = "REINTEGRO DE CUPO BCNL";
+                        Yii::app()->Procedimientos->setNotificacion($value["cadena_usuarios"], $asunto, $descripcion_historial);
+
+                        $log = 'REINTEGRO - El sistema reintegro ('.$total["no_enviados"].') SMS al usuario '.$usuario["login"].' (id='.$value["cadena_usuarios"].') por la promocion BCNL (id_promo = '.$value["id_promo"].')';
+
+                        Yii::app()->Procedimientos->setLog($log);                      
+                    }   
+                    else
+                    { 
+                        print_r(" | No aplica para reintegro de cupo<br>");
+                    }
+
+                    print_r("Marcando promoción como verificada<br>");
+                    $sql_verificada = "UPDATE promociones SET verificado = 1 WHERE id_promo = ".$value["id_promo"];
+                    Yii::app()->db->createCommand($sql_verificada)->execute();  
+                }
             }
             else
             {

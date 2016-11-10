@@ -104,7 +104,7 @@ class PromocionController extends Controller
                         {
                             if ($model->tipo == 1) //BCNL
                             {
-                                $estado = 0;
+                                $estado = 1;
                                 $prefijo = "BCNL";
                             }
                             else if ($model->tipo == 2) //CPEI

@@ -171,8 +171,13 @@ class Procedimientos extends CApplicationComponent
 
 	public function setLog($descripcion)
 	{
-		$model = new Log();
-		$model->id_usuario = Yii::app()->user->id;
+		$id_usuario = 0;
+
+		if (isset(Yii::app()->user->id))
+			$id_usuario = Yii::app()->user->id;
+		
+		$model = new Log;
+		$model->id_usuario = $id_usuario;
 		$model->ip_usuario = Yii::app()->request->userHostAddress;
 		$model->ip_servidor = Yii::app()->request->serverName;
 		$model->fecha = date("Y-m-d");
