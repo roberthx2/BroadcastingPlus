@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP', 'confirmarBCNL'),
+                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP', 'confirmarBCNL', 'verDetalles'),
                 'users' => array('@'),
             ),
 
@@ -185,7 +185,7 @@ class PromocionController extends Controller
                                 $limite_inferio = $limite_inferio + $sms_x_modem;
                             }
 
-                            $this->actionRestarCupoBCL($id_promo, $total);
+                            $this->actionRestarCupoBCNL($id_promo, $total);
 
                             if ($model->tipo == 1) //BCNL
                             {
@@ -379,7 +379,15 @@ class PromocionController extends Controller
                 }
                 else if ($tipo == 2)
                 {
-                    $data = Yii::app()->Procedimientos->getClienteCPEI(Yii::app()->user->id);
+                    if (Yii::app()->user->id == 1) //Godadmin
+                    {
+                        $data = Yii::app()->Procedimientos->getClientesBCNL(Yii::app()->user->id);
+                    }
+                    else
+                    {
+                        $data = Yii::app()->Procedimientos->getClienteCPEI(Yii::app()->user->id);    
+                    }
+                    
                     $model_cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
                 }
                 else if ($tipo == 3) //BCP
@@ -592,7 +600,7 @@ class PromocionController extends Controller
         echo CJSON::encode(array('error' => $error));
     }
 
-    protected function actionRestarCupoBCL($id_promo, $cupo_consumido)
+    protected function actionRestarCupoBCNL($id_promo, $cupo_consumido)
     {
         $login = Yii::app()->user->name;
 
@@ -643,6 +651,30 @@ class PromocionController extends Controller
     public function actionReporteCreate($id_proceso, $nombre, $url_confirmar, $tipo)
     {
         $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar, 'tipo'=>$tipo));
+    }
+
+    public function actionVerDetalles()
+    {
+        $modelBCNL = array();
+        $modelBCP = array();
+
+        if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
+        {
+            $modelBCNL = new Promociones('searchDetalles');
+            $modelBCNL->unsetAttributes();
+            if(isset($_GET['Promociones']))
+                $modelBCNL->attributes=$_GET['Promociones'];
+        }
+
+        if (Yii::app()->user->getPermisos()->broadcasting_premium)
+        {
+            $modelBCP = new PromocionesPremium('searchDetalles');
+            $modelBCP->unsetAttributes();
+            if(isset($_GET['PromocionesPremium']))
+                $modelBCP->attributes=$_GET['PromocionesPremium'];
+        }
+
+        $this->render('verDetalles', array('modelBCNL'=> $modelBCNL,'modelBCP'=>$modelBCP));
     }
 }
 

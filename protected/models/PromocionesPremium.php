@@ -28,6 +28,7 @@ class PromocionesPremium extends CActiveRecord
 	public $no_enviados;
 	public $id;
 	public $login;
+	public $buscar;
 
 	public function tableName()
 	{
@@ -150,6 +151,31 @@ class PromocionesPremium extends CActiveRecord
     	));
 
 		return $model;
+	}
+
+	public function searchVerDetalles()
+	{
+		$sql = "SELECT GROUP_CONCAT(id_cliente) AS id_clientes FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
+		$id_clientes = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, (SELECT COUNT(*) FROM outgoing_premium o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
+		$criteria->addInCondition("t.id_cliente", explode(",", $id_clientes["id_clientes"]));
+		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "u.login LIKE '%".$this->buscar."%')";
+		$criteria->order = "id_promo DESC";
+		
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+        		'attributes'=>array(
+             		'id_promo', 'fecha', 'nombrePromo', 'u.login'
+        		),
+    		),
+		));
 	}
 
 	/**

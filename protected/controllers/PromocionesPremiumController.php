@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'prueba'),
+				'actions'=>array('index','view', 'indexPromociones'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -181,6 +181,90 @@ class PromocionesPremiumController extends Controller
 		$this->render('indexPromociones',array(
 			'model'=>$model,
 		));
+	}
+
+	public function actionObtenerStatusDetalle($id_promo)
+	{
+		$sql = "SELECT p.estado,  p.fecha, p.hora, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = CURDATE() AND id_promo = p.id_promo) AS total,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = CURDATE() AND id_promo = p.id_promo AND status = 1) AS enviados
+			FROM promociones_premium AS p, deadline_outgoing_premium AS d_o
+			WHERE p.id_promo IN (".$id_promo.") AND p.id_promo = d_o.id_promo";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+		$objeto = array("estado"=>$sql["estado"], "fecha"=>$sql["fecha"], "hora"=>$sql["hora"], "fecha_limite"=>$sql["fecha_limite"], "hora_limite"=>$sql["hora_limite"], "total"=>$sql["total"], "enviados"=>$sql["enviados"], "no_enviados"=>($sql["total"] - $sql["enviados"]));
+
+	    switch ($objeto["estado"])
+	    {
+	        case 0: 
+	            //$estado = "No Confirmada";
+	            $estado = 0;
+	            break;
+	        case 1: 
+	            //$estado = "Enviada";
+	            $estado = 1;
+	        break;
+	        case 2:
+	            //$estado = "Confirmada";
+	            $estado = 2;
+	            $ts_actual = time();
+	            $ts_inicio = strtotime($objeto["fecha"] . " " . $objeto["hora"]);
+	            $ts_fin = strtotime($objeto["fecha_limite"] . " " . $objeto["hora_limite"]);
+	            
+	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "En Transito";
+	                    $estado = 6;
+	                } else { 
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                } 
+	            }
+
+	            if ($ts_actual < $ts_inicio) {
+	                //$estado = "Confirmada";
+	                $estado = 2;
+	            }
+
+	            if ($ts_actual > $ts_fin) {  
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "Incompleta";
+	                    $estado = 3;
+	                }
+	                if($objeto["no_enviados"] == $objeto["total"]){
+	                    //$estado = "No Enviada";
+	                    $estado = 5;
+	                }
+	                if($objeto["no_enviados"] == 0){
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                }
+	            }
+
+	        break;
+	        case 4: 
+	            //$estado = "Cancelada";
+	            $estado = 4;
+	            
+	            if($objeto["no_enviados"] == $objeto["total"]){
+	                //$estado = "Cancelada";
+	                $estado = 4;
+	            }
+	            if($objeto["no_enviados"] >= 0 && $objeto["no_enviados"] < $objeto["total"]){
+	                //$estado = "Enviada y Cancelada";
+	                $estado = 7;
+	            }
+	        break;
+	        case 5: 
+	            //$estado = "No enviada";
+	            $estado = 5;
+	        break;
+
+	    
+	    }
+
+	    return $estado; 
 	}
 
 	public function actionObtenerStatus($status, $fecha, $hora, $fecha_limite, $hora_limite, $no_enviados, $all_sms)

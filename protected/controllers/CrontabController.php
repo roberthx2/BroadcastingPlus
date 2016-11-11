@@ -473,7 +473,7 @@ class CrontabController extends Controller
     }
 
     //Se ejecuta todos los dias cada 10 minutos, verifica todas las promociones BCP que finalizaron y verifica cuantos sms no fuerón enviados para realizar el reintegro de cupo al usuario que creo la promoción
-    public function actionReintroCupoBCP()
+    public function actionReintegroCupoBCP()
     {
         printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
 
@@ -572,7 +572,7 @@ class CrontabController extends Controller
         print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");
     }
 
-    public function actionReintroCupoBCNL()
+    public function actionReintegroCupoBCNL()
     {
         //NO ES MI CULPA QUE ESTA BROMA QUEDARA ASI DE FEA, SOLO SEGUI LA LOGICA EN QUE HICIERON EL MANEJO DEL CUPO BCNL
         printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
@@ -640,9 +640,7 @@ class CrontabController extends Controller
                             $aux = ($cupo_consumido_nuevo < 0 ? 0 : $cupo_consumido_nuevo);
                             $model_cupo = ControlCupoUsuario::model()->findByPk($key["id"]);
                             $model_cupo->cupo_consumido = $aux;
-                            print_r($model_cupo);
-                            print_r("<br>");
-                            //$model_cupo->save();
+                            $model_cupo->save();
 
                             //Insertar log de transaccion en historico_uso_cupo_usuario
 
@@ -654,13 +652,8 @@ class CrontabController extends Controller
                             $model_cupo_historial->cupo_consumido_despues = $aux;
                             $model_cupo_historial->fecha = date("Y-m-d H:i:s");
                             $model_cupo_historial->entidad = 'SISTEMA';
-                            print_r($model_cupo_historial);
-                            print_r("<br>");
-                            //$model_cupo_historial->save();
+                            $model_cupo_historial->save();
 
-                            print_r($cupo_consumido_nuevo);
-                            print_r("<br>");
-                            exit;
                             if ($cupo_consumido_nuevo < 0)
                                 $cupo_consumido_nuevo = abs($cupo_consumido_nuevo);
                             else
