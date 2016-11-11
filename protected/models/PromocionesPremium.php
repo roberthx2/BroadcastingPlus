@@ -166,11 +166,12 @@ class PromocionesPremium extends CActiveRecord
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "u.login LIKE '%".$this->buscar."%')";
-		$criteria->order = "id_promo DESC";
+		//$criteria->order = "id_promo DESC";
 		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
+				'defaultOrder'=>'id_promo DESC',
         		'attributes'=>array(
              		'id_promo', 'fecha', 'nombrePromo', 'u.login'
         		),

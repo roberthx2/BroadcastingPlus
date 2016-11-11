@@ -91,19 +91,19 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("lista/update", array("id"=>$data["id_lista"]))',
 	            			//'visible'=>'visibleConfirmar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'title'=>'Editar Lista', 'style'=>'color:black;'),
+	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Lista', 'style'=>'color:black;'),
                             ),
 	            	'Descargar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("lista/descargarLista", array("nombre" => $data["nombre"], "id_lista" => $data["id_lista"]))',
 	            			//'visible'=>'visibleCancelar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-download-alt', 'title'=>'Descargar Lista', 'style'=>'color:black;',),
+	            			'options'=>array('class'=>'glyphicon glyphicon-download-alt', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Descargar Lista', 'style'=>'color:black;',),
 	            			),
 	            	'Eliminar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("lista/viewDelete", array("id_lista" => $data["id_lista"]))',
 	            			//'visible'=>'visibleCancelar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-trash', 'title'=>'Eliminar Lista', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-target' => '#modalEliminar'),
+	            			'options'=>array('class'=>'glyphicon glyphicon-trash', 'title'=>'Eliminar Lista', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminar'),
 	            			)
 	            ),
 	        ),
@@ -136,5 +136,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 		        $(target).find(".modal-body").load(url);
 		    }
 		});
+
+		$('[data-tooltip="tooltip"]').tooltip();
 	});
 </script>

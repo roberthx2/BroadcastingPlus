@@ -6,7 +6,7 @@ class PromocionesPremiumController extends Controller
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
 	 */
-	public $layout='//layouts/menuBCP';
+	public $layout='//layouts/menuApp';
 
 	/**
 	 * @return array action filters
@@ -51,16 +51,32 @@ class PromocionesPremiumController extends Controller
 	 */
 	public function actionView($id)
 	{
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing_premium o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->join = "INNER JOIN deadline_outgoing_premium d ON t.id_promo = d.id_promo ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
+		$criteria->compare("t.id_promo", $id);
+		$model_promocion = PromocionesPremium::model()->find($criteria);
+
+		$model_outgoing=new OutgoingPremium('search');
+		$model_outgoing->unsetAttributes();
+
+		if(isset($_GET['OutgoingPremium']))
+			$model_outgoing->buscar = $_GET['OutgoingPremium']["buscar"];
+
 		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+			'model_promocion'=>$model_promocion, 'model_outgoing' => $model_outgoing
 		));
+		/*$this->render('view',array(
+			'model'=>$this->loadModel($id),
+		));*/
 	}
 
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 */
-	public function actionCreate()
+	/*public function actionCreate()
 	{
 		$model=new PromocionesPremium;
 
@@ -77,14 +93,14 @@ class PromocionesPremiumController extends Controller
 		$this->render('create',array(
 			'model'=>$model,
 		));
-	}
+	}*/
 
 	/**
 	 * Updates a particular model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionUpdate($id)
+	/*public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
 
@@ -101,37 +117,37 @@ class PromocionesPremiumController extends Controller
 		$this->render('update',array(
 			'model'=>$model,
 		));
-	}
+	}*/
 
 	/**
 	 * Deletes a particular model.
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id)
+	/*public function actionDelete($id)
 	{
 		$this->loadModel($id)->delete();
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
 			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-	}
+	}*/
 
 	/**
 	 * Lists all models.
 	 */
-	public function actionIndex()
+	/*public function actionIndex()
 	{
 		$dataProvider=new CActiveDataProvider('PromocionesPremium');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
-	}
+	}*/
 
 	/**
 	 * Manages all models.
 	 */
-	public function actionAdmin()
+	/*public function actionAdmin()
 	{
 		$model=new PromocionesPremium('search');
 		$model->unsetAttributes();  // clear any default values
@@ -141,7 +157,7 @@ class PromocionesPremiumController extends Controller
 		$this->render('admin',array(
 			'model'=>$model,
 		));
-	}
+	}*/
 
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
@@ -267,6 +283,30 @@ class PromocionesPremiumController extends Controller
 	    return $estado; 
 	}
 
+	public function actionLabelStatuPromo($estado)
+	{
+		$objeto = array();
+
+		if($estado == 0)
+			$objeto = array('label'=> 'No confirmada', 'clase' => 'default', 'background_color' => '');
+		elseif ($estado == 1)
+			$objeto = array('label'=> 'Enviada', 'clase' => 'success', 'background_color' => '');
+		elseif ($estado == 2)
+			$objeto = array('label'=> 'Confirmada', 'clase' => 'primary', 'background_color' => '');
+		elseif ($estado == 3)
+			$objeto = array('label'=> 'Incompleta', 'clase' => 'success', 'background_color' => '#FC6E51');
+		elseif ($estado == 4)
+			$objeto = array('label'=> 'Cancelada', 'clase' => 'danger', 'background_color' => '');
+		elseif ($estado == 5)
+			$objeto = array('label'=> 'No enviada', 'clase' => '', 'background_color' => '#434A54');
+		elseif ($estado == 6)
+			$objeto = array('label'=> 'Transito', 'clase' => 'warning', 'background_color' => '');
+		elseif ($estado == 7)
+			$objeto = array('label'=> 'Enviada y Cancelada', 'clase' => '', 'background_color' => '#967ADC');
+
+		return $objeto;
+	}
+
 	public function actionObtenerStatus($status, $fecha, $hora, $fecha_limite, $hora_limite, $no_enviados, $all_sms)
 	{
 	    switch ($status)
@@ -338,5 +378,33 @@ class PromocionesPremiumController extends Controller
 	    
 	    }
 	    return $estado; 
+	}
+
+	public function actionReporteTorta($id_promo)
+	{
+		$sql = "SELECT descripcion, SUM(total) AS total, id_operadora FROM (
+				SELECT o.descripcion, COUNT(*) AS total, t.operadora AS id_operadora FROM outgoing_premium t 
+				INNER JOIN (SELECT id_operadora_bcp, descripcion FROM operadoras_relacion) o ON t.operadora = o.id_operadora_bcp 
+				WHERE t.id_promo = ".$id_promo." 
+				GROUP BY t.operadora) AS tabla 
+				GROUP BY descripcion ORDER BY id_operadora";
+
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		$data = array();
+		$bandera = 0;
+
+		foreach ($sql as $value)
+		{
+			if ($bandera == 0)
+			{
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCP($value["id_operadora"]), 'sliced' => true, 'selected' => true);
+          		$bandera++;
+			}
+          	else
+          		$data[] = array('name' => $value["descripcion"], 'y' => intval($value["total"]), 'color' => Yii::app()->Funciones->getColorOperadoraBCP($value["id_operadora"]));
+		}
+
+		return $data;
 	}
 }

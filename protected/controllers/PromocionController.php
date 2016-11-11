@@ -655,26 +655,7 @@ class PromocionController extends Controller
 
     public function actionVerDetalles()
     {
-        $modelBCNL = array();
-        $modelBCP = array();
-
-        if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
-        {
-            $modelBCNL = new Promociones('searchDetalles');
-            $modelBCNL->unsetAttributes();
-            if(isset($_GET['Promociones']))
-                $modelBCNL->attributes=$_GET['Promociones'];
-        }
-
-        if (Yii::app()->user->getPermisos()->broadcasting_premium)
-        {
-            $modelBCP = new PromocionesPremium('searchDetalles');
-            $modelBCP->unsetAttributes();
-            if(isset($_GET['PromocionesPremium']))
-                $modelBCP->attributes=$_GET['PromocionesPremium'];
-        }
-
-        $this->render('verDetalles', array('modelBCNL'=> $modelBCNL,'modelBCP'=>$modelBCP));
+        $this->render('verDetalles');
     }
 }
 

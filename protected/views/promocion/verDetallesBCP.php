@@ -32,13 +32,19 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Id promo',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover '),
 	            'visible'=>Yii::app()->user->isAdmin()
         	), 
         	array(
 	            'name' => 'nombrePromo',
 	            'header' => 'Nombre',
 	            'type' => 'raw',
+	            'value' => function($data)
+	            {
+	            	$url = Yii::app()->createUrl('promocionesPremium/view', array("id"=>$data["id_promo"]));
+	            	$var = '<a href="'.$url.'" data-toggle="tooltip" data-placement="top" title="Ver detalles">'.$data["nombrePromo"].'</a>';
+	            	return $var;
+	            },
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
@@ -62,7 +68,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	$clase = "";
 	            	$estado = PromocionesPremiumController::actionObtenerStatusDetalle($data["id_promo"]);
 
-	            	$objeto = estadoPromo($estado);
+	            	$objeto = PromocionesPremiumController::actionLabelStatuPromo($estado);
 
 	            	$this->widget(
 					    'booster.widgets.TbLabel',
@@ -93,39 +99,3 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         ),
     ));
 ?>
-
-<?php
-
-function estadoPromo($estado)
-{
-	$objeto = array();
-
-	if($estado == 0)
-		$objeto = array('label'=> 'No confirmada', 'clase' => 'default', 'background_color' => '');
-	elseif ($estado == 1)
-		$objeto = array('label'=> 'Enviada', 'clase' => 'success', 'background_color' => '');
-	elseif ($estado == 2)
-		$objeto = array('label'=> 'Confirmada', 'clase' => 'primary', 'background_color' => '');
-	elseif ($estado == 3)
-		$objeto = array('label'=> 'Incompleta', 'clase' => 'success', 'background_color' => '#FC6E51');
-	elseif ($estado == 4)
-		$objeto = array('label'=> 'Cancelada', 'clase' => 'danger', 'background_color' => '');
-	elseif ($estado == 5)
-		$objeto = array('label'=> 'No enviada', 'clase' => '', 'background_color' => '#434A54');
-	elseif ($estado == 6)
-		$objeto = array('label'=> 'Transito', 'clase' => 'warning', 'background_color' => '');
-	elseif ($estado == 7)
-		$objeto = array('label'=> 'Enviada y Cancelada', 'clase' => '', 'background_color' => '#967ADC');
-
-	return $objeto;
-}
-
-?>
-
-<?php $this->beginWidget(
-    'booster.widgets.TbModal',
-    array('id' => 'modalConfirmar')
-); ?>
-
- 
-<?php $this->endWidget(); ?>

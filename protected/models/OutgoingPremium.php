@@ -20,6 +20,7 @@
  */
 class OutgoingPremium extends CActiveRecord
 {
+	public $buscar;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -112,6 +113,31 @@ class OutgoingPremium extends CActiveRecord
 		$criteria->compare('operadora',$this->operadora,true);
 		$criteria->compare('status',$this->status);
 		$criteria->compare('id_promo',$this->id_promo,true);
+		$criteria->compare('id_insignia_alarmas',$this->id_insignia_alarmas,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchDetalleBCP($id_promo)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id',$this->id,true);
+		$criteria->compare('destinatario',$this->destinatario,true);
+		$criteria->compare('mensaje',$this->mensaje,true);
+		$criteria->compare('fecha_in',$this->fecha_in,true);
+		$criteria->compare('hora_in',$this->hora_in,true);
+		$criteria->compare('fecha_out',$this->fecha_out,true);
+		$criteria->compare('hora_out',$this->hora_out,true);
+		$criteria->compare('tipo_evento',$this->tipo_evento,true);
+		$criteria->compare('cliente',$this->cliente,true);
+		$criteria->compare('operadora',$this->operadora,true);
+		$criteria->compare('status',$this->status);
+		$criteria->compare('id_promo',$id_promo);
 		$criteria->compare('id_insignia_alarmas',$this->id_insignia_alarmas,true);
 
 		return new CActiveDataProvider($this, array(
