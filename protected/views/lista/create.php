@@ -32,8 +32,11 @@ $form = $this->beginWidget(
 		'enableAjaxValidation'=>false,
 	)
 ); ?>
+	
+	<fieldset>
+ 
+	<legend>Crear Lista</legend>
 
-	<h2>Crear Lista</h2>
 	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
 	<?php if (Yii::app()->user->isAdmin()){ ?>
@@ -49,6 +52,7 @@ $form = $this->beginWidget(
 						'data' => CHtml::listData(UsuarioMasivo::model()->findAll(array("order"=>"login")), 'id_usuario', 'login'),
 						'htmlOptions' => array('prompt' => 'Seleccionar...'),
 					),
+					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
 					'hint' => 'En caso de seleccionar un usuario, la lista sera asociada a dicho usuario',
 				)
 			); ?>
@@ -66,7 +70,8 @@ $form = $this->beginWidget(
 					),
 					'widgetOptions' => array(
 						'htmlOptions' => array('placeholder' => 'Nombre de la lista', 'autocomplete'=>'off'),
-					)
+					),
+					'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
 				)
 			); ?>
 	</div>
@@ -80,12 +85,17 @@ $form = $this->beginWidget(
 					//'class' => 'col-sm-5',
 				),
 				'widgetOptions' => array(
-					'htmlOptions' => array('rows' => 10, 'placeholder'=>'4140000000,4240000000,4160000000,4260000000,4120000000'),
-				)
+					'htmlOptions' => array('class'=>'numerosTextarea', 'onKeyPress' => 'return processKeydown(event);', 'rows' => 10, 'placeholder'=>'4140000000,4240000000,4160000000,4260000000,4120000000'),
+				),
+				'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
 			)
 		); ?>
+		<div style="float: right; font: bold 13px Arial;"><strong>Total: </strong>
+				<?php echo CHTML::textField('total',0,array('size'=>2 ,'style'=>'margin-left:10px; border:0;', 'readonly' => true)); ?>
+		</div>
 	</div>
-
+	</fieldset>
+	<br><br>
 	<div>
 		<div class="col-xs-offset-4 col-sm-offset-10 col-md-offset-10 col-lg-offset-10">
 		<?php //echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

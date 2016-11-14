@@ -21,6 +21,8 @@
 class OutgoingPremium extends CActiveRecord
 {
 	public $buscar;
+	public $descripcion_oper;
+	public $descripcion_estado;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -125,23 +127,20 @@ class OutgoingPremium extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('destinatario',$this->destinatario,true);
-		$criteria->compare('mensaje',$this->mensaje,true);
-		$criteria->compare('fecha_in',$this->fecha_in,true);
-		$criteria->compare('hora_in',$this->hora_in,true);
-		$criteria->compare('fecha_out',$this->fecha_out,true);
-		$criteria->compare('hora_out',$this->hora_out,true);
-		$criteria->compare('tipo_evento',$this->tipo_evento,true);
-		$criteria->compare('cliente',$this->cliente,true);
-		$criteria->compare('operadora',$this->operadora,true);
-		$criteria->compare('status',$this->status);
+		$criteria->select = "CONCAT(o.prefijo, t.destinatario) AS destinatario, t.operadora, t.status, o.descripcion AS descripcion_oper";
+		$criteria->join = "INNER JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
+		//$criteria->join .= "INNER JOIN status_outgoing_premium s ON t.status = s.id_status";
 		$criteria->compare('id_promo',$id_promo);
-		$criteria->compare('id_insignia_alarmas',$this->id_insignia_alarmas,true);
+		$criteria->condition .= " AND (CONCAT(o.prefijo, t.destinatario) LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= " o.descripcion LIKE '%".$this->buscar."%') ";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+        		'attributes'=>array(
+             		'destinatario', 'o.descripcion'
+        		),
+    		),
 		));
 	}
 

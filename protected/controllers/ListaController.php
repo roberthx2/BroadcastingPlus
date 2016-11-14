@@ -63,6 +63,7 @@ class ListaController extends Controller
 	public function actionCreate()
 	{
 		$model=new ListaForm;
+		$model->scenario = "create";
 		//$model_user=new usersMasivo;
 
 		// Uncomment the following line if AJAX validation is needed
@@ -71,7 +72,8 @@ class ListaController extends Controller
 		if(isset($_POST['ListaForm']))
 		{
 			$model->attributes=$_POST['ListaForm'];
-			
+			//$model->scenario = "create";
+
 			if ($model->validate())
 			{
 				$transaction = Yii::app()->db_masivo_premium->beginTransaction();
@@ -185,6 +187,7 @@ class ListaController extends Controller
 	{
 		//$model=$this->loadModel($id_lista);
 		$model=new ListaForm;
+		$model->scenario = "agregarNumeros";
 		//$model->id_lista = $id_lista;
 
 		if(isset($_POST['ListaForm']))

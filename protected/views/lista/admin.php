@@ -64,6 +64,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                   	//'showbuttons' => false,
                   	//'inputclass' => 'input-mini',
                   	//'placement'  => 'right',
+                  	'title' => '',
                   	'success' => 'js: function(response, newValue) {
 				       if(!response.success) return response.msg;
 				    }',

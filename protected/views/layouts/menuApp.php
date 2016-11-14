@@ -68,6 +68,16 @@
                     </ul>
                 <?php } ?>
 
+                <?php if (Yii::app()->user->getPermisos()->modulo_herramientas) { ?>
+                <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
+                    <a href="#"> Herramientas <span class="caret brandMenu" aria-hidden="true"></span></a>
+                </li>
+                    <ul class="sub-menu collapse" id="menu_herramientas">
+                        <?php if (Yii::app()->user->getPermisos()->administrar_prefijo) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('prefijoPromocion/admin');?>"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Prefijos </a></li> <?php } ?>
+                    </ul>
+                <?php } ?>
+
                 <?php if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
                 <li data-toggle="collapse" data-target="#menu_exentos" class="collapsed active">
                     <a href="#"> Exentos <span class="caret brandMenu" aria-hidden="true"></span></a>

@@ -1,36 +1,40 @@
 <br>
 <?php
-Yii::app()->clientScript->registerScript('searchReporteBCP', "
+	Yii::app()->clientScript->registerScript('searchDetalleBCP', "
 
-$('.search-form form').submit(function(){
-    $('#reporte').yiiGridView('update', {
-        data: $(this).serialize()
-    });
-    return false;
-});
+	$('.search-form form').submit(function(){
+	    $('#promocionBCP-grid').yiiGridView('update', {
+	        data: $(this).serialize()
+	    });
+	    return false;
+	});
 
-");
-
+	");
 ?>
-<div class="search-form">
-    <?php $this->renderPartial('/TmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
+
+<div class="clearfix visible-xs-block"></div>
+
+<div class="search-form ">
+    <?php $this->renderPartial('busqueda',array('model'=>$model_outgoing, 'id_promo'=>$model_promocion->id_promo)); ?>
 </div><!-- search-form -->
 
 <?php
 
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'reporte',
+        'id'=>'promocionBCP-grid',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model_procesamiento->searchReporteBCP($id_proceso),
+        'dataProvider' => $model_outgoing->searchDetalleBCP($model_promocion->id_promo),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
+        //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
+        'selectableRows' => 2,
        // 'filter'=> $model_procesamiento,
-        'columns'=> array(
+        'columns'=> array( 
         	array(
-	            'name' => 'numero',
-	            'header' => 'Número',
+	            'name' => 'destinatario',
+	            'header' => 'Destinatario',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
@@ -46,7 +50,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                             'context' => '',
                             // 'default', 'primary', 'success', 'info', 'warning', 'danger'
                             'label' => $data["descripcion_oper"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCP($data["id_operadora"]).';'),    
+                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCP($data["operadora"]).';'),    
                         )
                     );
                 },
@@ -55,15 +59,17 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
             array(
-                'name' => 'e.descripcion',
                 'header' => 'Estado',
-                'value' => function($data)
+                'value' => function($data, $model_promocion)
                 {
+                    //$estado = $this->actionGetStatusDestinatario($data["status"], $model_promocion["fecha"], $model_promocion["hora"], $model_promocion["hora_limite"]);
+                    $objeto = Yii::app()->Funciones->getColorLabelEstadoDestinatarioBCP($data["status"]);
+
                     $this->widget(
                         'booster.widgets.TbLabel',
                         array(
-                            'label' => $data["descripcion_estado"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorValidoInvalido($data["estado"]).';'),    
+                            'label' => $objeto['label'],
+                            'htmlOptions'=>array('style'=>'background-color: '.$objeto['background_color'].';'),    
                         )
                     );
                 },

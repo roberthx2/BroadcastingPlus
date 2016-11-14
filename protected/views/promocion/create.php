@@ -30,6 +30,8 @@
  
 	<legend>Crear Promoción</legend>
 
+	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
+
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 		<?php echo $form->dropDownListGroup(
 			$model,
@@ -291,7 +293,7 @@
 						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 					),
 					'widgetOptions' => array(
-						'htmlOptions' => array('onKeyPress' => 'return processKeydown(event);', 'rows' => 5, 'placeholder' => '4160000000,4260000000,4140000000,4240000000,4120000000'),
+						'htmlOptions' => array('class'=>'numerosTextarea', 'onKeyPress' => 'return processKeydown(event);', 'rows' => 5, 'placeholder' => '4160000000,4260000000,4140000000,4240000000,4120000000'),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
 				)

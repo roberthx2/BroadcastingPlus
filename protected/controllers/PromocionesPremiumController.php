@@ -58,18 +58,8 @@ class PromocionesPremiumController extends Controller
 		$criteria->compare("t.id_promo", $id);
 		$model_promocion = PromocionesPremium::model()->find($criteria);
 
-		$model_outgoing=new OutgoingPremium('search');
-		$model_outgoing->unsetAttributes();
 
-		if(isset($_GET['OutgoingPremium']))
-			$model_outgoing->buscar = $_GET['OutgoingPremium']["buscar"];
-
-		$this->render('view',array(
-			'model_promocion'=>$model_promocion, 'model_outgoing' => $model_outgoing
-		));
-		/*$this->render('view',array(
-			'model'=>$this->loadModel($id),
-		));*/
+		$this->render('view',array('model_promocion'=>$model_promocion));
 	}
 
 	/**
@@ -199,11 +189,12 @@ class PromocionesPremiumController extends Controller
 		));
 	}
 
-	public function actionObtenerStatusDetalle($id_promo)
+	//Obtener el estado de la promocion
+	public function actionGetStatusPromocion($id_promo)
 	{
 		$sql = "SELECT p.estado,  p.fecha, p.hora, d_o.fecha_limite, d_o.hora_limite,
-			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = CURDATE() AND id_promo = p.id_promo) AS total,
-			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = CURDATE() AND id_promo = p.id_promo AND status = 1) AS enviados
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 			FROM promociones_premium AS p, deadline_outgoing_premium AS d_o
 			WHERE p.id_promo IN (".$id_promo.") AND p.id_promo = d_o.id_promo";
 
@@ -217,7 +208,7 @@ class PromocionesPremiumController extends Controller
 	            //$estado = "No Confirmada";
 	            $estado = 0;
 	            break;
-	        case 1: 
+	        case 1: //El java coloca este estado si todos los mensajes fueron enviados (CUANDO FUNCIONA)
 	            //$estado = "Enviada";
 	            $estado = 1;
 	        break;
@@ -283,101 +274,46 @@ class PromocionesPremiumController extends Controller
 	    return $estado; 
 	}
 
-	public function actionLabelStatuPromo($estado)
+	public function actionGetStatusDestinatario($id_estado, $fecha, $hora, $hora_limite)
 	{
-		$objeto = array();
-
-		if($estado == 0)
-			$objeto = array('label'=> 'No confirmada', 'clase' => 'default', 'background_color' => '');
-		elseif ($estado == 1)
-			$objeto = array('label'=> 'Enviada', 'clase' => 'success', 'background_color' => '');
-		elseif ($estado == 2)
-			$objeto = array('label'=> 'Confirmada', 'clase' => 'primary', 'background_color' => '');
-		elseif ($estado == 3)
-			$objeto = array('label'=> 'Incompleta', 'clase' => 'success', 'background_color' => '#FC6E51');
-		elseif ($estado == 4)
-			$objeto = array('label'=> 'Cancelada', 'clase' => 'danger', 'background_color' => '');
-		elseif ($estado == 5)
-			$objeto = array('label'=> 'No enviada', 'clase' => '', 'background_color' => '#434A54');
-		elseif ($estado == 6)
-			$objeto = array('label'=> 'Transito', 'clase' => 'warning', 'background_color' => '');
-		elseif ($estado == 7)
-			$objeto = array('label'=> 'Enviada y Cancelada', 'clase' => '', 'background_color' => '#967ADC');
-
-		return $objeto;
-	}
-
-	public function actionObtenerStatus($status, $fecha, $hora, $fecha_limite, $hora_limite, $no_enviados, $all_sms)
-	{
-	    switch ($status)
+		switch ($id_estado)
 	    {
-	        case 0: 
-	            //$estado = "No Confirmada";
+	    	case 0: //No confirmado
 	            $estado = 0;
 	            break;
-	        case 1: 
-	            //$estado = "Enviada";
-	            $estado = 1;
-	        break;
-	        case 2:
-	            //$estado = "Confirmada";
-	            $estado = 2;
-	            $ts_actual = time();
-	            $ts_inicio = strtotime($fecha . " " . $hora);
-	            $ts_fin = strtotime($fecha_limite . " " . $hora_limite);
-	            
-	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
-	                if ($no_enviados > 0) {
-	                    //$estado = "En Transito";
-	                    $estado = 6;
-	                } else { 
-	                    //$estado = "Enviada";
-	                    $estado = 1;
-	                } 
+
+	        case 1: //Enviado
+	        	$estado = 1;
+	        	break;
+
+	        case 2: //Confirmado
+	        	$estado = 2; //Confirmado
+	            $hora_actual = time();
+	            $hora_inicio = strtotime($fecha . " " . $hora);
+	            $hora_fin = strtotime($fecha . " " . $hora_limite);
+
+	            if (($hora_actual >= $hora_inicio) && ($hora_actual <= $hora_fin)) {
+	            	$estado = 3; //Transito
 	            }
 
-	            if ($ts_actual < $ts_inicio) {
-	                //$estado = "Confirmada";
-	                $estado = 2;
+	            if ($hora_actual < $hora_inicio) {
+	                $estado = 2; //Confirmado
 	            }
 
-	            if ($ts_actual > $ts_fin) {  
-	                if ($no_enviados > 0) {
-	                    //$estado = "Incompleta";
-	                    $estado = 3;
-	                }
-	                if($no_enviados == $all_sms){
-	                    //$estado = "No Enviada";
-	                    $estado = 5;
-	                }
-	                if($no_enviados == 0){
-	                    //$estado = "Enviada";
-	                    $estado = 1;
-	                }
+	            if ($hora_actual > $hora_fin) {  
+	                $estado = 5; //No enviado
 	            }
 
-	        break;
-	        case 4: 
-	            //$estado = "Cancelada";
-	            $estado = 4;
-	            
-	            if($no_enviados == $all_sms){
-	                //$estado = "Cancelada";
-	                $estado = 4;
-	            }
-	            if($no_enviados >= 0 && $no_enviados < $all_sms){
-	                //$estado = "Enviada y Cancelada";
-	                $estado = 7;
-	            }
-	        break;
-	        case 5: 
-	            //$estado = "No enviada";
-	            $estado = 5;
-	        break;
+	            break;
+	        case 3: //Transito
+	        	$estado = 3;
+	        	break;
+	        case 4: //Cancelado
+	        	$estado = 4;
+	        	break;
+	    }	
 
-	    
-	    }
-	    return $estado; 
+	    return $estado;
 	}
 
 	public function actionReporteTorta($id_promo)

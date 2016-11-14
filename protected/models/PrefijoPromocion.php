@@ -10,6 +10,8 @@
  */
 class PrefijoPromocion extends CActiveRecord
 {
+	public $buscar;
+	public $login;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -26,13 +28,32 @@ class PrefijoPromocion extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario, prefijo', 'required'),
+			array('prefijo', 'required', 'message'=>'{attribute} requerido'),
 			array('id_usuario', 'numerical', 'integerOnly'=>true),
 			array('prefijo', 'length', 'max'=>10),
+			
+			array("prefijo","filter","filter"=>array($this, "limpiarPrefijo")),
+			array("prefijo", "ext.ValidarNombre"), //Valida los caracteres
+			array("prefijo", "existe"), //Valida si existe el nombre de la promoción segun su tipo
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, id_usuario, prefijo', 'safe', 'on'=>'search'),
 		);
+	}
+
+	public function limpiarPrefijo($cadena)
+	{
+		return Yii::app()->Funciones->limpiarNombre($cadena);
+	}
+
+	public function existe($attribute, $params)
+	{
+		$model = PrefijoPromocion::model()->find("id_usuario =? AND prefijo =?", array(Yii::app()->user->id, $this->$attribute));
+
+		if ($model)
+		{
+			$this->addError($attribute, "EL prefijo ya existe");
+		}
 	}
 
 	/**
@@ -82,6 +103,31 @@ class PrefijoPromocion extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchPrefijo($id_usuario)
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id, t.prefijo, t.id_usuario, u.login";
+		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario";
+
+		if ($id_usuario != null) //NO es admin
+			$criteria->condition = "(t.id_usuario = ".$id_usuario.") AND ";
+		else  $criteria->condition = "(u.login LIKE '%".$this->buscar."%') OR "; //SI es admin
+
+		$criteria->condition .= "prefijo LIKE '%".$this->buscar."%'";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'login ASC',
+        		'attributes'=>array(
+             		'u.login','prefijo'
+        		),
+    		),
 		));
 	}
 

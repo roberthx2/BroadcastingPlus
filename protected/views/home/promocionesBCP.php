@@ -61,8 +61,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'value' => function($data){
 	            	$label = "";
 	            	$clase = "";
-	            	$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
-
+	            	//$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
+                    $estado = PromocionesPremiumController::actionGetStatusPromocion($data["id"]);
 	            	$objeto = estadoPromo($estado);
 
 	            	$this->widget(
@@ -83,7 +83,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 'value' => function($data)
                 {
                 	$avance = avance($data["total"], $data["enviados"]);
-                	$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
+                	//$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
+                    $estado = PromocionesPremiumController::actionGetStatusPromocion($data["id"]);
 
                 	if ($estado == 1) //Enviada
                 		$clase = 'success';
@@ -191,7 +192,8 @@ function estadoPromo($estado)
 
 function visibleConfirmar($data)
 {
-	$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
+    $estado = PromocionesPremiumController::actionGetStatusPromocion($data["id"]);
+	//$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
 	//Confirmada
 	if ($estado == 0)
 		return true;
@@ -201,7 +203,8 @@ function visibleConfirmar($data)
 
 function visibleCancelar($data)
 {
-	$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
+    $estado = PromocionesPremiumController::actionGetStatusPromocion($data["id"]);
+	//$estado = PromocionesPremiumController::actionObtenerStatus($data["estado"], $data["fecha"], $data["hora"], $data["fecha_limite"], $data["hora_limite"], $data["no_enviados"], $data["total"]);
 	//Confirmada / En transito
 	if ($estado == 2 || $estado == 6)
 		return true;

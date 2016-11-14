@@ -60,7 +60,6 @@ function processKeydown(e)
     if(tecla == 44 && canPress() == "comma")
         return;
 
-
     // Si lo presionado no es un numero, stop
     if ((e.shiftKey || (tecla < 48 || tecla > 57)) && (tecla < 96 || tecla > 105)) {
         e.preventDefault();
@@ -74,12 +73,12 @@ function processKeydown(e)
 
 function canPress()
 {
-    var destinatarios = $("#PromocionForm_destinatarios").val();
+    var destinatarios = $(".numerosTextarea").val();
 
     if(destinatarios == "" || destinatarios.length < 10)
         return "number";
 
-    var lastDigits = $("#PromocionForm_destinatarios").val().slice( -10 );
+    var lastDigits = $(".numerosTextarea").val().slice( -10 );
 
     //console.log("Last digits: " + lastDigits);
     //console.log("IndexOfComma: " +lastDigits.indexOf(','));
@@ -92,7 +91,7 @@ function canPress()
 
 
 function countNumber() {
-    var destinatarios = $("#PromocionForm_destinatarios");
+    var destinatarios = $(".numerosTextarea");
     var countSpan = $("#total");
 
     var text = destinatarios.val();

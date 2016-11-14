@@ -66,15 +66,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'value' => function($data){
 	            	$label = "";
 	            	$clase = "";
-	            	$estado = PromocionesPremiumController::actionObtenerStatusDetalle($data["id_promo"]);
+	            	$estado = PromocionesPremiumController::actionGetStatusPromocion($data["id_promo"]);
 
-	            	$objeto = PromocionesPremiumController::actionLabelStatuPromo($estado);
+	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
 
 	            	$this->widget(
 					    'booster.widgets.TbLabel',
 					    array(
-					        'context' => $objeto['clase'],
-					        // 'default', 'primary', 'success', 'info', 'warning', 'danger'
 					        'label' => $objeto['label'],
 					        'htmlOptions'=>array('style'=>'background-color: '.$objeto['background_color'].';'),	
 					    )

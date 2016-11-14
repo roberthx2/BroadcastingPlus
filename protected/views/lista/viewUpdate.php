@@ -72,7 +72,7 @@
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 <?php 
 	$data = $this->actionReporteTorta($model_lista->id_lista);
-	echo $this->renderPartial("/TmpProcesamiento/graficoTortaBCNL", array("data"=>$data), true); 
+	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
 </div>
 
@@ -232,20 +232,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 	$(document).ready(function()
 	{
-		/*$("#boton_eliminar").click(function(){
-			var checked = $.fn.yiiGridView.getCheckedRowsIds('listaUpdate-grid');
-			var total = checked.length;
-			var mensaje = "<center><strong>¿Confirma eliminar "+total+" destinatarios?</strong></center>";
-			$("#divModalEliminar").html(mensaje);
-			$("#modal_footer").show();
-		});*/
-
-	 	/*$('#confirmar').click(function () {
-	    	var $btn = $(this).button('loading');
-	    	// business logic...
-	    	//$btn.button('reset');
-	 	});*/
-
 		$("a[data-toggle=modal]").click(function(){
 		    var target = $(this).attr('data-target');
 		    var url = $(this).attr('href');

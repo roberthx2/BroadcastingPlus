@@ -92,6 +92,50 @@ class Funciones extends CApplicationComponent
 
 		return $color;
 	}
+
+	public function getColorLabelEstadoPromocionesBCP($id_estado)
+	{
+		$objeto = array();
+
+		if($id_estado == 0)
+			$objeto = array('label'=> 'No confirmada', 'background_color' => '#999');
+		elseif ($id_estado == 1)
+			$objeto = array('label'=> 'Enviada', 'background_color' => '#5cb85c');
+		elseif ($id_estado == 2)
+			$objeto = array('label'=> 'Confirmada', 'background_color' => '#337ab7');
+		elseif ($id_estado == 3)
+			$objeto = array('label'=> 'Incompleta', 'background_color' => '#FC6E51');
+		elseif ($id_estado == 4)
+			$objeto = array('label'=> 'Cancelada', 'background_color' => '#d9534f');
+		elseif ($id_estado == 5)
+			$objeto = array('label'=> 'No enviada', 'background_color' => '#434A54');
+		elseif ($id_estado == 6)
+			$objeto = array('label'=> 'En transito', 'background_color' => '#f0ad4e');
+		elseif ($id_estado == 7)
+			$objeto = array('label'=> 'Enviada y Cancelada', 'background_color' => '#967ADC');
+
+		return $objeto;
+	}
+
+	public function getColorLabelEstadoDestinatarioBCP($id_estado)
+	{
+		$objeto = array();
+
+		if($id_estado == 0) //No confirmado
+			$objeto = array('label'=> 'No confirmado', 'background_color' => '#999');
+		elseif ($id_estado == 1) //Enviado
+			$objeto = array('label'=> 'Enviado', 'background_color' => '#5cb85c');
+		elseif ($id_estado == 2) //Confirmado
+			$objeto = array('label'=> 'Confirmado', 'background_color' => '#337ab7');
+		elseif ($id_estado == 3) //Transito
+			$objeto = array('label'=> 'En transito', 'background_color' => '#f0ad4e');
+		elseif ($id_estado == 4) //Cancelado
+			$objeto = array('label'=> 'Cancelado', 'background_color' => '#d9534f');
+		elseif ($id_estado == 5) //No enviado
+			$objeto = array('label'=> 'No enviado', 'background_color' => '#434A54');
+
+		return $objeto;
+	}
 }
 
 ?>

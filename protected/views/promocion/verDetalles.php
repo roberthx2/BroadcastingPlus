@@ -3,7 +3,7 @@
 $contenido = array();
 $active = true;
 
-if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
+/*if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
 {
     $modelBCNL = new Promociones('searchDetalles');
     $modelBCNL->unsetAttributes();
@@ -14,7 +14,7 @@ if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermis
             		array('label' => 'BCNL', 'content' => 'loading ....', 'active' => $active),
             	);
     $active = false;
-}
+}*/
 
 if (Yii::app()->user->getPermisos()->broadcasting_premium)
 {
