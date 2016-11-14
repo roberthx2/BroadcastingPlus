@@ -1,9 +1,9 @@
 <br>
 <?php
-	Yii::app()->clientScript->registerScript('searchDetalleBCP', "
+	Yii::app()->clientScript->registerScript('searchDetalleBCNL', "
 
 	$('.search-form form').submit(function(){
-	    $('#promocionBCP-grid').yiiGridView('update', {
+	    $('#promocionBCNL-grid').yiiGridView('update', {
 	        data: $(this).serialize()
 	    });
 	    return false;
@@ -21,10 +21,10 @@
 <?php
 
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'promocionBCP-grid',
+        'id'=>'promocionBCNL-grid',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model_outgoing->searchDetalleBCP($model_promocion->id_promo),
+        'dataProvider' => $model_outgoing->searchDetalleBCNL($model_promocion->id_promo),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
@@ -33,13 +33,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
        // 'filter'=> $model_procesamiento,
         'columns'=> array( 
         	array(
-	            'name' => 'destinatario',
+	            'name' => 'number',
 	            'header' => 'Destinatario',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
-        	array(
+        	/*array(
 	            'name' => 'o.descripcion',
 	            'header' => 'Operadora',
                 'value' => function($data)
@@ -57,7 +57,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
+        	),*/
             array(
                 'name' => 'e.descripcion',
                 'header' => 'Estado',
@@ -67,7 +67,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         'booster.widgets.TbLabel',
                         array(
                             'label' => $data["descripcion_estado"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoDestinatarioBCP($data["status"]).';'),    
+                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoDestinatarioBCNL($data["status"]).';'),    
                         )
                     );
                 },

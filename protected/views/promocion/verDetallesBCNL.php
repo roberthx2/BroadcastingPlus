@@ -1,9 +1,9 @@
 <br>
 <?php
-Yii::app()->clientScript->registerScript('searchDetallesBCP', "
+Yii::app()->clientScript->registerScript('searchDetallesBCNL', "
 
 $('.search-form form').submit(function(){
-    $('#detallesBCP').yiiGridView('update', {
+    $('#detallesBCNL').yiiGridView('update', {
         data: $(this).serialize()
     });
     return false;
@@ -17,7 +17,7 @@ $('.search-form form').submit(function(){
 </div><!-- search-form -->
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'detallesBCP',
+        'id'=>'detallesBCNL',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model->searchVerDetalles(),
@@ -41,7 +41,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'type' => 'raw',
 	            'value' => function($data)
 	            {
-	            	$url = Yii::app()->createUrl('promocionesPremium/view', array("id"=>$data["id_promo"]));
+	            	$url = Yii::app()->createUrl('promociones/view', array("id"=>$data["id_promo"]));
 	            	$var = '<a href="'.$url.'" data-toggle="tooltip" data-placement="top" title="Ver detalles">'.$data["nombrePromo"].'</a>';
 	            	return $var;
 	            },
@@ -66,7 +66,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'value' => function($data){
 	            	$label = "";
 	            	$clase = "";
-	            	$estado = PromocionesPremiumController::actionGetStatusPromocion($data["id_promo"]);
+	            	$estado = PromocionesController::actionGetStatusPromocion($data["id_promo"]);
 
 	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
 

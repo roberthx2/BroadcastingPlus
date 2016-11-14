@@ -117,6 +117,34 @@ class Procedimientos extends CApplicationComponent
         else return "null";
 	}
 
+	public function getUsuariosBCNLHerencia($id_usuario)
+	{
+		$model_sms = UsuarioSms::model()->findByPk($id_usuario);
+        $ids_usuarios[] = $id_usuario;
+
+        $sql = "SELECT GROUP_CONCAT(id_usuario) AS cadena FROM usuario WHERE creado = :id_usuario";
+        $sql = Yii::app()->db_sms->createCommand($sql);
+        $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_STR);
+        $sql = $sql->queryRow();
+        
+        $cadena = trim(preg_replace('/,{2,}/', ",", $sql["cadena"]), ",");
+
+        while ($cadena != "")
+        {
+        	$ids_usuarios[] = $cadena;
+        	$sql = "SELECT GROUP_CONCAT(id_usuario) AS cadena FROM usuario WHERE creado IN (".$cadena.")";
+            $sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+            $cadena = trim(preg_replace('/,{2,}/', ",", $sql["cadena"]), ",");
+        }
+
+        $ids_usuarios = implode(",", $ids_usuarios);
+        $ids_usuarios = trim(preg_replace('/,{2,}/', ",", $ids_usuarios), ",");
+
+        if ($ids_usuarios != "")
+        	return $ids_usuarios;
+        else return "null";
+	}
+
 	public function getUsuariosBCNLHerenciaInversa($id_usuario)
 	{
 		$model_sms = UsuarioSms::model()->findByPk($id_usuario);

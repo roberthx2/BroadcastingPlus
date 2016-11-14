@@ -24,12 +24,16 @@ $('.search-form form').submit(function(){
 <h1>Administrar Prefijos</h1>
 <br>
 
-<div class="search-form">
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 hidden-xs">
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
 </div><!-- search-form -->
 
 <div class="add-prefijo-form">
     <?php $this->renderPartial('create',array('model'=>$model)); ?>
+</div><!-- search-form -->
+
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 visible-xs">
+    <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
 </div><!-- search-form -->
 
 <?php

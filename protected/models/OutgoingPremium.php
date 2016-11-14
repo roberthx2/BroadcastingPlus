@@ -124,21 +124,21 @@ class OutgoingPremium extends CActiveRecord
 
 	public function searchDetalleBCP($id_promo)
 	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
 		$criteria=new CDbCriteria;
-		$criteria->select = "CONCAT(o.prefijo, t.destinatario) AS destinatario, t.operadora, t.status, o.descripcion AS descripcion_oper";
-		$criteria->join = "INNER JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
+		$criteria->select = "CONCAT(o.prefijo, t.destinatario) AS destinatario, t.operadora, t.status, e.descripcion AS descripcion_estado, o.descripcion AS descripcion_oper";
+		$criteria->join =  "LEFT JOIN outgoing_premium_estados e ON t.status = e.id_estado ";
+		$criteria->join .= "LEFT JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
 		//$criteria->join .= "INNER JOIN status_outgoing_premium s ON t.status = s.id_status";
 		$criteria->compare('id_promo',$id_promo);
 		$criteria->condition .= " AND (CONCAT(o.prefijo, t.destinatario) LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "e.descripcion LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= " o.descripcion LIKE '%".$this->buscar."%') ";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
         		'attributes'=>array(
-             		'destinatario', 'o.descripcion'
+             		'destinatario', 'o.descripcion', 'e.descripcion'
         		),
     		),
 		));

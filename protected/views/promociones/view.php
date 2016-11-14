@@ -15,11 +15,11 @@
 
 <?php 
 
-	$model_outgoing=new OutgoingPremium('search');
+	$model_outgoing=new Outgoing('search');
 	$model_outgoing->unsetAttributes();
 
-	if(isset($_GET['OutgoingPremium']))
-		$model_outgoing->buscar = $_GET['OutgoingPremium']["buscar"];
+	if(isset($_GET['Outgoing']))
+		$model_outgoing->buscar = $_GET['Outgoing']["buscar"];
 
 	echo $this->renderPartial("informacionDestinatarios", array("model_promocion"=>$model_promocion, 'model_outgoing'=>$model_outgoing), true); 
 ?>

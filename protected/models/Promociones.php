@@ -19,6 +19,10 @@
  */
 class Promociones extends CActiveRecord
 {
+	public $buscar;
+	public $login;
+	public $total;
+	public $hora_limite;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -112,6 +116,31 @@ class Promociones extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchVerDetalles()
+	{
+		$cadena_usuarios = Yii::app()->Procedimientos->getUsuariosBCNLHerencia(Yii::app()->user->id);
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->join = "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
+		$criteria->addInCondition("t.cadena_usuarios", explode(",", $cadena_usuarios));
+		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "u.login LIKE '%".$this->buscar."%')";
+		//$criteria->order = "id_promo DESC";
+		
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_promo DESC',
+        		'attributes'=>array(
+             		'id_promo', 'fecha', 'nombrePromo', 'u.login'
+        		),
+    		),
 		));
 	}
 

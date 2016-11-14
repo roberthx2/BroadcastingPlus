@@ -3,18 +3,18 @@
 $contenido = array();
 $active = true;
 
-/*if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
+if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
 {
-    $modelBCNL = new Promociones('searchDetalles');
+    $modelBCNL = new Promociones('searchVerDetalles');
     $modelBCNL->unsetAttributes();
     if(isset($_GET['Promociones']))
         $modelBCNL->buscar = $_GET['Promociones']["buscar"];
             
     $contenido = array(
-            		array('label' => 'BCNL', 'content' => 'loading ....', 'active' => $active),
+            		array('label' => 'BCNL', 'content' => $this->renderPartial('verDetallesBCNL', array('model'=>$modelBCNL), true), 'active' => $active),
             	);
     $active = false;
-}*/
+}
 
 if (Yii::app()->user->getPermisos()->broadcasting_premium)
 {

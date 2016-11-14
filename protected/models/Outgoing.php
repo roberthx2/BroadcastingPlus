@@ -21,6 +21,8 @@
  */
 class Outgoing extends CActiveRecord
 {
+	public $buscar;
+	public $descripcion_estado;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -119,6 +121,27 @@ class Outgoing extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchDetalleBCNL($id_promo)
+	{
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.number, t.status, e.descripcion AS descripcion_estado";
+		$criteria->join =  "LEFT JOIN status_outgoing e ON t.status = e.status ";
+		//$criteria->join .= "LEFT JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
+		$criteria->compare('id_promo',$id_promo);
+		$criteria->condition .= " AND (number LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "e.descripcion LIKE '%".$this->buscar."%')";// OR ";
+		//$criteria->condition .= " o.descripcion LIKE '%".$this->buscar."%') ";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+        		'attributes'=>array(
+             		//'destinatario', 'o.descripcion', 'e.descripcion'
+        		),
+    		),
 		));
 	}
 

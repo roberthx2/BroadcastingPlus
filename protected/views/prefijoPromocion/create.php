@@ -37,7 +37,9 @@
                     ),
                 )
             );
-
+            ?>
+            <div id="respuesta" class="alert alert-success" role="alert" style="display: none;"></div>
+            <?php 
             echo $form->textFieldGroup(
                 $model,
                 'prefijo',
@@ -46,14 +48,13 @@
                         //'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
                     ),
                     'widgetOptions' => array(
-                        'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+                        'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'class'=>'input_prefijo'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
                     ),
                     'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
                 )
             );
         ?>
     </div>
-        <div id="respuesta"> </div>
     <div class="modal-footer" id="modal_footer_prefijo">
         <?php
             echo CHtml::submitButton('Crear Prefijo', array('id' => 'bontonCrear', 'class'=>'btn btn-success'));
@@ -77,39 +78,52 @@
                 
                 beforeSend: function()
                 {
-                    $("#bontonCrear").attr("disabled",true);
+                   // $("#bontonCrear").attr("disabled",true);
+                   $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
+                   $("#PrefijoPromocion_prefijo_em_").hide();
+                   $("#respuesta").hide();
                 },
                 complete: function()
                 {
                     //alert("termine");
+                   // $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
+                   // $("#PrefijoPromocion_prefijo_em_").hide();
+                    //$("#respuesta").hide();
                 },
                 success: function(data)
                 {
-                    $("#PrefijoPromocion_prefijo_em_").show();
-
                     if (data.salida == 'true')
                     {
-                        $(".form-group").removeClass("has-error").addClass("has-success");
+                    	$("#PrefijoPromocion_prefijo").val("");
+                    	$("#prefijo-promocion-form div.form-group").addClass("has-success");
+                        $("#respuesta").html("El prefijo fue creado correctamente");
+                        $("#respuesta").show();
 
-                        $("#PrefijoPromocion_prefijo_em_").html("El prefijo fue creado correctamente");
+                        $('#prefijo-promocion-grid').yiiGridView('update', {
+							data: $(this).serialize()
+						});
+						return;
                     }
                     else (data.salida == 'false')
                     {
-                        $(".form-group").removeClass("has-success").addClass("has-error");
+                    	$("#prefijo-promocion-form div.form-group").addClass("has-error");
+                    	$("#PrefijoPromocion_prefijo_em_").show();
 
                         var error = data.error.prefijo;
 
                         $.each(error, function(i, value) {
                             $("#PrefijoPromocion_prefijo_em_").html(value);
                         });
+                        return;
                     }
                     
-                    $("#bontonCrear").attr("disabled",false);
+                   // $("#bontonCrear").attr("disabled",false);
                 },
                 error: function()
                 {
-                    document.getElementById('respuesta').innerHTML = "Error occured.please try again" + data;
-                    $("#bontonCrear").attr("disabled",false);
+                	//$("#respuesta").show();
+                    //$("#respuesta").html("Ocurrio un error al procesar los datos intente nuevamente" + data);
+                    //$("#bontonCrear").attr("disabled",false);
                 }
             });
         }
