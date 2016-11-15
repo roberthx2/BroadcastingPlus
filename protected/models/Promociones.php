@@ -22,6 +22,8 @@ class Promociones extends CActiveRecord
 	public $buscar;
 	public $login;
 	public $total;
+	public $enviados;
+	public $fecha_limite;
 	public $hora_limite;
 	/**
 	 * @return string the associated database table name
@@ -116,6 +118,35 @@ class Promociones extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchHome()
+	{
+		$cadena_usuarios = Yii::app()->Procedimientos->getUsuariosBCNLHerencia(Yii::app()->user->id);
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, u.login, t.nombrePromo, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo) AS total,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo AND status = 3) AS enviados";
+		$criteria->join = "INNER JOIN deadline_outgoing d_o ON t.id_promo = d_o.id_promo ";
+		$criteria->join .= "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
+		$criteria->condition = "t.fecha = '".date("Y-m-d")."'";
+		$criteria->addInCondition("t.cadena_usuarios", explode(",", $cadena_usuarios));
+		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "u.login LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.hora LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "d_o.hora_limite LIKE '%".$this->buscar."%')";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_promo DESC',
+        		'attributes'=>array(
+             		'id_promo', 'fecha', 'nombrePromo', 'u.login'
+        		),
+    		),
 		));
 	}
 

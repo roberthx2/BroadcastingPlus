@@ -121,7 +121,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar Lista</h4>
     </div>
  	
-    <div class="modal-body" id="divModalEliminar" >
+    <div class="modal-body trOverFlow" id="divModalEliminar" >
        
     </div>
  

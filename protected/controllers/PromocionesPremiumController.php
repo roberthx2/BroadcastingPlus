@@ -28,8 +28,8 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones'),
-				'users'=>array('*'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo'),
+				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
 				'actions'=>array('create','update'),
@@ -52,110 +52,19 @@ class PromocionesPremiumController extends Controller
 	public function actionView($id)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing_premium o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->select = "t.id_promo, t.id_cliente, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing_premium o WHERE o.id_promo = t.id_promo) AS total";
 		$criteria->join = "INNER JOIN deadline_outgoing_premium d ON t.id_promo = d.id_promo ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
 		$criteria->compare("t.id_promo", $id);
 		$model_promocion = PromocionesPremium::model()->find($criteria);
 
+		$sql = "SELECT descripcion FROM cliente WHERE id = ".$model_promocion->id_cliente;
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+		$cliente = str_replace("@", "", $sql["descripcion"]);
 
-		$this->render('view',array('model_promocion'=>$model_promocion));
+		$this->render('view',array('model_promocion'=>$model_promocion, 'cliente'=>$cliente));
 	}
 
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	/*public function actionCreate()
-	{
-		$model=new PromocionesPremium;
-
-		// Uncomment the following line if AJAX validation is needed
-		 $this->performAjaxValidation($model);
-
-		if(isset($_POST['PromocionesPremium']))
-		{
-			$model->attributes=$_POST['PromocionesPremium'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_promo));
-		}
-
-		$this->render('create',array(
-			'model'=>$model,
-		));
-	}*/
-
-	/**
-	 * Updates a particular model.
-	 * If update is successful, the browser will be redirected to the 'view' page.
-	 * @param integer $id the ID of the model to be updated
-	 */
-	/*public function actionUpdate($id)
-	{
-		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['PromocionesPremium']))
-		{
-			$model->attributes=$_POST['PromocionesPremium'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_promo));
-		}
-
-		$this->render('update',array(
-			'model'=>$model,
-		));
-	}*/
-
-	/**
-	 * Deletes a particular model.
-	 * If deletion is successful, the browser will be redirected to the 'admin' page.
-	 * @param integer $id the ID of the model to be deleted
-	 */
-	/*public function actionDelete($id)
-	{
-		$this->loadModel($id)->delete();
-
-		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-	}*/
-
-	/**
-	 * Lists all models.
-	 */
-	/*public function actionIndex()
-	{
-		$dataProvider=new CActiveDataProvider('PromocionesPremium');
-		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
-		));
-	}*/
-
-	/**
-	 * Manages all models.
-	 */
-	/*public function actionAdmin()
-	{
-		$model=new PromocionesPremium('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['PromocionesPremium']))
-			$model->attributes=$_GET['PromocionesPremium'];
-
-		$this->render('admin',array(
-			'model'=>$model,
-		));
-	}*/
-
-	/**
-	 * Returns the data model based on the primary key given in the GET variable.
-	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer $id the ID of the model to be loaded
-	 * @return PromocionesPremium the loaded model
-	 * @throws CHttpException
-	 */
 	public function loadModel($id)
 	{
 		$model=PromocionesPremium::model()->findByPk($id);
@@ -187,6 +96,110 @@ class PromocionesPremiumController extends Controller
 		$this->render('indexPromociones',array(
 			'model'=>$model,
 		));
+	}
+
+	public function actionViewResumen($id_promo)
+	{
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, u.login, t.loaded_by, t.nombrePromo, t.id_cliente, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
+		$criteria->join = "INNER JOIN deadline_outgoing_premium d_o ON t.id_promo = d_o.id_promo ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
+		$criteria->condition = "t.id_promo = :id_promo";
+		$criteria->params = array(':id_promo' => $id_promo);
+
+		$model = PromocionesPremium::model()->find($criteria);
+
+		$sql = "SELECT descripcion FROM cliente WHERE id = ".$model->id_cliente;
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+		$cliente = $sql["descripcion"];
+
+		$array = array(
+		    "estado"=>$model->estado, 
+		    "fecha"=>$model->fecha, 
+		    "hora"=>$model->hora, 
+		    "fecha_limite"=>$model->fecha_limite, 
+		    "hora_limite"=>$model->hora_limite, 
+		    "total"=>$model->total, 
+		    "enviados"=>$model->enviados, 
+		    "no_enviados"=>($model->total - $model->enviados)
+		);
+
+		$estado = $this->actionGetStatusPromocionRapida($array);
+
+		return array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado);
+	}
+
+	public function actionViewConfirmar($id_promo)
+	{
+		$objeto = $this->actionViewResumen($id_promo);
+
+		$this->renderPartial('viewConfirmar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+
+	public function actionViewCancelar($id_promo)
+	{
+		$objeto = $this->actionViewResumen($id_promo);
+
+		$this->renderPartial('viewCancelar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+
+	public function actionConfirmarPromo($id_promo)
+    {
+        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $model_promocion = PromocionesPremium::model()->findByPk($id_promo);
+            $model_promocion->estado = 2;
+            $model_promocion->save();
+
+            $sql = "UPDATE outgoing_premium SET status = 2 WHERE id_promo = :id_promo";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+            $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
+            $sql->execute();
+
+            $log = "PROMOCION CONFIRMADA BCP | id_promo: ".$id_promo." | id_cliente_bcp: ".$model_promocion->id_cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            $transaction->commit();
+        } catch (Exception $e)
+            {
+                $transaction->rollBack();
+            }
+
+        $this->redirect("home/index");
+    }
+
+	public function actionCancelarPromo($id_promo)
+	{
+		$transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+			$model = $this->loadModel($id_promo);
+			$model->estado = 4;
+			$model->save();
+
+			//Todo lo que sea distinto de enviado
+			$sql = "UPDATE outgoing_premium SET status = 4 WHERE id_promo = ".$id_promo." AND status <> 1"; 
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+			$log = "PROMOCION CANCELADA BCP | id_promo: ".$id_promo." | id_cliente_bcp: ".$model->id_cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            Yii::app()->user->setFlash("success", "La promoción fue cancelada correctamente");
+			$transaction->commit();
+		} catch (Exception $e)
+			{
+				//print_r($e);
+				$error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+				Yii::app()->user->setFlash("danger", $error);
+        		$transaction->rollBack();
+    		}
+
+    	$this->redirect("home/index");
 	}
 
 	//Obtener el estado de la promocion
@@ -267,8 +280,78 @@ class PromocionesPremiumController extends Controller
 	            //$estado = "No enviada";
 	            $estado = 5;
 	        break;
+	    }
 
-	    
+	    return $estado; 
+	}
+
+	public function actionGetStatusPromocionRapida($objeto)
+	{
+	    switch ($objeto["estado"])
+	    {
+	        case 0: 
+	            //$estado = "No Confirmada";
+	            $estado = 0;
+	            break;
+	        case 1: //El java coloca este estado si todos los mensajes fueron enviados (CUANDO FUNCIONA)
+	            //$estado = "Enviada";
+	            $estado = 1;
+	        break;
+	        case 2:
+	            //$estado = "Confirmada";
+	            $estado = 2;
+	            $ts_actual = time();
+	            $ts_inicio = strtotime($objeto["fecha"] . " " . $objeto["hora"]);
+	            $ts_fin = strtotime($objeto["fecha_limite"] . " " . $objeto["hora_limite"]);
+	            
+	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "En Transito";
+	                    $estado = 6;
+	                } else { 
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                } 
+	            }
+
+	            if ($ts_actual < $ts_inicio) {
+	                //$estado = "Confirmada";
+	                $estado = 2;
+	            }
+
+	            if ($ts_actual > $ts_fin) {  
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "Incompleta";
+	                    $estado = 3;
+	                }
+	                if($objeto["no_enviados"] == $objeto["total"]){
+	                    //$estado = "No Enviada";
+	                    $estado = 5;
+	                }
+	                if($objeto["no_enviados"] == 0){
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                }
+	            }
+
+	        break;
+	        case 4: 
+	            //$estado = "Cancelada";
+	            $estado = 4;
+	            
+	            if($objeto["no_enviados"] == $objeto["total"]){
+	                //$estado = "Cancelada";
+	                $estado = 4;
+	            }
+	            if($objeto["no_enviados"] >= 0 && $objeto["no_enviados"] < $objeto["total"]){
+	                //$estado = "Enviada y Cancelada";
+	                $estado = 7;
+	            }
+	        break;
+	        case 5: 
+	            //$estado = "No enviada";
+	            $estado = 5;
+	        break;
 	    }
 
 	    return $estado; 

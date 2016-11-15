@@ -1,4 +1,12 @@
 <div id="page-content-wrapper">
+<?php if(Yii::app()->user->hasFlash('success')):?>
+    <br>
+    <div class="container-fluid alert alert-success">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <span class="glyphicon glyphicon-ok"></span> <?php echo Yii::app()->user->getFlash('success'); ?>
+    </div>
+<?php endif; ?>
+
 <?php
 echo "<h3>Promociones del dia</h3>";
 
@@ -7,13 +15,13 @@ $active = true;
 
 if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
 {
-    $modelBCNL = new Promociones('search');
+    $modelBCNL = new Promociones('searchHome');
     $modelBCNL->unsetAttributes();
     if(isset($_GET['Promociones']))
         $modelBCNL->buscar = $_GET['Promociones']["buscar"];
             
     $contenido = array(
-            		array('label' => 'Broadcasting', 'content' => 'loading ....', 'active' => $active),
+            		array('label' => 'Broadcasting', 'content' => $this->renderPartial('promocionesBCNL', array('model'=>$modelBCNL), true), 'active' => $active),
             	);
     $active = false;
 }

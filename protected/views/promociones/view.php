@@ -1,6 +1,6 @@
 <div class="col-md-6">
 	<?php 
-		echo $this->renderPartial("informacionPromocion", array("model_promocion"=>$model_promocion), true); 
+		echo $this->renderPartial("informacionPromocion", array("model_promocion"=>$model_promocion, 'cliente'=>$cliente), true); 
 	?>
 </div>
 

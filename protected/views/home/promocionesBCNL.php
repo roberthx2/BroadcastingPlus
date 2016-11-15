@@ -1,9 +1,9 @@
 <br>
 <?php
-Yii::app()->clientScript->registerScript('searchDetallesBCPToday', "
+Yii::app()->clientScript->registerScript('searchDetallesBCNLToday', "
 
 $('.search-form form').submit(function(){
-    $('#detallesBCPToday').yiiGridView('update', {
+    $('#detallesBCNLToday').yiiGridView('update', {
         data: $(this).serialize()
     });
     return false;
@@ -18,7 +18,7 @@ $('.search-form form').submit(function(){
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'detallesBCPToday',
+        'id'=>'detallesBCNLToday',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model->searchHome(),
@@ -82,7 +82,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         "no_enviados"=>($data["total"] - $data["enviados"])
                     );
 
-                    $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
+                    $estado = PromocionesController::actionGetStatusPromocionRapida($array);
 	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
 
 	            	$this->widget(
@@ -111,7 +111,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         "no_enviados"=>($data["total"] - $data["enviados"])
                     );
 
-                    $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
+                    $estado = PromocionesController::actionGetStatusPromocionRapida($array);
                     $avance = floor(($data["enviados"] * 100) / $data["total"]);
 
                 	if ($estado == 1) //Enviada
@@ -149,20 +149,20 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'buttons' => array(
 	            	'ver'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("promocionesPremium/view", array("id"=>$data["id_promo"]))',
+	            			'url'=>'Yii::app()->createUrl("promociones/view", array("id"=>$data["id_promo"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Ver', 'style'=>'color:black;'),
 	            			),
 	            	'Confirmar'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("promocionesPremium/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
-	            			'visible'=>'visibleConfirmar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalConfirmar'),
+	            			'url'=>'Yii::app()->createUrl("promociones/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
+	            			//'visible'=>'visibleConfirmarBCNL($data)',
+	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalConfirmarBCNL'),
                             ),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("promocionesPremium/viewCancelar", array("id_promo"=>$data["id_promo"]))',
-	            			'visible'=>'visibleCancelar($data)',
-	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminar'),
+	            			'url'=>'Yii::app()->createUrl("promociones/viewCancelar", array("id_promo"=>$data["id_promo"]))',
+	            			//'visible'=>'visibleCancelarBCNL($data)',
+	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminarBCNL'),
 	            			)
 	            ),
 	        ),
@@ -172,7 +172,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 <?php
 
-function visibleConfirmar($data)
+function visibleConfirmarBCNL($data)
 {
     $hora_actual = time();
     $hora_limite = strtotime($data["fecha_limite"] . " " . $data["hora_limite"]);
@@ -184,7 +184,7 @@ function visibleConfirmar($data)
 		return false;
 }
 
-function visibleCancelar($data)
+function visibleCancelarBCNL($data)
 {
     $array = array(
         "estado"=>$data["estado"], 
@@ -210,14 +210,14 @@ function visibleCancelar($data)
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
-    array('id' => 'modalConfirmar')
+    array('id' => 'modalConfirmarBCNL')
 ); ?>
  
     <div class="modal-header" style="background-color:#428bca">
         <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Confirmar Promoción</h4>
     </div>
  
-    <div class="modal-body" id="divModalConfirmar">
+    <div class="modal-body" id="divModalConfirmarBCNL">
        
     </div>
  
@@ -225,14 +225,14 @@ function visibleCancelar($data)
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
-    array('id' => 'modalEliminar')
+    array('id' => 'modalEliminarBCNL')
 ); ?>
  
     <div class="modal-header" style="background-color:#d2322d">
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancelar Promoción</h4>
     </div>
  
-    <div class="modal-body" id="divModalEliminar">
+    <div class="modal-body" id="divModalEliminarBCNL">
        
     </div>
 

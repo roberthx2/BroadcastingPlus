@@ -32,7 +32,7 @@ class PromocionesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -52,13 +52,64 @@ class PromocionesController extends Controller
 	public function actionView($id)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->select = "t.id_promo, t.cliente, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
 		$criteria->join = "INNER JOIN deadline_outgoing d ON t.id_promo = d.id_promo ";
 		$criteria->join .= "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
 		$criteria->compare("t.id_promo", $id);
 		$model_promocion = Promociones::model()->find($criteria);
 
-		$this->render('view',array('model_promocion'=>$model_promocion));
+		$sql = "SELECT Des_cliente FROM cliente WHERE id_cliente = ".$model_promocion->cliente;
+		$sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+		$cliente = $sql["Des_cliente"];
+
+		$this->render('view',array('model_promocion'=>$model_promocion, 'cliente'=>$cliente));
+	}
+
+	public function actionViewResumen($id_promo)
+	{
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_promo, u.login, t.cadena_usuarios, t.nombrePromo, t.cliente, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo) AS total,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo AND status = 3) AS enviados";
+		$criteria->join = "INNER JOIN deadline_outgoing d_o ON t.id_promo = d_o.id_promo ";
+		$criteria->join .= "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
+		$criteria->condition = "t.id_promo = :id_promo";
+		$criteria->params = array(':id_promo' => $id_promo);
+
+		$model = Promociones::model()->find($criteria);
+
+		$sql = "SELECT Des_cliente FROM cliente WHERE id_cliente = ".$model->cliente;
+		$sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+		$cliente = $sql["Des_cliente"];
+
+		$array = array(
+		    "estado"=>$model->estado, 
+		    "fecha"=>$model->fecha, 
+		    "hora"=>$model->hora, 
+		    "fecha_limite"=>$model->fecha_limite, 
+		    "hora_limite"=>$model->hora_limite, 
+		    "total"=>$model->total, 
+		    "enviados"=>$model->enviados, 
+		    "no_enviados"=>($model->total - $model->enviados)
+		);
+
+		$estado = $this->actionGetStatusPromocionRapida($array);
+
+		return array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado);
+	}
+
+	public function actionViewConfirmar($id_promo)
+	{
+		$objeto = $this->actionViewResumen($id_promo);
+
+		$this->renderPartial('viewConfirmar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+
+	public function actionViewCancelar($id_promo)
+	{
+		$objeto = $this->actionViewResumen($id_promo);
+
+		$this->renderPartial('viewCancelar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
 	/**
@@ -297,7 +348,79 @@ class PromocionesController extends Controller
 
 	    
 	    }
+	    return $estado; 
+	}
 
+	public function actionGetStatusPromocionRapida($objeto)
+	{
+	    switch ($objeto["estado"])
+	    {
+	        case 0: 
+	            //$estado = "No Confirmada";
+	            $estado = 0;
+	            break;
+	        case 1: //El java coloca este estado si todos los mensajes fueron enviados (CUANDO FUNCIONA)
+	            //$estado = "Enviada";
+	            $estado = 1;
+	        break;
+	        case 2:
+	            //$estado = "Confirmada";
+	            $estado = 2;
+	            $ts_actual = time();
+	            $ts_inicio = strtotime($objeto["fecha"] . " " . $objeto["hora"]);
+	            $ts_fin = strtotime($objeto["fecha_limite"] . " " . $objeto["hora_limite"]);
+	            
+	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "En Transito";
+	                    $estado = 6;
+	                } else { 
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                } 
+	            }
+
+	            if ($ts_actual < $ts_inicio) {
+	                //$estado = "Confirmada";
+	                $estado = 2;
+	            }
+
+	            if ($ts_actual > $ts_fin) {  
+	                if ($objeto["no_enviados"] > 0) {
+	                    //$estado = "Incompleta";
+	                    $estado = 3;
+	                }
+	                if($objeto["no_enviados"] == $objeto["total"]){
+	                    //$estado = "No Enviada";
+	                    $estado = 5;
+	                }
+	                if($objeto["no_enviados"] == 0){
+	                    //$estado = "Enviada";
+	                    $estado = 1;
+	                }
+	            }
+
+	        break;
+	        case 4: 
+	            //$estado = "Cancelada";
+	            $estado = 4;
+	            
+	            if($objeto["no_enviados"] == $objeto["total"]){
+	                //$estado = "Cancelada";
+	                $estado = 4;
+	            }
+	            if($objeto["no_enviados"] >= 0 && $objeto["no_enviados"] < $objeto["total"]){
+	                //$estado = "Enviada y Cancelada";
+	                $estado = 7;
+	            }
+	        break;
+	        case 5: 
+	            //$estado = "No enviada";
+	            $estado = 5;
+	        break;
+
+	    
+	    }
 	    return $estado; 
 	}
 }

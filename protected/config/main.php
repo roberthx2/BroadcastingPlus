@@ -58,7 +58,7 @@ Yii::setPathOfAlias('editable', dirname(__FILE__).'/../extensions/x-editable');
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'Broadcasting Plus',
-	'timeZone' => 'America/Caracas',
+	//'timeZone' => 'America/Caracas',
     'language'=>'es',
     //'theme'=>'blackboot',
 

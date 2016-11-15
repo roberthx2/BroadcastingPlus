@@ -24,15 +24,33 @@
 	        		</li>
 	        	<?php }	?>
 	        	<?php if (Yii::app()->user->isAdmin()) { ?>
+	        		<li class="list-group-item">
+		        		<?php $this->widget(
+		                    'booster.widgets.TbBadge',
+		                    array(
+		                        'label' => $cliente,
+		                        'htmlOptions' => array('style' => 'background-color: white; color: black', 'class'=>'visible-md visible-lg'),
+		                    )
+		                ); ?>
+		                <?php echo '<strong class="visible-md visible-lg">Cliente</strong>'; ?>
+
+		                <div class="cantainer visible-xs visible-sm "><strong>Cliente</strong></div>
+		        		<div class="cantainer visible-xs visible-sm trOverFlow" style="font-size:12px;"><br><strong><?php echo $cliente; ?></strong></div>
+		        	</li>
+	        	<?php }	?>
+	        	<?php if (Yii::app()->user->isAdmin()) { ?>
 		        	<li class="list-group-item">
 		        		<?php $this->widget(
 		                    'booster.widgets.TbBadge',
 		                    array(
 		                        'label' => $model_promocion->login,
-		                        'htmlOptions' => array('style' => 'background-color: white; color: black'),
+		                        'htmlOptions' => array('style' => 'background-color: white; color: black', 'class'=>'visible-md visible-lg'),
 		                    )
 		                ); ?>
-		                <?php echo '<strong>Usuario</strong>'; ?>
+		                <?php echo '<strong class="visible-md visible-lg">Usuario</strong>'; ?>
+
+		                <div class="cantainer visible-xs visible-sm "><strong>Usuario</strong></div>
+		        		<div class="cantainer visible-xs visible-sm trOverFlow" style="font-size:12px;"><br><strong><?php echo $model_promocion->login; ?></strong></div>
 		        	</li>
 		        <?php }	?>	
 		        	<li class="list-group-item">
