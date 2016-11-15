@@ -28,38 +28,34 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         //'filter'=> $model,
         'columns'=> array( 
         	array(
-	            'name' => 'id_promo',
+	            'name' => 'id',
 	            'header' => 'Id promo',
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	), 
         	array(
 	            'name' => 'nombrePromo',
 	            'header' => 'Nombre',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
         	),
         	array(
-	            'name' => 'u.login',
-                'value' => function($data)
-                {
-                    return $data["login"];
-                },
+	            'name' => 'login',
 	            'header' => 'Usuario',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	),
         	array(
 	            'name' => 'id_cliente',
 	            'header' => 'Cliente',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	),
         	array(
@@ -67,16 +63,16 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Hora inicio',
 	            'type' => 'time',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
         	),
         	array(
 	            'name' => 'hora_limite',
 	            'header' => 'Hora fin',
 	            'type' => 'time',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
         	),
-        	/*array(
+        	array(
 	            'header' => 'Estado',
 	            'type' => 'raw',
 	            'value' => function($data){
@@ -97,9 +93,9 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 					);
 	            },
 	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),*/
-        	/*array(
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+        	),
+        	array(
                 'header' => 'Avance',
                 'value' => function($data)
                 {
@@ -123,8 +119,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         ));
                 },
                 'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-            ),*/
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
+            ),
             array(
             	'header' => 'Enviados/Total',
             	'value' => function ($data){
@@ -137,12 +133,12 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
 	            'template' => '{ver}&#09;{Confirmar}&#09;{Cancelar}',
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+	            'headerHtmlOptions' => array('class'=>'bg-primary text-center'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
 	            	'ver'=>array(
 	            			'label'=>' ',
-	            			#'url'=>'Yii::app()->createUrl("promocionesPremium/view", array("id"=>$data["id"]))',
+	            			'url'=>'Yii::app()->createUrl("promocionesPremium/view", array("id"=>$data["id"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'title'=>'Ver', 'style'=>'color:black;'),
 	            			),
 	            	'Confirmar'=>array(

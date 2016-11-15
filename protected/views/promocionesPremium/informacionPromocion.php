@@ -40,10 +40,13 @@
 		                    'booster.widgets.TbBadge',
 		                    array(
 		                        'label' => $model_promocion->nombrePromo,
-		                        'htmlOptions' => array('style' => 'background-color: white; color: black'),
+		                        'htmlOptions' => array('style' => 'background-color: white; color: black', 'class'=>'visible-md visible-lg trOverFlow'),
 		                    )
 		                ); ?>
-		                <?php echo '<strong>Nombre</strong>'; ?>
+		                <?php echo '<strong class="visible-md visible-lg">Nombre</strong>'; ?>
+
+		                <div class="cantainer visible-xs visible-sm "><strong>Nombre</strong></div>
+		        		<div class="cantainer visible-xs visible-sm trOverFlow" style="font-size:12px;"><br><strong><?php echo $model_promocion->nombrePromo; ?></strong></div>
 		        	</li>
 		        	<li class="list-group-item">
 		        		<div class="cantainer"><strong>Mensaje</strong></div>

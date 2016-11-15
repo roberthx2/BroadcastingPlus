@@ -46,7 +46,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Usuario',
 	            'type' => 'raw',
 //	            'ajaxUpdate'=>true,
-	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	),
@@ -78,7 +78,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'name' => 'total',
 	            'header' => 'Total Destinatarios',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover'),
         	),
         	array(

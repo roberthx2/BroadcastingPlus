@@ -22,7 +22,9 @@
 class Outgoing extends CActiveRecord
 {
 	public $buscar;
+	public $descripcion_oper;
 	public $descripcion_estado;
+	public $id_operadora;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -127,19 +129,20 @@ class Outgoing extends CActiveRecord
 	public function searchDetalleBCNL($id_promo)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.number, t.status, e.descripcion AS descripcion_estado";
+		$criteria->select = "t.number, t.status, e.descripcion AS descripcion_estado, o.descripcion AS descripcion_oper, o.id_operadora_bcnl AS id_operadora";
 		$criteria->join =  "LEFT JOIN status_outgoing e ON t.status = e.status ";
-		//$criteria->join .= "LEFT JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
+		$criteria->join .= "LEFT JOIN (SELECT descripcion, prefijo, id_operadora_bcnl FROM insignia_masivo_premium.operadoras_relacion GROUP BY prefijo) AS o
+							ON SUBSTRING(number,2,3) = o.prefijo";
 		$criteria->compare('id_promo',$id_promo);
 		$criteria->condition .= " AND (number LIKE '%".$this->buscar."%' OR ";
-		$criteria->condition .= "e.descripcion LIKE '%".$this->buscar."%')";// OR ";
-		//$criteria->condition .= " o.descripcion LIKE '%".$this->buscar."%') ";
+		$criteria->condition .= "e.descripcion LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= " o.descripcion LIKE '%".$this->buscar."%') ";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
         		'attributes'=>array(
-             		//'destinatario', 'o.descripcion', 'e.descripcion'
+             		'number', 'o.descripcion', 'e.descripcion'
         		),
     		),
 		));

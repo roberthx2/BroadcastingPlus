@@ -2,7 +2,7 @@
 
 class HomeController extends Controller
 {
-	public $layout="//layouts/column2";
+	//public $layout="//layouts/column2";
 
 	public function filters() {
         return array(
@@ -27,26 +27,7 @@ class HomeController extends Controller
 
 	public function actionIndex()
 	{
-		$modelBCNL = array();
-		$modelBCP = array();
-
-		if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_cpei)
-		{
-			$modelBCNL = new Promociones('search');
-			$modelBCNL->unsetAttributes();
-			if(isset($_GET['Promociones']))
-				$modelBCNL->attributes=$_GET['Promociones'];
-		}
-
-		if (Yii::app()->user->getPermisos()->broadcasting_premium)
-		{
-			$modelBCP = new PromocionesPremium('searchHome');
-			$modelBCP->unsetAttributes();
-			if(isset($_GET['PromocionesPremium']))
-				$modelBCP->attributes=$_GET['PromocionesPremium'];
-		}
-
-		$this->render('index', array('modelBCNL'=> $modelBCNL,'modelBCP'=>$modelBCP));
+		$this->render('index');
 	}
 
 	// Uncomment the following methods and override them if needed

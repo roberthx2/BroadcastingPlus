@@ -39,7 +39,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
-        	/*array(
+        	array(
 	            'name' => 'o.descripcion',
 	            'header' => 'Operadora',
                 'value' => function($data)
@@ -50,14 +50,14 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                             'context' => '',
                             // 'default', 'primary', 'success', 'info', 'warning', 'danger'
                             'label' => $data["descripcion_oper"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCP($data["operadora"]).';'),    
+                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($data["id_operadora"]).';'),    
                         )
                     );
                 },
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),*/
+        	),
             array(
                 'name' => 'e.descripcion',
                 'header' => 'Estado',

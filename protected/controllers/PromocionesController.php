@@ -185,7 +185,7 @@ class PromocionesController extends Controller
 		$cond_1 = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 		$sql = "SELECT CONCAT('CASE SUBSTRING(number,2,3) ',GROUP_CONCAT(condicion SEPARATOR ' '), ' END') AS condicion FROM (
-				SELECT CONCAT('WHEN ', \" '\", prefijo, \"'\", ' THEN ', id_operadora_bcnl) AS condicion
+				SELECT DISTINCT CONCAT('WHEN ', \" '\", prefijo, \"'\", ' THEN ', id_operadora_bcnl) AS condicion
 				FROM operadoras_relacion) AS tabla";
 		$cond_2 = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 

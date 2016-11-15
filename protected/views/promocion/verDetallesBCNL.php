@@ -45,7 +45,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	$var = '<a href="'.$url.'" data-toggle="tooltip" data-placement="top" title="Ver detalles">'.$data["nombrePromo"].'</a>';
 	            	return $var;
 	            },
-	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
@@ -56,7 +56,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 },
 	            'header' => 'Usuario',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'visible'=>Yii::app()->user->isAdmin()
         	),
