@@ -236,7 +236,7 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
                             Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
