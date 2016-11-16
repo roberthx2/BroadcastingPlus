@@ -1,7 +1,7 @@
 <div class="modal-body trOverFlow" id="divModalEliminar" >
 <?php
 
-$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
 
 $this->widget(
     'booster.widgets.TbDetailView',

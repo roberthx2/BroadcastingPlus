@@ -341,7 +341,7 @@
 
 		<?php
 		//Visible si tiene permisos al modulo de btl
-		if (Yii::app()->user->getPermisos()->modulo_btl)
+		/*if (Yii::app()->user->getPermisos()->modulo_btl)
 		{ ?>
 			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
 	            <div align="center" style="padding: 30px 0 0px 0px;">
@@ -366,7 +366,7 @@
 	                ?>
 	            </div>
 			</div>
-		<?php }	?>
+		<?php }*/	?>
 	</div>
 
 	</fieldset>

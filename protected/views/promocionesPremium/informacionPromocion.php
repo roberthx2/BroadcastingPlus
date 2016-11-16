@@ -113,7 +113,7 @@
 		        	<li class="list-group-item">
 		        		<?php 
 		        			$estado = $this->actionGetStatusPromocion($model_promocion->id_promo);
-            				$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+            				$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
 
 	            			$this->widget(
 			                    'booster.widgets.TbBadge',

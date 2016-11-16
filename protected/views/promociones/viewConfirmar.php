@@ -1,7 +1,7 @@
 <div class="modal-body trOverFlow" id="divModalConfirmarBCNL" >
 <?php
 
-$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCNL($estado);
 
 $this->widget(
     'booster.widgets.TbDetailView',

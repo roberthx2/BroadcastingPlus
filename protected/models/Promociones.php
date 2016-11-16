@@ -144,7 +144,7 @@ class Promociones extends CActiveRecord
 			'sort'=>array(
 				'defaultOrder'=>'id_promo DESC',
         		'attributes'=>array(
-             		'id_promo', 'fecha', 'nombrePromo', 'u.login'
+             		'id_promo', 'nombrePromo', 'u.login', 'hora', 'd_o.hora_limite'
         		),
     		),
 		));

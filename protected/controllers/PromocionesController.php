@@ -112,6 +112,69 @@ class PromocionesController extends Controller
 		$this->renderPartial('viewCancelar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
+	public function actionConfirmarPromo($id_promo)
+    {
+        $transaction = Yii::app()->db->beginTransaction();
+        $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            $model_promocion = Promociones::model()->findByPk($id_promo);
+            $model_promocion->estado = 2;
+            $model_promocion->save();
+
+            $sql = "UPDATE outgoing SET status = 2 WHERE id_promo = :id_promo";
+            $sql = Yii::app()->db->createCommand($sql);
+            $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
+            $sql->execute();
+
+            $log = "PROMOCION CONFIRMADA BCNL | id_promo: ".$id_promo." | id_cliente: ".$model_promocion->cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            $transaction->commit();
+            $transaction2->commit();
+        } catch (Exception $e)
+            {
+                $transaction->rollBack();
+                $transaction2->rollBack();
+            }
+
+        $this->redirect("home/index");
+    }
+
+	public function actionCancelarPromo($id_promo)
+	{
+		$transaction = Yii::app()->db->beginTransaction();
+		$transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+			$model_promocion = Promociones::model()->findByPk($id_promo);
+            $model_promocion->estado = 5;
+            $model_promocion->save();
+
+			//Todo lo que sea distinto de enviado
+			$sql = "UPDATE outgoing SET status = 5 WHERE id_promo = ".$id_promo." AND status <> 3"; 
+			Yii::app()->db->createCommand($sql)->execute();
+
+			$log = "PROMOCION CANCELADA BCP | id_promo: ".$id_promo." | id_cliente: ".$model_promocion->cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            Yii::app()->user->setFlash("success", "La promoción fue cancelada correctamente");
+			$transaction->commit();
+			$transaction2->commit();
+		} catch (Exception $e)
+			{
+				//print_r($e);
+				$error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+				Yii::app()->user->setFlash("danger", $error);
+        		$transaction->rollBack();
+        		$transaction2->rollBack();
+    		}
+
+    	$this->redirect("home/index");
+	}
+
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
@@ -282,14 +345,10 @@ class PromocionesController extends Controller
 
 	    switch ($objeto["estado"])
 	    {
-	        case 0: 
+	        case 1: 
 	            //$estado = "No Confirmada";
-	            $estado = 0;
-	            break;
-	        case 1: //El java coloca este estado si todos los mensajes fueron enviados (CUANDO FUNCIONA)
-	            //$estado = "Enviada";
 	            $estado = 1;
-	        break;
+	            break;
 	        case 2:
 	            //$estado = "Confirmada";
 	            $estado = 2;
@@ -300,10 +359,10 @@ class PromocionesController extends Controller
 	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
 	                if ($objeto["no_enviados"] > 0) {
 	                    //$estado = "En Transito";
-	                    $estado = 6;
+	                    $estado = 4;
 	                } else { 
 	                    //$estado = "Enviada";
-	                    $estado = 1;
+	                    $estado = 3;
 	                } 
 	            }
 
@@ -315,35 +374,43 @@ class PromocionesController extends Controller
 	            if ($ts_actual > $ts_fin) {  
 	                if ($objeto["no_enviados"] > 0) {
 	                    //$estado = "Incompleta";
-	                    $estado = 3;
+	                    $estado = 6;
 	                }
 	                if($objeto["no_enviados"] == $objeto["total"]){
 	                    //$estado = "No Enviada";
-	                    $estado = 5;
+	                    $estado = 7;
 	                }
 	                if($objeto["no_enviados"] == 0){
 	                    //$estado = "Enviada";
-	                    $estado = 1;
+	                    $estado = 3;
 	                }
 	            }
 
-	        break;
+	        	break;
+	        case 3: 
+	            //$estado = "Enviada";
+	            $estado = 3;
+	        	break;
 	        case 4: 
-	            //$estado = "Cancelada";
+	            //$estado = "En Transito";
 	            $estado = 4;
+	            break;
+	        case 5: 
+	            //$estado = "Cancelada";
+	            $estado = 5;
 	            
 	            if($objeto["no_enviados"] == $objeto["total"]){
 	                //$estado = "Cancelada";
-	                $estado = 4;
+	                $estado = 5;
 	            }
 	            if($objeto["no_enviados"] >= 0 && $objeto["no_enviados"] < $objeto["total"]){
 	                //$estado = "Enviada y Cancelada";
-	                $estado = 7;
+	                $estado = 8;
 	            }
 	        break;
-	        case 5: 
+	        case 7: 
 	            //$estado = "No enviada";
-	            $estado = 5;
+	            $estado = 7;
 	        break;
 
 	    
@@ -355,14 +422,10 @@ class PromocionesController extends Controller
 	{
 	    switch ($objeto["estado"])
 	    {
-	        case 0: 
+	        case 1: 
 	            //$estado = "No Confirmada";
-	            $estado = 0;
-	            break;
-	        case 1: //El java coloca este estado si todos los mensajes fueron enviados (CUANDO FUNCIONA)
-	            //$estado = "Enviada";
 	            $estado = 1;
-	        break;
+	            break;
 	        case 2:
 	            //$estado = "Confirmada";
 	            $estado = 2;
@@ -373,10 +436,10 @@ class PromocionesController extends Controller
 	            if (($ts_actual >= $ts_inicio) && ($ts_actual <= $ts_fin)) {
 	                if ($objeto["no_enviados"] > 0) {
 	                    //$estado = "En Transito";
-	                    $estado = 6;
+	                    $estado = 4;
 	                } else { 
 	                    //$estado = "Enviada";
-	                    $estado = 1;
+	                    $estado = 3;
 	                } 
 	            }
 
@@ -388,35 +451,43 @@ class PromocionesController extends Controller
 	            if ($ts_actual > $ts_fin) {  
 	                if ($objeto["no_enviados"] > 0) {
 	                    //$estado = "Incompleta";
-	                    $estado = 3;
+	                    $estado = 6;
 	                }
 	                if($objeto["no_enviados"] == $objeto["total"]){
 	                    //$estado = "No Enviada";
-	                    $estado = 5;
+	                    $estado = 7;
 	                }
 	                if($objeto["no_enviados"] == 0){
 	                    //$estado = "Enviada";
-	                    $estado = 1;
+	                    $estado = 3;
 	                }
 	            }
 
-	        break;
+	        	break;
+	        case 3: 
+	            //$estado = "Enviada";
+	            $estado = 3;
+	        	break;
 	        case 4: 
-	            //$estado = "Cancelada";
+	            //$estado = "En Transito";
 	            $estado = 4;
+	            break;
+	        case 5: 
+	            //$estado = "Cancelada";
+	            $estado = 5;
 	            
 	            if($objeto["no_enviados"] == $objeto["total"]){
 	                //$estado = "Cancelada";
-	                $estado = 4;
+	                $estado = 5;
 	            }
 	            if($objeto["no_enviados"] >= 0 && $objeto["no_enviados"] < $objeto["total"]){
 	                //$estado = "Enviada y Cancelada";
-	                $estado = 7;
+	                $estado = 8;
 	            }
 	        break;
-	        case 5: 
+	        case 7: 
 	            //$estado = "No enviada";
-	            $estado = 5;
+	            $estado = 7;
 	        break;
 
 	    

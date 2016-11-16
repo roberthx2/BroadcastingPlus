@@ -61,7 +61,11 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
-	            'name' => 'hora_limite',
+	            'name' => 'd_o.hora_limite',
+                'value' => function($data)
+                {
+                    return $data["hora_limite"];
+                },
 	            'header' => 'Hora fin',
 	            'type' => 'time',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
@@ -83,7 +87,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                     );
 
                     $estado = PromocionesController::actionGetStatusPromocionRapida($array);
-	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCNL($estado);
 
 	            	$this->widget(
 					    'booster.widgets.TbLabel',
@@ -155,13 +159,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	'Confirmar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promociones/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
-	            			//'visible'=>'visibleConfirmarBCNL($data)',
+	            			'visible'=>'visibleConfirmarBCNL($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalConfirmarBCNL'),
                             ),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promociones/viewCancelar", array("id_promo"=>$data["id_promo"]))',
-	            			//'visible'=>'visibleCancelarBCNL($data)',
+	            			'visible'=>'visibleCancelarBCNL($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminarBCNL'),
 	            			)
 	            ),
@@ -177,8 +181,8 @@ function visibleConfirmarBCNL($data)
     $hora_actual = time();
     $hora_limite = strtotime($data["fecha_limite"] . " " . $data["hora_limite"]);
 
-	//Confirmada
-	if ($data["estado"] == 0 && ($hora_actual < $hora_limite))
+	//No Confirmada
+	if ($data["estado"] == 1 && ($hora_actual < $hora_limite))
 		return true;
 	else 
 		return false;
@@ -197,10 +201,10 @@ function visibleCancelarBCNL($data)
         "no_enviados"=>($data["total"] - $data["enviados"])
     );
 
-    $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
+    $estado = PromocionesController::actionGetStatusPromocionRapida($array);
 
 	//Confirmada / En transito
-	if ($estado == 2 || $estado == 6)
+	if ($estado == 2 || $estado == 4)
 		return true;
 	else 
 		return false;

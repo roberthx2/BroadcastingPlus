@@ -111,6 +111,9 @@ class ListaController extends Controller
 						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
+						$log = "LISTA CREADA | id_lista: ".$id_lista." | Destinatarios: ".$total;
+	                    Yii::app()->Procedimientos->setLog($log);
+
 						$transaction->commit();
 						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre));
 					}
@@ -226,6 +229,9 @@ class ListaController extends Controller
 						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
+						$log = "LISTA EDITADA (AGREGAR) | id_lista: ".$id_lista." | Destinatarios: ".$total;
+	                    Yii::app()->Procedimientos->setLog($log);
+
 						$transaction->commit();
 						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre));
 					}
@@ -273,6 +279,9 @@ class ListaController extends Controller
 		$this->loadModel($id)->delete();
 		Yii::app()->user->setFlash("success", "La lista fue eliminada correctamente");
 
+		$log = "LISTA ELIMINADA | id_lista: ".$id;
+	    Yii::app()->Procedimientos->setLog($log);
+
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
 			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
@@ -295,28 +304,45 @@ class ListaController extends Controller
 	//Se ejecuta desde la vista viewDelete la cual tiene el detalle de la lista
 	public function actionDeleteNumero()
 	{
-		$id_lista = $_POST['id_lista'];
-		//$numeros = "'".str_replace(",", "','", Yii::app()->request->post('numeros'))."'";
-		$numeros = explode(",", $_POST['numeros']);
+		$transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
-		$criteria = new CDbCriteria;
-		$criteria->compare("id_lista", $id_lista);
-		$criteria->addInCondition("numero", $numeros);
-		$msj = ListaDestinatarios::model()->deleteAll($criteria);
-		$listaDelete = 'false';
+        try
+        {
+			$id_lista = $_POST['id_lista'];
+			//$numeros = "'".str_replace(",", "','", Yii::app()->request->post('numeros'))."'";
+			$numeros = explode(",", $_POST['numeros']);
 
-		if ($msj != 0)
-		{
-			$total = ListaDestinatarios::model()->count("id_lista=".$id_lista);
+			$criteria = new CDbCriteria;
+			$criteria->compare("id_lista", $id_lista);
+			$criteria->addInCondition("numero", $numeros);
+			$msj = ListaDestinatarios::model()->deleteAll($criteria);
+			$listaDelete = 'false';
 
-			if ($total == 0)
+			$log = "LISTA EDITADA (ELIMINAR) | id_lista: ".$id_lista." | Destinatarios: ".COUNT($numeros);
+		    Yii::app()->Procedimientos->setLog($log);
+
+			if ($msj != 0)
 			{
-				//$this->loadModel($id_lista)->delete();
-				Lista::model()->deleteByPk($id_lista); 
-				Yii::app()->user->setFlash("success", "La lista y los números fueron eliminados correctamente");
-				$listaDelete = 'true';
+				$total = ListaDestinatarios::model()->count("id_lista=".$id_lista);
+
+				if ($total == 0)
+				{
+					//$this->loadModel($id_lista)->delete();
+					Lista::model()->deleteByPk($id_lista);
+					$log = "LISTA ELIMINADA | id_lista: ".$id_lista;
+		    		Yii::app()->Procedimientos->setLog($log);
+
+					Yii::app()->user->setFlash("success", "La lista y los números fueron eliminados correctamente");
+					$listaDelete = 'true';
+				}
 			}
-		}
+
+			$transaction->commit();
+
+		} catch (Exception $e)
+			{
+        		$transaction->rollBack();
+    		}
 
 		header('Content-Type: application/json; charset="UTF-8"');
 		echo CJSON::encode(array('salida' => $msj, 'listaDelete' => $listaDelete));

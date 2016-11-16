@@ -61,7 +61,11 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
-	            'name' => 'hora_limite',
+	            'name' => 'd_o.hora_limite',
+                'value' => function($data)
+                {
+                    return $data["hora_limite"];
+                },
 	            'header' => 'Hora fin',
 	            'type' => 'time',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
@@ -83,7 +87,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                     );
 
                     $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
-	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
 
 	            	$this->widget(
 					    'booster.widgets.TbLabel',

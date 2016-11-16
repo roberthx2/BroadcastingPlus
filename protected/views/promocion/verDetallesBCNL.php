@@ -68,7 +68,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	$clase = "";
 	            	$estado = PromocionesController::actionGetStatusPromocion($data["id_promo"]);
 
-	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromociones($estado);
+	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCNL($estado);
 
 	            	$this->widget(
 					    'booster.widgets.TbLabel',
