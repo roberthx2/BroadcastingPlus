@@ -36,7 +36,7 @@
                     </ul>
                 <?php } ?>    
 
-                <?php if (Yii::app()->user->getPermisos()->modulo_cupo) { ?>
+                <?php /*if (Yii::app()->user->getPermisos()->modulo_cupo) { ?>
                 <li data-toggle="collapse" data-target="#menu_cupo" class="collapsed active">
                     <a href="#"> Cupo <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
@@ -46,9 +46,9 @@
                         <?php if (Yii::app()->user->getPermisos()->historico_cupo_bcnl || Yii::app()->user->getPermisos()->historico_cupo_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Histórico </a></li> <?php } ?>
                     </ul>
-                <?php } ?>
+                <?php }*/ ?>
 
-                <?php if (Yii::app()->user->getPermisos()->modulo_reportes) { ?>
+                <?php /*if (Yii::app()->user->getPermisos()->modulo_reportes) { ?>
                 <li data-toggle="collapse" data-target="#menu_reportes" class="collapsed active">
                     <a href="#"> Reportes <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
@@ -66,7 +66,7 @@
                         <?php if (Yii::app()->user->getPermisos()->reporte_vigilancia_bcnl || Yii::app()->user->getPermisos()->reporte_vigilancia_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> Reporte de Vigilancia </a></li> <?php } ?>
                     </ul>
-                <?php } ?>
+                <?php } */?>
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_herramientas) { ?>
                 <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
@@ -78,7 +78,7 @@
                     </ul>
                 <?php } ?>
 
-                <?php if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
+                <?php /*if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
                 <li data-toggle="collapse" data-target="#menu_exentos" class="collapsed active">
                     <a href="#"> Exentos <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
@@ -88,7 +88,7 @@
                         <?php if (Yii::app()->user->getPermisos()->administrar_exentos) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Administrar </a></li> <?php } ?>
                     </ul>
-                <?php } ?>
+                <?php }*/ ?>
 
             </ul>
         </div>

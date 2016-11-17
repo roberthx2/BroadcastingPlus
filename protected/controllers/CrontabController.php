@@ -463,7 +463,7 @@ class CrontabController extends Controller
         } catch (Exception $e)
                 {
                     print_r("Ocurrio un error al procesar los datos<br>");
-                    print_r($e);
+                    //print_r($e);
                     $transaction->rollBack();
                 }
 
