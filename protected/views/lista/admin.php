@@ -21,8 +21,9 @@ $('.search-form form').submit(function(){
 	</div>
 <?php endif; ?>
 
-<h1>Administrar Listas</h1>
-<br><br>
+<fieldset>
+ 
+    <legend>Administrar Listas</legend>
 
 <div class="search-form">
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
@@ -111,6 +112,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         ),
     ));
 ?>
+</fieldset>
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',

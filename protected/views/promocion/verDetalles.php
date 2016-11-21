@@ -1,3 +1,6 @@
+<fieldset>
+ 
+    <legend>Detalles de las Promociones</legend>
 <?php
 
 $contenido = array();
@@ -36,3 +39,4 @@ $this->widget(
     )
 );
 ?>
+</fieldset>

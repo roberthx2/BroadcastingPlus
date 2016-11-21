@@ -45,7 +45,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	$var = '<a href="'.$url.'" data-toggle="tooltip" data-placement="top" title="Ver detalles">'.$data["nombrePromo"].'</a>';
 	            	return $var;
 	            },
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+	            'htmlOptions' => array('style' => 'text-align: center; size: 10px;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(

@@ -1,10 +1,10 @@
-<div class="col-md-6">
+<div class="col-md-7">
 	<?php 
 		echo $this->renderPartial("informacionPromocion", array("model_promocion"=>$model_promocion, "cliente"=>$cliente), true); 
 	?>
 </div>
 
-<div class="col-md-6">
+<div class="col-md-5">
 <?php 
 	$data = $this->actionReporteTorta($model_promocion->id_promo);
 	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", array("data"=>$data), true); 

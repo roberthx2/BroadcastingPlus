@@ -27,6 +27,8 @@ class PromocionesPremium extends CActiveRecord
 	public $enviados;
 	public $login;
 	public $buscar;
+	public $mes;
+	public $ano;
 
 	public function tableName()
 	{
@@ -72,7 +74,7 @@ class PromocionesPremium extends CActiveRecord
 		return array(
 			'id_promo' => 'Id Promo',
 			'nombrePromo' => 'Nombre',
-			'id_cliente' => 'Id Cliente',
+			'id_cliente' => 'Cliente',
 			'estado' => 'Estado',
 			'fecha' => 'Fecha',
 			'hora' => 'Hora',
@@ -81,6 +83,7 @@ class PromocionesPremium extends CActiveRecord
 			'fecha_cargada' => 'Fecha Cargada',
 			'hora_cargada' => 'Hora Cargada',
 			'verificada' => 'Verificada',
+			'ano' => 'Año',
 		);
 	}
 
@@ -206,6 +209,57 @@ class PromocionesPremium extends CActiveRecord
     		),
 		));
 	}
+
+	public function searchMensualSms()
+	{
+		if ($this->mes == "")
+			$this->mes = date("m");
+
+		if ($this->ano == "")
+			$this->ano = date("Y");
+
+		if ($this->id_cliente == "")
+		{
+			$sql = "SELECT GROUP_CONCAT(id_cliente) AS ids FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
+    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+    		$id_cliente = $sql["ids"];
+
+    		//ESTE QUERY SOLO SE HACE PARA QUE EL RESULTADO DE LA TABLA CONCUERDE CON EL VALOR POR DEFECTO DEL SELECT DE LOS CLIENTES 
+    		$sql = "SELECT id FROM cliente WHERE id IN(".$id_cliente.") LIMIT 1";
+    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+    		$id_cliente = $sql["id"];
+
+    		if ($id_cliente == "")
+    			$this->id_cliente = "null";
+    		else $this->id_cliente = $id_cliente;
+		}
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_cliente,t.nombrePromo, t.fecha, 
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
+		$criteria->compare("id_cliente", $this->id_cliente);
+		$criteria->addBetweenCondition("fecha", date($this->ano."-".$this->mes."-01"), $this->ultimoDiaMes($this->ano, $this->mes));
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_promo DESC',
+        		'attributes'=>array(
+             		'nombrePromo'
+        		),
+    		),
+		));
+	}
+
+	private function ultimoDiaMes($ano, $mes)
+    {
+        $month = date($mes);
+        $year = date($ano);
+        $day = date("d", mktime(0,0,0, $month+1, 0, $year));
+
+        return date('Y-m-d', mktime(0,0,0, $month, $day, $year));
+    }
 
 	/**
 	 * @return CDbConnection the database connection used for this class

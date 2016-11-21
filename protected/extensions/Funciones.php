@@ -176,6 +176,19 @@ class Funciones extends CApplicationComponent
 
 		return $color;
 	}
+
+	public function getColorLabelEstadoReportes($id_estado)
+	{
+		if($id_estado == 0) //Cuando el numero de Enviados/No enviados en igual a cero
+			$color = '#999';
+		elseif($id_estado == 1) //No envidado
+			$color = '#d9534f';
+		elseif ($id_estado == 2) //Enviado
+			$color = '#5cb85c';
+		elseif ($id_estado == 3) //Label total 
+			$color = '#337ab7';
+		return $color;
+	}
 }
 
 ?>

@@ -23,6 +23,10 @@ class OutgoingPremium extends CActiveRecord
 	public $buscar;
 	public $descripcion_oper;
 	public $descripcion_estado;
+	public $mes;
+	public $ano;
+	public $total;
+	public $enviados;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -82,6 +86,7 @@ class OutgoingPremium extends CActiveRecord
 			'status' => 'Status',
 			'id_promo' => 'Id Promo',
 			'id_insignia_alarmas' => 'Id Insignia Alarmas',
+			'ano' => 'Año',
 		);
 	}
 
@@ -143,6 +148,59 @@ class OutgoingPremium extends CActiveRecord
     		),
 		));
 	}
+
+	public function searchMensualSmsPorCliente()
+	{
+		if ($this->mes == "")
+			$this->mes = date("m");
+
+		if ($this->ano == "")
+			$this->ano = date("Y");
+
+		if ($this->id_promo == "")
+		{
+			$sql = "SELECT GROUP_CONCAT(id_cliente) AS ids FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
+    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+    		$id_cliente = $sql["ids"];
+
+    		if ($id_cliente == "")
+    			$id_cliente = "null";
+
+    		$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".$this->ultimoDiaMes($this->ano, $this->mes)."' AND id_cliente IN(".$id_cliente.")";
+    		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+    		$id_promo = $sql["ids"];
+
+    		if ($id_promo == "")
+    			$this->id_promo = "null";
+    		else $this->id_promo = $id_promo;
+		}
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.cliente, 
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$this->id_promo.") AND cliente = t.cliente) AS total, 
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$this->id_promo.") AND cliente = t.cliente AND status = 1) AS enviados";
+		$criteria->addInCondition("t.id_promo", explode(",", $this->id_promo));
+		$criteria->group = "t.cliente";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				//'defaultOrder'=>'cliente ASC',
+        		'attributes'=>array(
+             		//'cliente'
+        		),
+    		),
+		));
+	}
+
+	private function ultimoDiaMes($ano, $mes)
+    {
+        $month = date($mes);
+        $year = date($ano);
+        $day = date("d", mktime(0,0,0, $month+1, 0, $year));
+
+        return date('Y-m-d', mktime(0,0,0, $month, $day, $year));
+    }
 
 	/**
 	 * @return CDbConnection the database connection used for this class
