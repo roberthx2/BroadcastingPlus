@@ -15,7 +15,7 @@ $active = true;
 
 if (Yii::app()->user->getPermisos()->reporte_mensual_sms_bcp)
 {
-    $modelBCP = new PromocionesPremium('searchMesualSms');
+    $modelBCP = new PromocionesPremium('searchMensualSms');
     $modelBCP->unsetAttributes();
     
     if(isset($_GET['PromocionesPremium']))

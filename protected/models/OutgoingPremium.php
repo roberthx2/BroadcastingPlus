@@ -157,24 +157,14 @@ class OutgoingPremium extends CActiveRecord
 		if ($this->ano == "")
 			$this->ano = date("Y");
 
-		if ($this->id_promo == "")
-		{
-			$sql = "SELECT GROUP_CONCAT(id_cliente) AS ids FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
-    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-    		$id_cliente = $sql["ids"];
+		$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+		$id_promo = $sql["ids"];
 
-    		if ($id_cliente == "")
-    			$id_cliente = "null";
-
-    		$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".$this->ultimoDiaMes($this->ano, $this->mes)."' AND id_cliente IN(".$id_cliente.")";
-    		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-    		$id_promo = $sql["ids"];
-
-    		if ($id_promo == "")
-    			$this->id_promo = "null";
-    		else $this->id_promo = $id_promo;
-		}
-
+		if ($id_promo == "")
+			$this->id_promo = "null";
+		else $this->id_promo = $id_promo;
+    		
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.cliente, 
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$this->id_promo.") AND cliente = t.cliente) AS total, 

@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -426,4 +426,117 @@ class PromocionesPremiumController extends Controller
 
 		return $data;
 	}
+
+	public function actionReporteMensualSms()
+    {
+        $id_cliente = $_POST['PromocionesPremium']["id_cliente"];
+        $mes = $_POST['PromocionesPremium']["mes"];
+        $ano = $_POST['PromocionesPremium']["ano"];
+        $fecha_ini = date($ano."-".$mes."-01");
+        $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
+
+        $sql = "SELECT IFNULL(SUM(total),0) AS total, IFNULL(SUM(enviados),0) AS enviados FROM 
+                (SELECT  
+                    (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+                    (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados
+                    FROM promociones_premium t
+                    WHERE t.id_cliente = :id_cliente AND t.fecha BETWEEN :fecha_ini AND :fecha_fin
+                ) AS tabla";
+
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+        $sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_INT);
+        $sql->bindParam(":fecha_ini", $fecha_ini, PDO::PARAM_STR);
+        $sql->bindParam(":fecha_fin", $fecha_fin, PDO::PARAM_STR);
+        $sql = $sql->queryRow();
+
+        $enviados = 0;
+        $no_enviados = 0;
+
+        if ($sql["total"] > 0)
+        {
+            $enviados = floor(($sql["enviados"] * 100) / $sql["total"]);
+            $enviados = number_format($enviados, 1, '.', '.');
+
+            $no_enviados = floor((($sql["total"] - $sql["enviados"]) * 100) / $sql["total"]);
+            $no_enviados = number_format($no_enviados, 1, '.', '.');
+        }
+
+        $total = number_format($sql["total"], 0, '', '.');
+
+        $objeto = array(
+                'total' => $total,
+                'enviados_title' => $enviados." %",
+                'enviados_label' => number_format($sql["enviados"], 0, '', '.'),
+                'no_enviados_title' => $no_enviados." %",
+                'no_enviados' => number_format(($sql["total"] - $sql["enviados"]), 0, '', '.'),
+                'periodo' => $fecha_ini." / ".$fecha_fin,
+            );
+
+
+        echo CJSON::encode(array(
+            'objeto'=>$objeto,
+        ));
+
+        Yii::app()->end();
+    }
+
+    public function actionReporteMensualSmsPorCliente()
+    {
+        $mes = $_POST['OutgoingPremium']["mes"];
+        $ano = $_POST['OutgoingPremium']["ano"];
+        $fecha_ini = date($ano."-".$mes."-01");
+        $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
+
+        $sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN ':fecha_ini' AND ':fecha_fin'";
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+        $sql->bindParam(":fecha_ini", $fecha_ini, PDO::PARAM_STR);
+        $sql->bindParam(":fecha_fin", $fecha_fin, PDO::PARAM_STR);
+        $sql = $sql->queryRow();
+
+		$id_promo = $sql["ids"];
+
+		if ($id_promo == "")
+			$id_promo = "null";
+
+		$sql = "SELECT IFNULL(SUM(total),0) AS total, IFNULL(SUM(enviados),0) AS enviados FROM  
+				(SELECT  
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$id_promo.") AND cliente = t.cliente) AS total, 
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$id_promo.") AND cliente = t.cliente AND status = 1) AS enviados
+					FROM outgoing_premium t
+					WHERE t.id_promo IN(".$id_promo.")
+					GROUP BY t.cliente
+				) AS tabla";
+
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+        $enviados = 0;
+        $no_enviados = 0;
+
+        if ($sql["total"] > 0)
+        {
+            $enviados = floor(($sql["enviados"] * 100) / $sql["total"]);
+            $enviados = number_format($enviados, 1, '.', '.');
+
+            $no_enviados = floor((($sql["total"] - $sql["enviados"]) * 100) / $sql["total"]);
+            $no_enviados = number_format($no_enviados, 1, '.', '.');
+        }
+
+        $total = number_format($sql["total"], 0, '', '.');
+
+        $objeto = array(
+                'total' => $total,
+                'enviados_title' => $enviados." %",
+                'enviados_label' => number_format($sql["enviados"], 0, '', '.'),
+                'no_enviados_title' => $no_enviados." %",
+                'no_enviados' => number_format(($sql["total"] - $sql["enviados"]), 0, '', '.'),
+                'periodo' => $fecha_ini." / ".$fecha_fin,
+            );
+
+
+        echo CJSON::encode(array(
+            'objeto'=>$objeto,
+        ));
+
+        Yii::app()->end();
+    }
 }

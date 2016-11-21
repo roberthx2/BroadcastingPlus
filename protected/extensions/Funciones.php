@@ -12,6 +12,15 @@ class Funciones extends CApplicationComponent
 		return strtoupper(trim(preg_replace('/\s{2,}/', " ", $cadena)));
 	}
 
+	public function getUltimoDiaMes($ano, $mes)
+	{
+		$month = date($mes);
+        $year = date($ano);
+        $day = date("d", mktime(0,0,0, $month+1, 0, $year));
+
+        return date('Y-m-d', mktime(0,0,0, $month, $day, $year));
+	}
+
 	public function limpiarMensaje($sms)
     {
         $sms = str_replace(

@@ -6,6 +6,7 @@ $('.search-form form').submit(function(){
     $('#mensualSmsPorClienteBCP').yiiGridView('update', {
         data: $(this).serialize()
     });
+    updateInfo();
     return false;
 });
 
@@ -16,9 +17,9 @@ $('.search-form form').submit(function(){
     <?php $this->renderPartial('busquedaMensualSmsPorCliente',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
-<!--<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <?php //	$this->renderPartial('mensualSmsBCPDetalle',array('model'=>$model)); ?>
-</div>--><!-- search-form -->
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+    <?php 	$this->renderPartial('mensualSmsPorClienteBCPDetalle',array('model'=>$model)); ?>
+</div><!-- search-form -->
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
@@ -28,29 +29,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'dataProvider' => $model->searchMensualSmsPorCliente(),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
-        'template' => '<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12"><br />{extendedSummary}</div>{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
+        'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
-        //'filter'=> $model,
-        'extendedSummary' => array(
-	        'title' => 'Totales',
-	        'columns' => array(
-	            'enviados' => array('label'=>'Enviados', 'class'=>'TbSumOperation'),
-	            'no_enviados' => array('label'=>'No enviados', 'class'=>'TbSumOperation'),
-	            'total' => array('label'=>'Total', 'class'=>'TbSumOperation'),
-	            /*'total' => array(
-	                'label'=>'Total Expertise',
-	                'types' => array(
-	                    '4'=>array('label'=>'html'),
-	                    '7453'=>array('label'=>'html2')
-	                ),
-	                'class'=>'TbPercentOfTypeOperation'
-	            )*/
-	        )
-	    ),
-	    'extendedSummaryOptions' => array(
-	        'class' => 'well pull-right col-xs-12 col-sm-12 col-lg-12 col-md-12',
-	        'style' => 'width:200px;'
-	    ),
         'columns'=> array( 
         	//'id_cliente',
         	array(
@@ -125,17 +105,42 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 <script type="text/javascript">
 
-	function updateDescripcion()
+	function updateInfo()
 	{
-		var aux = $( "#PromocionesPremium_id_cliente option:selected" ).text();
-		$("#detalleClienteBCP").val(aux);
+		var url_action = "<?php echo Yii::app()->createUrl('promocionesPremium/reporteMensualSmsPorCliente'); ?>";
+
+		$.ajax({
+            url:url_action,
+            type:"POST",   
+            dataType:'json', 
+            data: $('.search-form form').serialize(),
+
+            success: function(data) 
+            {
+            	var aux = $( "#PromocionesPremium_id_cliente option:selected" ).text();
+            	var objeto = data.objeto;
+
+				$(".detalleClienteBCP").text(aux);
+				$(".detallePeriodoBCP").text(objeto.periodo);
+				$("#detalleTotalBCP").text(objeto.total);
+
+				$("#detalleEnviadosBCP").text(objeto.enviados_label);
+				$('#detalleEnviadosBCP').prop('title', objeto.enviados_title);
+
+				$("#detalleNoEnviadosBCP").text(objeto.no_enviados);
+				$('#detalleNoEnviadosBCP').prop('title', objeto.no_enviados_title);
+            },
+            error: function()
+            {
+                alert("Ocurrio un error al actualizar el resumen general");
+            }
+        });
 	}
 
 	$(document).ready(function()
 	{
-		//$("#boton_consultar").click(function(){
-			//$("#boton_consultar").addClass("disabled");
-		//});
+		updateInfo();
+		$('[data-tooltip="tooltip"]').tooltip();
 	});
 
 </script>

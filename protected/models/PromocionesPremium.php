@@ -239,7 +239,7 @@ class PromocionesPremium extends CActiveRecord
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
 		$criteria->compare("id_cliente", $this->id_cliente);
-		$criteria->addBetweenCondition("fecha", date($this->ano."-".$this->mes."-01"), $this->ultimoDiaMes($this->ano, $this->mes));
+		$criteria->addBetweenCondition("fecha", date($this->ano."-".$this->mes."-01"), Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes));
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -251,15 +251,6 @@ class PromocionesPremium extends CActiveRecord
     		),
 		));
 	}
-
-	private function ultimoDiaMes($ano, $mes)
-    {
-        $month = date($mes);
-        $year = date($ano);
-        $day = date("d", mktime(0,0,0, $month+1, 0, $year));
-
-        return date('Y-m-d', mktime(0,0,0, $month, $day, $year));
-    }
 
 	/**
 	 * @return CDbConnection the database connection used for this class

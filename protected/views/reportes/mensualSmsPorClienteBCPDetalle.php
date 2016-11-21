@@ -11,19 +11,6 @@
 	    <div id="collapseBCP" class="panel-collapse collapse in">
 	      	<div class="panel-body">
 	        	<ul class="list-group">
-	        		<li class="list-group-item">
-	        			<?php $this->widget(
-		                    'booster.widgets.TbBadge',
-		                    array(
-		                        'label' => '',
-		                        'htmlOptions' => array('style' => 'background-color: white; color: black', 'class'=>'detalleClienteBCP visible-md visible-lg trOverFlow'),
-		                    )
-		                ); ?>
-		                <?php echo '<strong class="visible-md visible-lg">Cliente</strong>'; ?>
-
-		                <div class="visible-xs visible-sm "><strong>Cliente</strong></div>
-		        		<div class="detalleClienteBCP visible-xs visible-sm trOverFlow"></div>
-		        	</li>
 		        	<li class="list-group-item">
 		        		<?php $this->widget(
 		                    'booster.widgets.TbBadge',
