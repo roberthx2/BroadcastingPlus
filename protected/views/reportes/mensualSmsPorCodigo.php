@@ -13,15 +13,15 @@ $active = true;
     $active = false;
 }*/
 
-if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_cliente_bcp)
+if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_codigo_bcp)
 {
-    $modelBCP = new OutgoingPremium('searchMesualSms');
+    $modelBCP = new PromocionesPremium('searchMensualSmsPorCodigo');
     $modelBCP->unsetAttributes();
     
-    if(isset($_GET['OutgoingPremium']))
+    if(isset($_GET['PromocionesPremium']))
     {
-        $modelBCP->mes=$_GET['OutgoingPremium']["mes"];
-        $modelBCP->ano=$_GET['OutgoingPremium']["ano"];
+        $modelBCP->mes=$_GET['PromocionesPremium']["mes"];
+        $modelBCP->ano=$_GET['PromocionesPremium']["ano"];
     }
 
     array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('mensualSmsPorCodigoBCP', array('model'=>$modelBCP), true), 'active' => $active));

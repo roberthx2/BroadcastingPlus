@@ -487,7 +487,7 @@ class PromocionesPremiumController extends Controller
         $fecha_ini = date($ano."-".$mes."-01");
         $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
 
-        $sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN ':fecha_ini' AND ':fecha_fin'";
+        $sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN :fecha_ini AND :fecha_fin";
         $sql = Yii::app()->db_masivo_premium->createCommand($sql);
         $sql->bindParam(":fecha_ini", $fecha_ini, PDO::PARAM_STR);
         $sql->bindParam(":fecha_fin", $fecha_fin, PDO::PARAM_STR);

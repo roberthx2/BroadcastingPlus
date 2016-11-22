@@ -29,6 +29,7 @@ class PromocionesPremium extends CActiveRecord
 	public $buscar;
 	public $mes;
 	public $ano;
+	public $id;
 
 	public function tableName()
 	{
@@ -250,6 +251,57 @@ class PromocionesPremium extends CActiveRecord
         		),
     		),
 		));
+	}
+
+	public function searchMensualSmsPorCodigo()
+	{
+		if ($this->mes == "")
+			$this->mes = date("m");
+
+		if ($this->ano == "")
+			$this->ano = date("Y");
+
+		$criteria=new CDbCriteria;
+		/*$criteria->select = "sc, SUM(total) AS total, SUM(enviados) AS enviados FROM ( 
+				SELECT p.sc,
+				(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
+				(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
+				FROM promociones_premium p
+				WHERE p.fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."' 
+				GROUP BY p.sc, p.id_promo) AS tabla";
+		$criteria->group = "sc";*/
+
+		$sql = "SELECT id AS id, sc, SUM(total) AS total, SUM(enviados) AS enviados FROM (
+					SELECT p.sc, p.id_promo AS id,
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
+					FROM promociones_premium p
+					WHERE p.fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."' 
+					GROUP BY p.sc, p.id_promo) AS tabla
+					GROUP BY sc";
+
+		return new CSqlDataProvider($sql, array(
+			'db'=>Yii::app()->db_masivo_premium, 
+			//'totalItemCount'=>$total["total"],
+			'sort'=>array(
+        		'attributes'=>array(
+             		//'fecha', 'id_promo',
+        		),
+    		),
+    		'pagination'=>array(
+        		'pageSize'=>10,
+    		),
+    	));
+
+		/*return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_promo DESC',
+        		'attributes'=>array(
+             		'nombrePromo'
+        		),
+    		),
+		));*/
 	}
 
 	/**

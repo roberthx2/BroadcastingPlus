@@ -1,9 +1,9 @@
 <br>
 <?php
-Yii::app()->clientScript->registerScript('searchMensualSmsPorClienteBCP', "
+Yii::app()->clientScript->registerScript('searchMensualSmsPorCodigoBCP', "
 
 $('.search-form form').submit(function(){
-    $('#mensualSmsPorClienteBCP').yiiGridView('update', {
+    $('#mensualSmsPorCodigoBCP').yiiGridView('update', {
         data: $(this).serialize()
     });
     return false;
@@ -22,43 +22,23 @@ $('.search-form form').submit(function(){
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'mensualSmsPorClienteBCP',
+        'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model->searchMensualSmsPorCliente(),
+        'dataProvider' => $model->searchMensualSmsPorCodigo(),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
-        'template' => '<div class="col-md-12 col-sm-12 col-lg-12 col-xs-12"><br />{extendedSummary}</div>{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
+        'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
-        //'filter'=> $model,
-        'extendedSummary' => array(
-	        'title' => 'Totales',
-	        'columns' => array(
-	            'enviados' => array('label'=>'Enviados', 'class'=>'TbSumOperation'),
-	            'no_enviados' => array('label'=>'No enviados', 'class'=>'TbSumOperation'),
-	            'total' => array('label'=>'Total', 'class'=>'TbSumOperation'),
-	            /*'total' => array(
-	                'label'=>'Total Expertise',
-	                'types' => array(
-	                    '4'=>array('label'=>'html'),
-	                    '7453'=>array('label'=>'html2')
-	                ),
-	                'class'=>'TbPercentOfTypeOperation'
-	            )*/
-	        )
-	    ),
-	    'extendedSummaryOptions' => array(
-	        'class' => 'well pull-right col-xs-12 col-sm-12 col-lg-12 col-md-12',
-	        'style' => 'width:200px;'
-	    ),
+
         'columns'=> array( 
         	//'id_cliente',
         	array(
 	            //'name' => 'cliente',
-	            'header' => 'Cliente',
+	            'header' => 'sc',
 	            'value' => function($data)
 	            {
-	            	return $this->actionGetDescripcionClienteBCP($data["cliente"]);
+	            	return $this->actionGetDescripcionClienteBCP($data["sc"]);
 	            },
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
