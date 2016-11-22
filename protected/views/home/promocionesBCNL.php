@@ -2,7 +2,7 @@
 <?php
 Yii::app()->clientScript->registerScript('searchDetallesBCNLToday', "
 
-$('.search-form form').submit(function(){
+$('.BCNL form').submit(function(){
     $('#detallesBCNLToday').yiiGridView('update', {
         data: $(this).serialize()
     });
@@ -12,7 +12,7 @@ $('.search-form form').submit(function(){
 ");
 
 ?>
-<div class="search-form">
+<div class="BCNL">
     <?php $this->renderPartial('/promocion/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
 

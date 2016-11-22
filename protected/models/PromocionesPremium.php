@@ -7,6 +7,7 @@
  * @property string $id_promo
  * @property string $nombrePromo
  * @property string $id_cliente
+ * @property string $sc
  * @property string $estado
  * @property string $fecha
  * @property string $hora
@@ -48,11 +49,11 @@ class PromocionesPremium extends CActiveRecord
 			array('verificada', 'numerical', 'integerOnly'=>true),
 			array('nombrePromo', 'length', 'max'=>100),
 			array('id_cliente', 'length', 'max'=>45),
-			array('estado, loaded_by', 'length', 'max'=>10),
+			array('sc, estado, loaded_by', 'length', 'max'=>10),
 			array('contenido', 'length', 'max'=>200),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_promo, nombrePromo, id_cliente, fecha, hora, contenido, fecha_cargada, hora_cargada', 'safe', 'on'=>'searchHome'),
+			array('id_promo, nombrePromo, id_cliente, sc, estado, fecha, hora, loaded_by, contenido, fecha_cargada, hora_cargada', 'safe', 'on'=>'searchHome'),
 		);
 	}
 
@@ -76,6 +77,7 @@ class PromocionesPremium extends CActiveRecord
 			'id_promo' => 'Id Promo',
 			'nombrePromo' => 'Nombre',
 			'id_cliente' => 'Cliente',
+			'sc' => 'Sc',
 			'estado' => 'Estado',
 			'fecha' => 'Fecha',
 			'hora' => 'Hora',
@@ -109,6 +111,7 @@ class PromocionesPremium extends CActiveRecord
 		$criteria->compare('id_promo',$this->id_promo,true);
 		$criteria->compare('nombrePromo',$this->nombrePromo,true);
 		$criteria->compare('id_cliente',$this->id_cliente,true);
+		$criteria->compare('sc',$this->sc,true);
 		$criteria->compare('estado',$this->estado,true);
 		$criteria->compare('fecha',$this->fecha,true);
 		$criteria->compare('hora',$this->hora,true);
@@ -262,27 +265,23 @@ class PromocionesPremium extends CActiveRecord
 			$this->ano = date("Y");
 
 		$criteria=new CDbCriteria;
-		/*$criteria->select = "sc, SUM(total) AS total, SUM(enviados) AS enviados FROM ( 
-				SELECT p.sc,
-				(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
-				(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
-				FROM promociones_premium p
-				WHERE p.fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."' 
-				GROUP BY p.sc, p.id_promo) AS tabla";
-		$criteria->group = "sc";*/
+
+		$sql = "SELECT GROUP_CONCAT(id_promo) AS id FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
+		$id_promo = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 		$sql = "SELECT id AS id, sc, SUM(total) AS total, SUM(enviados) AS enviados FROM (
 					SELECT p.sc, p.id_promo AS id,
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 					FROM promociones_premium p
-					WHERE p.fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."' 
+					WHERE p.id_promo IN(".$id_promo["id"].")  
 					GROUP BY p.sc, p.id_promo) AS tabla
 					GROUP BY sc";
+		
+		$model =PromocionesPremium::model()->findAllBySql($sql);
 
-		return new CSqlDataProvider($sql, array(
-			'db'=>Yii::app()->db_masivo_premium, 
-			//'totalItemCount'=>$total["total"],
+		$model = new CArrayDataProvider($model, array(
+
 			'sort'=>array(
         		'attributes'=>array(
              		//'fecha', 'id_promo',
@@ -292,6 +291,8 @@ class PromocionesPremium extends CActiveRecord
         		'pageSize'=>10,
     		),
     	));
+
+    	return $model;
 
 		/*return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

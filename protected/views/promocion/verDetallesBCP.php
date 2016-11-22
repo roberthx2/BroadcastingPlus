@@ -2,7 +2,7 @@
 <?php
 Yii::app()->clientScript->registerScript('searchDetallesBCP', "
 
-$('.search-form form').submit(function(){
+$('.BCP form').submit(function(){
     $('#detallesBCP').yiiGridView('update', {
         data: $(this).serialize()
     });
@@ -12,7 +12,7 @@ $('.search-form form').submit(function(){
 ");
 
 ?>
-<div class="search-form">
+<div class="BCP">
     <?php $this->renderPartial('/promocion/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
 <?php

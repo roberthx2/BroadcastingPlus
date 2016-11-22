@@ -1,5 +1,5 @@
 <?php
-
+ini_set("max_execution_time",0);
 class PromocionesPremiumController extends Controller
 {
 	/**
@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -529,6 +529,57 @@ class PromocionesPremiumController extends Controller
                 'enviados_label' => number_format($sql["enviados"], 0, '', '.'),
                 'no_enviados_title' => $no_enviados." %",
                 'no_enviados' => number_format(($sql["total"] - $sql["enviados"]), 0, '', '.'),
+                'periodo' => $fecha_ini." / ".$fecha_fin,
+            );
+
+
+        echo CJSON::encode(array(
+            'objeto'=>$objeto,
+        ));
+
+        Yii::app()->end();
+    }
+
+    public function actionReporteMensualSmsPorCodigo()
+    {
+        $mes = $_POST['PromocionesPremium']["mes"];
+        $ano = $_POST['PromocionesPremium']["ano"];
+        $fecha_ini = date($ano."-".$mes."-01");
+        $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
+
+        $sql = "SELECT GROUP_CONCAT(id_promo) AS id FROM promociones_premium WHERE fecha BETWEEN '".$fecha_ini."' AND '".$fecha_fin."'";
+		$id_promo = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+		$sql = "SELECT SUM(total) AS total, SUM(enviados) AS enviados FROM (
+					SELECT p.sc, p.id_promo AS id,
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
+					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
+					FROM promociones_premium p
+					WHERE p.id_promo IN(".$id_promo["id"].") 
+					GROUP BY p.sc, p.id_promo) AS tabla";
+		
+		$sql = PromocionesPremium::model()->findBySql($sql);
+
+        $enviados = 0;
+        $no_enviados = 0;
+
+        if ($sql->total > 0)
+        {
+            $enviados = floor(($sql->enviados * 100) / $sql->total);
+            $enviados = number_format($enviados, 1, '.', '.');
+
+            $no_enviados = floor((($sql->total - $sql->enviados) * 100) / $sql->total);
+            $no_enviados = number_format($no_enviados, 1, '.', '.');
+        }
+
+        $total = number_format($sql->total, 0, '', '.');
+
+        $objeto = array(
+                'total' => $total,
+                'enviados_title' => $enviados." %",
+                'enviados_label' => number_format($sql->enviados, 0, '', '.'),
+                'no_enviados_title' => $no_enviados." %",
+                'no_enviados' => number_format(($sql->total - $sql->enviados), 0, '', '.'),
                 'periodo' => $fecha_ini." / ".$fecha_fin,
             );
 
