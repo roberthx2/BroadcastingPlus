@@ -27,7 +27,7 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'mensualSmsPorCodigo'),
+                'actions' => array('index', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'mensualSmsPorCodigo', 'smsRecibidos'),
                 'users' => array('@'),
             ),
 
@@ -55,6 +55,11 @@ class ReportesController extends Controller
     public function actionMensualSmsPorCodigo()
     {
         $this->render("mensualSmsPorCodigo");
+    }
+
+    public function actionSmsRecibidos()
+    {
+        $this->render("smsRecibidos");
     }
 
     public function actionGetDescripcionClienteBCP($id_cliente)

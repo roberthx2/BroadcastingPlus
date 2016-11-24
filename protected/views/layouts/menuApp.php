@@ -62,7 +62,7 @@
                         <?php if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_codigo_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/mensualSmsPorCodigo');?>"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Mensual de SMS por código </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcnl || Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-import" aria-hidden="true"></span> SMS Recibidos </a></li> <?php } ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsRecibidos');?>"><span class="glyphicon glyphicon-import" aria-hidden="true"></span> SMS Recibidos </a></li> <?php } ?>
                         <?php /*if (Yii::app()->user->getPermisos()->reporte_vigilancia_bcnl || Yii::app()->user->getPermisos()->reporte_vigilancia_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-camera" aria-hidden="true"></span> Reporte de Vigilancia </a></li> <?php } */?>
                     </ul>

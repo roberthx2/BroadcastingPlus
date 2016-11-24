@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo', 'getPromociones'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -589,5 +589,46 @@ class PromocionesPremiumController extends Controller
         ));
 
         Yii::app()->end();
+    }
+
+    public function actionGetPromociones()
+    {
+        $id_cliente = $_POST['PromocionesPremium']["id_cliente"];
+        $mes = $_POST['PromocionesPremium']["mes"];
+        $fecha_ini = date("Y-".$mes."-01");
+        $ano = date("Y");
+
+        $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
+
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if ($id_cliente == '') {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => 'Cliente invalido'
+                ));
+                Yii::app()->end();
+            } else {   
+                
+                $sql = "SELECT id_promo, nombrePromo FROM promociones_premium WHERE fecha BETWEEN '".$fecha_ini."' AND '".$fecha_fin."' AND id_cliente = ".$id_cliente." ORDER BY nombrePromo DESC";
+                $data = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll($sql);
+               
+                if($data) {
+                    echo CJSON::encode(array(
+                                            'error' => 'false',
+                                            'status' => 'Promociones obtenidas correctamente',
+                                            'data' => $data,
+                                       )                                
+                         );
+                    Yii::app()->end();
+                } else {
+                    echo CJSON::encode(array(
+                        'error' => 'true',
+                        'status' => 'No pexisten promociones para el mes'
+                    ));
+                    Yii::app()->end();
+                }
+            }   
+        }
     }
 }

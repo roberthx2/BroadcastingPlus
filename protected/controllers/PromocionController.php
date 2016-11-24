@@ -264,6 +264,7 @@ class PromocionController extends Controller
                             $model_promocion = new PromocionesPremium;
                             $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $clienteBCP->sc, $model->nombre, $model->fecha);
                             $model_promocion->id_cliente = $model->id_cliente;
+                            $model_promocion->sc = $clienteBCP->sc;
                             $model_promocion->estado = 0;
                             $model_promocion->fecha = $model->fecha;
                             $model_promocion->hora = $model->hora_inicio;
