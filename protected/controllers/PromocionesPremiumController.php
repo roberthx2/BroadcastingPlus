@@ -593,8 +593,8 @@ class PromocionesPremiumController extends Controller
 
     public function actionGetPromociones()
     {
-        $id_cliente = $_POST['PromocionesPremium']["id_cliente"];
-        $mes = $_POST['PromocionesPremium']["mes"];
+        $id_cliente = $_POST['Smsin']["id_cliente"];
+        $mes = $_POST['Smsin']["mes"];
         $fecha_ini = date("Y-".$mes."-01");
         $ano = date("Y");
 

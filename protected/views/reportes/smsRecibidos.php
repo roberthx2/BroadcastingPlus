@@ -15,13 +15,14 @@ $active = true;
 
 if (Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcp)
 {
-    $modelBCP = new PromocionesPremium('searchMensualSmsPorCodigo');
+    $modelBCP = new Smsin('searchMensualSmsPorCodigo');
     $modelBCP->unsetAttributes();
     
-    if(isset($_GET['PromocionesPremium']))
+    if(isset($_GET['Smsin']))
     {
-        $modelBCP->mes=$_GET['PromocionesPremium']["mes"];
-        $modelBCP->ano=$_GET['PromocionesPremium']["ano"];
+        $modelBCP->mes=$_GET['Smsin']["mes"];
+        $modelBCP->id_cliente=$_GET['Smsin']["id_cliente"];
+        $modelBCP->id_promo=$_GET['Smsin']["id_promo"];
     }
 
     array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('SmsRecibidosBCP', array('model'=>$modelBCP), true), 'active' => $active));

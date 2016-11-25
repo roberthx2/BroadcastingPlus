@@ -43,28 +43,6 @@
 							),
 							'widgetOptions' => array(
 								'data' => CHtml::listData(ClienteAlarmas::model()->findAll(array("select"=>"id, REPLACE(descripcion, '@', '') AS descripcion", "condition"=>"id IN(".$id_clientes.")", "order"=>"descripcion")), 'id', 'descripcion'),
-								//'htmlOptions' => array('prompt' => 'Seleccionar...'),
-								/*'ajax' => array(
-		                        'type'=>'POST', //request type
-		                        'dataType' => 'json',
-		                        'url'=>Yii::app()->createUrl('/promocionesPremium/getPromociones'), //url to call.
-		                        'data' => array('id_cliente' => 'js:$("#PromocionesPremium_id_cliente").val()'),
-		                        'success' => 'function(response){
-		                                if (response.error == "false")
-		                                {
-		                                    $("#'.CHTML::activeId($model,'PromocionesPremium_nombrePromo').'").empty();
-		                                    var cliente = response.data;
-		                                    $.each(cliente, function(i, value) {
-		                                        $("#'.CHTML::activeId($model,'PromocionesPremium_nombrePromo').'").append($("<option>").text(value.descripcion).attr("value",value.PromocionesPremium_nombrePromo));
-		                                    });
-		                                }
-		                                else
-		                                {
-		                                    $("#'.CHTML::activeId($model,'PromocionesPremium_nombrePromo').'").empty();
-		                                    console.log(response.status);
-		                                }
-		                            }'
-		                		),*/
 							),
 							'prepend' => '<i class="glyphicon glyphicon-user"></i>',
 						)
@@ -87,14 +65,14 @@
 
 					<?php echo $form->dropDownListGroup(
 						$model,
-						'nombrePromo',
+						'id_promo',
 						array(
 							'wrapperHtmlOptions' => array(
 								'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 								'style'=>'display: none;',
 							),
 							'widgetOptions' => array(
-								'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+								'htmlOptions' => array('prompt' => 'Seleccionar...',), //col-xs-12 col-sm-4 col-md-4 col-lg-4
 							),
 							'prepend' => '<i class="glyphicon glyphicon-user"></i>',
 						)
