@@ -16,10 +16,6 @@ $('.BCP form').submit(function(){
     <?php $this->renderPartial('busquedaSmsRecibidosBCP',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <?php //$this->renderPartial('mensualSmsDetallePeriodo',array('model'=>$model)); ?>
-</div><!-- search-form -->
-
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
@@ -59,36 +55,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 <script type="text/javascript">
 
-	function updateInfo()
-    {
-        var url_action = "<?php echo Yii::app()->createUrl('promocionesPremium/reporteMensualSmsPorCodigo'); ?>";
-
-        $.ajax({
-            url:url_action,
-            type:"POST",   
-            dataType:'json', 
-            data: $('.BCP form').serialize(),
-
-            success: function(data) 
-            {
-                var objeto = data.objeto;
-
-                $(".detallePeriodoBCP").text(objeto.periodo);
-                $("#detalleTotalBCP").text(objeto.total);
-
-                $("#detalleEnviadosBCP").text(objeto.enviados_label);
-                $('#detalleEnviadosBCP').prop('title', objeto.enviados_title);
-
-                $("#detalleNoEnviadosBCP").text(objeto.no_enviados);
-                $('#detalleNoEnviadosBCP').prop('title', objeto.no_enviados_title);
-            },
-            error: function()
-            {
-                alert("Ocurrio un error al actualizar el resumen general");
-            }
-        });
-    }
-
     function updatePromociones()
     {
         var url_action = "<?php echo Yii::app()->createUrl('promocionesPremium/getPromociones'); ?>";
@@ -126,7 +92,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 	$(document).ready(function()
 	{
-		//updateInfo();
         $('[data-tooltip="tooltip"]').tooltip();
         $("#Smsin_id_cliente").on('change', function(){
             updatePromociones();

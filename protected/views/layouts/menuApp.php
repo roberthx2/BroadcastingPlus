@@ -8,7 +8,7 @@
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
                     <a href="#" style="padding-top:10px;">
-                        Envios Premium
+                         
                     </a>
                 </li>
 
@@ -68,7 +68,7 @@
                     </ul>
                 <?php } ?>
 
-                <?php /*if (Yii::app()->user->getPermisos()->modulo_herramientas) { ?>
+                <?php if (Yii::app()->user->getPermisos()->modulo_herramientas) { ?>
                 <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
                     <a href="#"> Herramientas <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>

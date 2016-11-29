@@ -55,7 +55,7 @@
 	    'booster.widgets.TbNavbar',
 	    array(
 	        'type' => 'inverse',
-	        'brand' => Yii::app()->name.' <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
+	        'brand' => Yii::app()->name.' <span class="none" aria-hidden="true"></span> ',//.CHtml::image(Yii::app()->getBaseUrl().'/images/logoInsig3.png'),
 	        'brandUrl' => '#',
 	        'brandOptions' => array("class"=>"boton_menu"),
 	        'collapse' => true, // requires bootstrap-responsive.css
@@ -67,7 +67,7 @@
 	                'type'  => 'navbar',
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
-		                    array('label' => 'Home', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest, 'itemOptions'=>array('id'=>'boton_home')),
 		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('app/index'), 'visible'=>!Yii::app()->user->isGuest && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei)),
 		                    //array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('#'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getPermisos()->modulo_administracion),
 		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
@@ -142,3 +142,36 @@ body {
 /*************************************************/
 
 </style>
+
+<script type="text/javascript">
+	$(document).ready(function() 
+	{
+	    var controlador = "<?php echo Yii::app()->controller->id; ?>";
+
+	    if (controlador == "home")
+	    {
+	    	$("#boton_home").find(".glyphicon-home").removeClass("glyphicon glyphicon-home").addClass("glyphicon glyphicon-refresh");
+
+	    	$("#boton_home").html(function(buscayreemplaza, reemplaza) {
+		        return reemplaza.replace('Inicio', 'Actualizar');
+		    });
+	    }
+	    else
+	    {
+	    	$("#boton_home").find(".glyphicon-refresh").removeClass("glyphicon glyphicon-refresh").addClass("glyphicon glyphicon-home");
+
+	    	$("#boton_home").html(function(buscayreemplaza, reemplaza) {
+		        return reemplaza.replace('Actualizar', 'Inicio');
+		    });
+	    }
+
+	    if (controlador == "site" || controlador == "home")
+	    {
+	    	$(".boton_menu").find(".glyphicon-transfer").removeClass("glyphicon glyphicon-transfer").addClass("none");
+	    }
+	    else
+	    {
+	    	$(".boton_menu").find(".none").removeClass("none").addClass("glyphicon glyphicon-transfer");
+	    }
+	});
+</script>

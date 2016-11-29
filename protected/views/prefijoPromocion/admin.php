@@ -135,7 +135,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         <?php $this->widget(
             'booster.widgets.TbButton',
             array(
-                'label' => 'Close',
+                'label' => 'Cerrar',
                 'url' => '#',
                 'htmlOptions' => array('data-dismiss' => 'modal'),
             )

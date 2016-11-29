@@ -114,9 +114,6 @@ class Smsin extends CActiveRecord
 
 	public function searchSmsRecibidosBCP()
 	{
-		$fecha = date("Y-m-d");
-		$hora_ini = '07:00:00';
-		$hora_fin = '20:00:00';;
 		$id_usuario = Yii::app()->user->id;
 
 		$sql = "SELECT sc FROM cliente WHERE id = :id_cliente";
@@ -147,35 +144,39 @@ class Smsin extends CActiveRecord
 		$sql->bindParam(":id_promo", $this->id_promo, PDO::PARAM_INT);
         $promo = $sql->queryRow();
 
-        if (Yii::app()->user->isAdmin())//Godadmin
+        if (Yii::app()->user->isAdmin())
         {
-            $fecha_ini = "2008-11-01";
-            $fecha_fin = date("Y-m-d");
+            $fecha_consulta = $promo["fecha"];
         }
         else
         {
-        	$sql = "SELECT fecha_init_sc, CASE fecha_fin_sc WHEN '0000-00-00' THEN CURDATE() ELSE fecha_fin_sc END FROM fecha_init_rep 
-        			WHERE id_sc = ".$sc." AND f.id_usuario = ".$id_usuario." 
+        	$sql = "SELECT fecha_init_sc, CASE fecha_fin_sc WHEN '0000-00-00' THEN CURDATE() ELSE fecha_fin_sc END AS fecha_fin_sc FROM fecha_init_rep 
+        			WHERE id_sc = ".$sc." AND id_usuario = ".$id_usuario." 
         			ORDER BY id_registro 
         			DESC LIMIT 1";
             $sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
 
             $fecha_ini = $sql["fecha_init_sc"];
             $fecha_fin = $sql["fecha_fin_sc"];
+
+            //Determinar la fecha inicio del reporte
+	        if ($promo["fecha"] >= $fecha_ini && $promo["fecha"] <= $fecha_fin)
+	        {
+	            $fecha_consulta = $promo["fecha"];
+	        } 
+	        else if ($promo["fecha"] < $fecha_ini || $promo["fecha"] > $fecha_fin)
+	        {
+	            $fecha_consulta = "0000-00-00";
+	        }
         }
 
-        //Determinar la fecha inicio del reporte
-        if ($promo["fecha"] >= $fecha_ini && $promo["fecha"] <= $fecha_fin)
-        {
-            $fecha_ini_aux = $promo["fecha"];
-        } 
-        else if ($promo["fecha"] < $fecha_ini || $promo["fecha"] > $fecha_fin)
-        {
-            $fecha_ini_aux = "0000-00-00";
-        }
-
-        $sql = "SELECT GROUP_CONCAT(CONCAT(\"'\",descripcion,\"'\")) AS oper_activas FROM operadoras_activas_bcp WHERE estatus = 1";
+        $sql = "SELECT GROUP_CONCAT(descripcion) AS oper_activas FROM operadoras_activas_bcp WHERE estatus = 1";
         $operadoras_activas = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+        $sql = "SELECT GROUP_CONCAT(destinatario) AS numeros FROM outgoing_premium WHERE id_promo = :id_promo";
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+		$sql->bindParam(":id_promo", $this->id_promo, PDO::PARAM_INT);
+        $outgoing_premium = $sql->queryRow();
 
 		$criteria=new CDbCriteria;
 
@@ -186,11 +187,13 @@ class Smsin extends CActiveRecord
 			WHEN origen REGEXP '^58412' THEN CONCAT('0412', SUBSTRING(origen,-7)) 
 			END) AS origen, contenido, time_arrive";
 
-		$criteria->compare("data_arrive", $fecha_ini_aux);
-		$criteria->addBetweenCondition("time_arrive", $hora_ini, $hora_fin);
+		$criteria->compare("data_arrive", $fecha_consulta);
+		$criteria->addBetweenCondition("time_arrive", $promo["hora"], $promo["hora_limite"]);
 		$criteria->compare("sc", $sc);
 		$criteria->addInCondition("desp_op", explode(",", $operadoras_activas["oper_activas"]));
 		$criteria->addInCondition("id_producto", $cadena_serv);
+		$criteria->addInCondition("desp_op", explode(",", $operadoras_activas["oper_activas"]));
+		$criteria->addInCondition("SUBSTRING(origen,-7)", explode(",", $outgoing_premium["numeros"]));
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -18,6 +18,7 @@
 ); ?>
  
     <div class="modal-header" style="background-color:#428bca">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Crear Prefijo</h4>
     </div>
     

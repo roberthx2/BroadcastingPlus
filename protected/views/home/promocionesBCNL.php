@@ -218,6 +218,7 @@ function visibleCancelarBCNL($data)
 ); ?>
  
     <div class="modal-header" style="background-color:#428bca">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Confirmar Promoción</h4>
     </div>
  
@@ -233,6 +234,7 @@ function visibleCancelarBCNL($data)
 ); ?>
  
     <div class="modal-header" style="background-color:#d2322d">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancelar Promoción</h4>
     </div>
  

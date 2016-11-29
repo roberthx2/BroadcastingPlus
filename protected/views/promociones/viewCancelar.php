@@ -37,7 +37,7 @@ $this->widget(
     <?php $this->widget(
         'booster.widgets.TbButton',
         array(
-            'label' => 'Close',
+            'label' => 'Cerrar',
             'url' => '#',
             'htmlOptions' => array('data-dismiss' => 'modal'),
         )

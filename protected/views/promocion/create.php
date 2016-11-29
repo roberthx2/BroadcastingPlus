@@ -212,11 +212,12 @@
 							'defaultTime' => date("H:i"),
 							'showMeridian' => false,
 							'showSeconds' => false,
+							'minuteStep' => 1,
 						),
 						'wrapperHtmlOptions' => array(
 							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
 						),
-						'htmlOptions' => array( 'readonly'=>true, 'style'=>'background-color: white;'),
+						'htmlOptions' => array( 'readonly'=>false, 'style'=>'background-color: white;'),
 					),
 					//'hint' => 'Nice bootstrap time picker',
 				)
@@ -233,11 +234,12 @@
 							'defaultTime' => date('H:i' , strtotime('+1 hours', strtotime(date("H:i")))),
 							'showMeridian' => false,
 							'showSeconds' => false,
+							'minuteStep' => 1,
 						),
 						'wrapperHtmlOptions' => array(
 							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
 						),
-						'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
+						'htmlOptions' => array('readonly'=>false, 'style'=>'background-color: white;'),
 					),
 					//'hint' => 'Nice bootstrap time picker',
 				)

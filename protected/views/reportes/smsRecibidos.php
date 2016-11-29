@@ -15,7 +15,7 @@ $active = true;
 
 if (Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcp)
 {
-    $modelBCP = new Smsin('searchMensualSmsPorCodigo');
+    $modelBCP = new Smsin('searchSmsRecibidosBCP');
     $modelBCP->unsetAttributes();
     
     if(isset($_GET['Smsin']))
