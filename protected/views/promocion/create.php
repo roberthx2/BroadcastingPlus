@@ -348,27 +348,12 @@
 			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
 	            <div align="center" style="padding: 30px 0 0px 0px;">
 				<?php
-	                echo $this->renderPartial('/btl/index',false,true);
+					$model_btl = new BtlForm;
+	               	$this->renderPartial('btl', array("model"=>$model_btl));
 	            ?>
 	            </div>
-	            <div id="numerosBTLDiv" style="display: none;" >
-	                <?php 
-	                echo $form->textAreaGroup(
-							$model,
-							'btl',
-							array(
-								'wrapperHtmlOptions' => array(
-									//'class' => 'col-sm-5',
-								),
-								'widgetOptions' => array(
-									'htmlOptions' => array('rows' => 5, 'onKeyPress' => 'return processKeydown(event);'),
-								)
-							)
-						); 
-	                ?>
-	            </div>
 			</div>
-		<?php }*/	?>
+		<?php }	*/?>
 	</div>
 
 	</fieldset>
@@ -396,6 +381,20 @@
 		$this->endWidget();
 		unset($form);
 	?>
+
+	<?php
+		//Visible si tiene permisos al modulo de btl
+		if (Yii::app()->user->getPermisos()->modulo_btl)
+		{ ?>
+			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
+	            <div align="center" style="padding: 30px 0 0px 0px;">
+				<?php
+					$model_btl = new Btl;
+	               	$this->renderPartial('btl', array("model"=>$model_btl));
+	            ?>
+	            </div>
+			</div>
+		<?php }	?>
 
 <script type="text/javascript">
 	$(document).ready(function() 
