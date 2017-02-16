@@ -233,3 +233,15 @@ function insertarPrefijo()
         $("#PromocionForm_mensaje").val(mensaje);
     }
 }
+
+function defaultOperadoraBTL()
+{
+    $("#Btl_all_operadoras").prop('checked', true);
+    $("#Btl_all_operadoras").prop('disabled', false);
+    $("#Btl_operadoras").prop('disabled', true);
+}
+
+function checkedOperadoraBTL()
+{
+    $("#Btl_operadoras").prop('disabled', function(i, v) { return !v; });
+}

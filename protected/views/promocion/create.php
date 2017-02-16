@@ -28,7 +28,7 @@
 	 
 	<fieldset>
  
-	<legend>Crear Promoción</legend>
+	<legend>Crear Promoción </legend>
 
 	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
@@ -359,7 +359,7 @@
 	</fieldset>
 	<br><br>
 	<div id="div_botones" class="form-actions col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
-		<center>
+
 		<?php $this->widget(
 			'booster.widgets.TbButton',
 			array(
@@ -369,22 +369,29 @@
 				'htmlOptions' => array(),
 			)
 		); ?>
+<?php
+		$this->endWidget();
+		unset($form);
+	?>
+		<?php
+		//Visible si tiene permisos al modulo de btl
+		if (Yii::app()->user->getPermisos()->modulo_btl)
+		{
+			$model_btl = new Btl;
+           	$this->renderPartial('btl', array("model"=>$model_btl));
+        }	?>
 
-		<?php /*$this->widget(
-			'booster.widgets.TbButton',
-			array('buttonType' => 'reset', 'label' => 'Reset')
-		); */?>
-		</center>
+		
 	</div>
 
 	<?php
-		$this->endWidget();
-		unset($form);
+		/*$this->endWidget();
+		unset($form);*/
 	?>
 
 	<?php
 		//Visible si tiene permisos al modulo de btl
-		if (Yii::app()->user->getPermisos()->modulo_btl)
+		/*if (Yii::app()->user->getPermisos()->modulo_btl)
 		{ ?>
 			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
 	            <div align="center" style="padding: 30px 0 0px 0px;">
@@ -394,7 +401,7 @@
 	            ?>
 	            </div>
 			</div>
-		<?php }	?>
+		<?php }*/	?>
 
 <script type="text/javascript">
 	$(document).ready(function() 

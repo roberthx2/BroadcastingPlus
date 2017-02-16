@@ -7,7 +7,7 @@
             'context' => 'dafault',
             'label' => 'Números BTL',
             'icon' => 'glyphicon glyphicon-plus',
-            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6', 'data-toggle' => 'modal', 'data-target' => '#modalBTL'),
+            'htmlOptions' => array('class'=>'col-xs-6 col-sm-6 col-md-6 col-lg-6', 'data-toggle' => 'modal', 'data-target' => '#modalBTL'),
         )
     ); 
 ?>
@@ -127,7 +127,7 @@
             
             beforeSend: function()
             {
-               $("#divModalBTL").html("me estoy enviando");
+               //$("#divModalBTL").html("me estoy enviando");
             },
             complete: function()
             {
@@ -135,7 +135,11 @@
             },
             success: function(data)
             {
+                $("#modalBTL").find(".modal-dialog").addClass("modal-lg");
+                $("#modalBTL").find(".modal-title").text('Datos de BTL');
                 $("#divModalBTL").html(data);
+                $("#modal_footer_btl").html("");
+                //$( "#modal_footer_btl" ).remove();
             },
             error: function()
             {

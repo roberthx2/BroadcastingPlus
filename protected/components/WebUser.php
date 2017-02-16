@@ -38,6 +38,18 @@ class WebUser extends CWebUser
         return $this->_model;
     }
 
+    public function getCadenaSc()
+    {
+        $model = $this->modelSMS();
+        return Yii::app()->Funciones->limpiarNumerosTexarea($model->cadena_sc);
+    }
+
+    public function getCadenaServicios()
+    {
+        $model = $this->modelSMS();
+        return Yii::app()->Funciones->limpiarNumerosTexarea($model->cadena_serv);
+    }
+
     /*public function getAccesosBCP()
     {
         $this->_model = AccesosBcp::model()->findByPk(Yii::app()->user->id);

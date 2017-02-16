@@ -129,3 +129,27 @@
 	color: black;
     text-decoration: none;
 }
+
+@media (max-width: 400px) { 
+    #Btl_productos {
+        height: 100px; 
+    }
+}
+
+@media (min-width: 401px) and (max-width: 768px){ 
+    #Btl_productos {
+        height: 300px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px){ 
+    #Btl_productos {
+        height: 330px; 
+    }
+}
+
+@media (min-width: 992px){ 
+    #Btl_productos {
+        height: 350px;
+    }
+}
