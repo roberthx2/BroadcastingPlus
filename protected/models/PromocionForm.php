@@ -17,6 +17,17 @@ Class PromocionForm extends CFormModel
 	public $puertos;
 	public $all_puertos;
 
+	/*BTL*/
+
+	public $sc;
+	public $productos;
+	public $fecha_inicio;
+	public $fecha_fin;
+	public $operadoras;
+	public $all_operadoras;
+
+	public $desc_producto; //Solo se usa para saber que productos fueron seleccionados en el formulario
+
 	public function rules()
 	{
 		return array(
@@ -26,8 +37,8 @@ Class PromocionForm extends CFormModel
 			array('nombre', 'length', 'max'=>25),
 			array('mensaje', 'length', 'max'=>158),
 			//Safe
-			array("prefijo, puertos, destinatarios, listas, btl", "safe"),
-			array('all_puertos', 'boolean'),
+			array("prefijo, puertos, destinatarios, listas, btl, sc, productos, fecha_inicio, fecha_fin, operadoras, desc_producto", "safe"),
+			array('all_puertos, all_operadoras', 'boolean'),
 			array('fecha', 'date', 'format'=>'yyyy-M-d'),
 			//Filter
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
@@ -67,6 +78,7 @@ Class PromocionForm extends CFormModel
 			'puertos' => 'Puertos',
 			'all_puertos' => 'Todos',
 			'duracion' => 'Duración',
+			'sc' => 'Short Code',
 		);
 	}
 

@@ -227,11 +227,33 @@ function hideShowFormPromocion(tipo)
 
 function insertarPrefijo()
 {
-    if ($("#PromocionForm_prefijo").val() != "")
+    /*if ($("#PromocionForm_prefijo").val() != "")
     {
         var mensaje = "("+$("#PromocionForm_prefijo").val()+") "+$("#PromocionForm_mensaje").val();
         $("#PromocionForm_mensaje").val(mensaje);
+    }*/
+
+    var mensaje = $("#PromocionForm_mensaje").val();
+    var pos = mensaje.indexOf(")");
+
+    if ($("#PromocionForm_prefijo").val() != "")
+        var prefijo_nuevo = "("+$("#PromocionForm_prefijo").val()+") ";
+    else var prefijo_nuevo = "";
+
+    //Existe un prefijo en el sms
+    if (mensaje[0] == "(" && pos != -1 && pos < 10) //El prefijo es de maximo 10 caracteres
+    {
+        var prefijo_anterior = mensaje.substring(0, pos+1);
+        var mensaje = mensaje.replace(prefijo_anterior, prefijo_nuevo);
     }
+    else
+    {
+        var mensaje = prefijo_nuevo + mensaje;
+    }
+
+    mensaje = $.trim(mensaje.replace(/\s{2,}/g, ' '));
+
+    $("#PromocionForm_mensaje").val(mensaje);
 }
 
 function defaultOperadoraBTL()

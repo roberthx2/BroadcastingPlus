@@ -24,7 +24,7 @@
     
     <div align="left" class="modal-body" id="divModalBTL" >
         <?php /** @var TbActiveForm $form */
-            $form = $this->beginWidget(
+            $form_btl = $this->beginWidget(
                 'booster.widgets.TbActiveForm',
                 array(
                     'id' => 'btl-form',
@@ -41,7 +41,7 @@
             ?>
             <div id="respuesta" class="alert alert-success" role="alert" style="display: none;"></div>
             <?php 
-            echo $form->passwordFieldGroup(
+            echo $form_btl->passwordFieldGroup(
                 $model,
                 'password',
                 array(
@@ -61,14 +61,13 @@
             echo CHtml::submitButton('Enviar', array('id' => 'bontonEnviar', 'class'=>'btn btn-success'));
 
             $this->endWidget();
-            unset($form);
+            unset($form_btl);
         ?>
     </div>
  
 <?php $this->endWidget(); ?>
 
 <script type="text/javascript">
-
     function enviar(form, data, hasError)
     {
         if(!hasError)
@@ -123,7 +122,12 @@
         $.ajax({
             url:"<?php echo Yii::app()->createUrl('btl/form'); ?>",
             type:"POST",    
-            data:{},
+            data:{sc: $("#PromocionForm_sc").val(), 
+                  operadoras: $("#PromocionForm_operadoras").val(), 
+                  all_operadoras: $("#PromocionForm_all_operadoras").val(),
+                  fecha_inicio: $("#PromocionForm_fecha_inicio").val(),
+                  fecha_fin: $("#PromocionForm_fecha_fin").val(),
+                  productos: $("#PromocionForm_productos").val()},
             
             beforeSend: function()
             {
@@ -147,6 +151,23 @@
             }
         });
     }
+
+    function sleep(milliseconds) {
+      var start = new Date().getTime();
+      for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+          break;
+        }
+      }
+    }
+
+    $(document).ready(function() 
+    {
+        if ($("#PromocionForm_sc").val() != "")
+        {
+            formulario();
+        }
+    });
 
 </script>
 

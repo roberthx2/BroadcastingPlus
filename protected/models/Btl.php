@@ -16,8 +16,17 @@ Class Btl extends CFormModel
 		return array(
 			// username and password are required
 			array('password', 'required', 'message'=>'{attribute} requerido', 'on'=>'authenticate'),
+			array('sc, fecha_inicio, fecha_fin, productos', 'required', 'message'=>'{attribute} requerido', 'on'=>'validateForm'),
 			// password needs to be authenticated
 			array('password', 'authenticate', 'on'=>'authenticate'),
+			//Safe
+			array("operadoras", "safe"),
+			array('all_operadoras', 'boolean'),
+
+			//Validaciones
+			array('operadoras', 'operadorasSeleccionadas', 'on'=>'validateForm'), //Valida que se seleccione por lo menos una operadora
+			array('fecha_inicio, fecha_fin', 'date', 'format'=>'yyyy-M-d', 'on'=>'validateForm'),
+			array('fecha_inicio, fecha_fin', 'compararFechas', 'on'=>'validateForm'), //Valida que la fecha inicio sea menor que la fecha fin
 		);
 	}
 
@@ -43,6 +52,22 @@ Class Btl extends CFormModel
 			$this->addError($attribute, "La contraseña es incorrecta");
 		}
 	}
+
+	public function compararFechas($attribute, $params)
+    {
+    	if (strtotime($this->fecha_inicio) > strtotime($this->fecha_fin))
+    	{
+    		$this->addError($attribute, "La fecha inicio debe ser mayor que la fecha fin");
+    	}
+    }
+
+    public function operadorasSeleccionadas($attribute, $params)
+    {
+		if (COUNT($this->$attribute) == 0 && $this->all_operadoras == 0)
+		{
+			$this->addError($attribute, "Debe seleccionar una operadora");
+		}
+    }
 }
 
 ?>

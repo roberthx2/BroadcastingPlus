@@ -37,6 +37,7 @@ class PromocionController extends Controller
     public function actionCreate()
     {
         $model = new PromocionForm;
+
         $listas = array();
         $dataTipo = array();
 
@@ -45,7 +46,7 @@ class PromocionController extends Controller
         if(isset($_POST['PromocionForm']))
         {
             $model->attributes=$_POST['PromocionForm'];
-
+            
             if ($model->validate())
             {
                 $transaction = Yii::app()->db->beginTransaction(); //Insignia_masivo
@@ -357,7 +358,7 @@ class PromocionController extends Controller
             }
         }
 
-        $this->render("create", array('model' => $model, 'dataTipo' => $dataTipo, 'listas' => $listas));
+        $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas));
     }
 
     public function actionGetCliente()

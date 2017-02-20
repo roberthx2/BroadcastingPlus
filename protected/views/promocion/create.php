@@ -28,7 +28,7 @@
 	 
 	<fieldset>
  
-	<legend>Crear Promoción </legend>
+	<legend>Crear Promoción</legend>
 
 	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
@@ -340,24 +340,20 @@
 				);
 			} ?>
 		</div>
-
-		<?php
-		//Visible si tiene permisos al modulo de btl
-		/*if (Yii::app()->user->getPermisos()->modulo_btl)
-		{ ?>
-			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
-	            <div align="center" style="padding: 30px 0 0px 0px;">
-				<?php
-					$model_btl = new BtlForm;
-	               	$this->renderPartial('btl', array("model"=>$model_btl));
-	            ?>
-	            </div>
-			</div>
-		<?php }	*/?>
 	</div>
 
 	</fieldset>
 	<br><br>
+
+	<!--BTL-->
+	<?php echo $form->hiddenField($model, 'sc'); ?>
+	<?php echo $form->hiddenField($model, 'operadoras'); ?>
+	<?php echo $form->hiddenField($model, 'all_operadoras'); ?>
+	<?php echo $form->hiddenField($model, 'fecha_inicio'); ?>
+	<?php echo $form->hiddenField($model, 'fecha_fin'); ?>
+	<?php echo $form->hiddenField($model, 'productos'); ?>
+	<?php echo $form->hiddenField($model, 'desc_producto'); ?>
+
 	<div id="div_botones" class="form-actions col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
 
 		<?php $this->widget(
@@ -369,39 +365,21 @@
 				'htmlOptions' => array(),
 			)
 		); ?>
-<?php
-		$this->endWidget();
-		unset($form);
-	?>
+
 		<?php
-		//Visible si tiene permisos al modulo de btl
-		if (Yii::app()->user->getPermisos()->modulo_btl)
-		{
-			$model_btl = new Btl;
-           	$this->renderPartial('btl', array("model"=>$model_btl));
-        }	?>
+			$this->endWidget();
+			unset($form);
+		?>
 
-		
+		<?php
+			//Visible si tiene permisos al modulo de btl
+			if (Yii::app()->user->getPermisos()->modulo_btl)
+			{
+				$model_btl = new Btl;
+	           	$this->renderPartial('btl', array("model"=>$model_btl));
+	        }
+        ?>	
 	</div>
-
-	<?php
-		/*$this->endWidget();
-		unset($form);*/
-	?>
-
-	<?php
-		//Visible si tiene permisos al modulo de btl
-		/*if (Yii::app()->user->getPermisos()->modulo_btl)
-		{ ?>
-			<div id="div_btl" class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
-	            <div align="center" style="padding: 30px 0 0px 0px;">
-				<?php
-					$model_btl = new Btl;
-	               	$this->renderPartial('btl', array("model"=>$model_btl));
-	            ?>
-	            </div>
-			</div>
-		<?php }*/	?>
 
 <script type="text/javascript">
 	$(document).ready(function() 
@@ -432,12 +410,15 @@
 	            {
 	            	if (response.error == "false")
 	                {
+	                	var id_cliente = "<?php echo $model->id_cliente; ?>";
+
 	                    $("#PromocionForm_id_cliente").empty();
 	                    var cliente = response.data;
 	                    $.each(cliente, function(i, value) {
 	                        $("#PromocionForm_id_cliente").append($("<option>").text(value.descripcion).attr("value",value.id_cliente));
 	                    });
 	                    $("#cupo").val(response.cupo);
+	                    $("#PromocionForm_id_cliente option[value='" + id_cliente + "']").prop("selected", true);
 	                    hideShowFormPromocion($("#PromocionForm_tipo").val());
 	                }
 	                else
