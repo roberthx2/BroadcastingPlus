@@ -226,6 +226,14 @@
                         	$("#btl-form div.form-group_"+i).addClass("has-error");
                             $("#Btl_"+i+"_em_").html(value);
                             $("#Btl_"+i+"_em_").show();
+
+                            $("#PromocionForm_sc").val("");
+		                	$("#PromocionForm_operadoras").val("");
+		                	$("#PromocionForm_fecha_inicio").val("");
+		                	$("#PromocionForm_fecha_fin").val("");
+		                	$("#PromocionForm_productos").val("");
+		                	$("#PromocionForm_desc_producto").val("");
+		                	$("#PromocionForm_all_operadoras").val(false);
                         });
                         return;
                     }

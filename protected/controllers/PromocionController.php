@@ -55,12 +55,30 @@ class PromocionController extends Controller
                 try
                 {
                     $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+
                     $cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
                     $url_confirmar = null;
 
                     //BCNL / CPEI
                     if ($model->tipo == 1 || $model->tipo == 2)
                     {
+                        //BTL
+                        if (isset($model->sc) && $model->sc != "")
+                        {
+                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos);
+
+                            //En case de existir numeros obtenidos desde BTL los updateo como validos para que no se aplique ningun filtro
+                            if ($btl_destinatarios != "")
+                            {
+                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
+                                $sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
+
+                                $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                                $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+                                $sql->execute();
+                            }
+                        }
+
                         //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
                         if (isset($model->destinatarios) && $model->destinatarios != "") 
                             Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->destinatarios);
@@ -69,7 +87,7 @@ class PromocionController extends Controller
                         if (isset($model->listas) && COUNT($model->listas) > 0)
                         {
                             $listas_destinatarios = $this->actionGetNumerosListas($model->listas, $model->tipo, null);
-                                //Guarda los numeros de las listas en la tabla de procesamiento
+                            //Guarda los numeros de las listas en la tabla de procesamiento
                             Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $listas_destinatarios);
                         }
 
@@ -209,6 +227,22 @@ class PromocionController extends Controller
                             $alfanumerico = false;
                         else
                             $alfanumerico = true; //En caso de ser alfanumerico
+
+                        //BTL
+                        if (isset($model->sc) && $model->sc != "")
+                        {
+                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos);
+
+                            //En case de existir numeros obtenidos desde BTL los updateo como validos para que no se aplique ningun filtro
+                            if ($btl_destinatarios != "")
+                            {
+                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
+                                $sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
+                                $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                                $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+                                $sql->execute();
+                            }
+                        }
 
                         //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
                         if (isset($model->destinatarios) && $model->destinatarios != "") 

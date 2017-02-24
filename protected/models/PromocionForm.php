@@ -13,7 +13,6 @@ Class PromocionForm extends CFormModel
 	public $duracion;
 	public $destinatarios;
 	public $listas;
-	public $btl;
 	public $puertos;
 	public $all_puertos;
 
@@ -37,8 +36,9 @@ Class PromocionForm extends CFormModel
 			array('nombre', 'length', 'max'=>25),
 			array('mensaje', 'length', 'max'=>158),
 			//Safe
-			array("prefijo, puertos, destinatarios, listas, btl, sc, productos, fecha_inicio, fecha_fin, operadoras, desc_producto", "safe"),
-			array('all_puertos, all_operadoras', 'boolean'),
+			array("prefijo, puertos, destinatarios, listas, sc, productos, fecha_inicio, fecha_fin, operadoras, desc_producto, all_operadoras", "safe"),
+			//array("prefijo, puertos, destinatarios, listas", "safe"),
+			array('all_puertos', 'boolean'),
 			array('fecha', 'date', 'format'=>'yyyy-M-d'),
 			//Filter
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
@@ -56,7 +56,7 @@ Class PromocionForm extends CFormModel
 			array("hora_inicio, hora_fin", "compararHoras"), //Valida que la hora inicio sea menor que la hora fin
 			array("hora_inicio, hora_fin", "horarioPermitido"), //Valida que la hora este en el rango permitido para la carga de promociones
 			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
-			array("destinatarios, listas, btl", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
+			array("destinatarios, listas, sc", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
 			array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
 			
 		);
@@ -74,7 +74,6 @@ Class PromocionForm extends CFormModel
 			'hora_fin' => 'Hora Fin',
 			'destinatarios' => 'Destinatarios',
 			'listas' => 'Listas',
-			'btl' => 'BTL',
 			'puertos' => 'Puertos',
 			'all_puertos' => 'Todos',
 			'duracion' => 'Duración',
@@ -411,11 +410,11 @@ Class PromocionForm extends CFormModel
     public function btlIsset()
     {
     	//Retorna true para no tomarlo en cuenta
-    	if (!isset($this->btl))
+    	if (!isset($this->sc))
     		return true;
-    	if (isset($this->btl) && $this->btl == "")
+    	if (isset($this->sc) && $this->sc == "")
     		return true;
-    	if (isset($this->btl) && $this->btl != "")
+    	if (isset($this->sc) && $this->sc != "")
     		return false;
     }
 }

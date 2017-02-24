@@ -15,7 +15,7 @@ class BtlController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm'),
+                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm', 'getNumeros'),
                 'users' => array('@'),
             ),
 
@@ -199,6 +199,97 @@ class BtlController extends Controller
                 echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
             }
         }
+    }
+
+    public function actionGetNumeros($sc, $operadoras, $all_operadoras, $fecha_inicio, $fecha_fin, $productos)
+    {
+        $numeros_btl = "";
+
+        if ($all_operadoras == 'true')
+            $operadoras_txt = OperadorasRelacion::model()->find(array("select"=>"GROUP_CONCAT(DISTINCT desp_op) AS desp_op"));
+        else 
+            $operadoras_txt = OperadorasRelacion::model()->find(array("select"=>"GROUP_CONCAT(DISTINCT desp_op) AS desp_op", "condition"=>"id_operadora_bcnl IN(".$operadoras.")"));
+
+        $criteria = new CDbCriteria();
+        $criteria->select = " DISTINCT origen";
+        $criteria->addBetweenCondition("data_arrive", $fecha_inicio, $fecha_fin);
+        $criteria->addInCondition("id_producto", explode(",", $productos));
+        $criteria->compare("sc", $sc);
+        $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
+
+        $numeros = Smsin::model()->findAll($criteria);
+        $numeros_array = array();
+
+        foreach ($numeros as $value)
+        {
+            $aux = Yii::app()->Funciones->formatearNumero($value->origen);
+
+            if ($aux != false)
+                $numeros_array[] = $aux;
+        }
+
+        if (COUNT($numeros_array) > 0)
+        {
+           /* $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+            try
+            {*/
+                $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+                $numeros = implode(",", $numeros_array);
+                $id_usuario = Yii::app()->user->id;
+
+                $sql = "SELECT porcentaje_lista FROM control_fe INNER JOIN sc_id ON INSTR(sc_cadena, id_sc) 
+                        WHERE id_usuario = :id_usuario AND sc_id = :sc LIMIT 1";
+
+                $sql = Yii::app()->db_sms->createCommand($sql);
+                $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
+                $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
+                $porcentaje = $sql->queryRow();
+
+                //Guarda los numeros en la tabla de procesamiento
+                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros);
+                //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+                Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+                //Update en estado 4 todos los numeros exentos
+                Yii::app()->Filtros->filtrarExentos($id_proceso);
+                //Update en estado 10 todos los numeros que sobrepasen el porcentaje permitido
+                Yii::app()->Filtros->filtrarPorcentaje($id_proceso, $porcentaje["porcentaje_lista"]);
+                //Updatea a estado = 1 todos los numeros validos 
+                Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+                //Cantidad de destinatarios validos
+                $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+                //En caso de existir numeros validos los obtengo de la tabla temporal
+                print_r($total);
+
+                if ($total > 0)
+                {
+                    $sql = "SELECT numero FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                    $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                    $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+                    $sql = $sql->queryAll();
+
+                    foreach ($sql as $value)
+                    {
+                        $numeros_btl[] = $value["numero"];
+                    }
+
+                    $numeros_btl = implode(",", $numeros_btl);
+                }
+
+                ProcesosActivos::model()->deleteByPk($id_proceso);
+
+                /*$transaction->commit();
+            }
+            catch (Exception $e)
+                {
+                    print_r($e);
+                    $transaction->rollBack();
+                } */
+        }
+
+        return $numeros_btl;
     }
 }
 

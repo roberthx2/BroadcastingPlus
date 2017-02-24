@@ -198,6 +198,41 @@ class Funciones extends CApplicationComponent
 			$color = '#337ab7';
 		return $color;
 	}
+
+	public function formatearNumero($numero)
+	{
+		$numero_tmp = false;
+
+		if (strlen($numero)==10) //Numeros sin cero (416,426,414,424,412)
+		{
+			if (substr($numero, 0, 2) == "41" || substr($numero, 0, 2) == "42")
+			{
+				$numero_tmp = $numero;
+			}
+			else if (substr($numero, 0, 3) == "158") //1581234567
+			{
+				$numero_tmp = "416".substr($numero, 3);
+			}
+			else if (substr($numero, 0, 3) == "199") //1991234567
+			{
+				$numero_tmp = "426".substr($numero, 3);
+			}
+
+		}
+		else if (strlen($numero) > 10)
+		{	//Numeros con cero (0416,0426,0414,0424,0412)
+			if (substr($numero, 0, 3) == "041" || substr($numero, 0, 3) == "042")
+			{
+				$numero_tmp = substr($numero, 1);
+			}
+			else if (substr($numero, 0, 2) == "58")
+			{
+				$numero_tmp = substr($numero, 2);
+			}
+		}
+
+		return $numero_tmp;
+	}
 }
 
 ?>

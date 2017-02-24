@@ -342,6 +342,42 @@ class Filtros extends CApplicationComponent
         	Yii::app()->db_masivo_premium->createCommand($sql)->execute();
         }
 	}
+
+	public function filtrarPorcentaje($id_proceso, $porcentaje)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "id_operadora, COUNT(*) AS buscar";
+		$criteria->compare("id_proceso", $id_proceso);
+		$criteria->group = "id_operadora";
+
+		$model = TmpProcesamiento::model()->findAll($criteria);
+
+		foreach ($model as $value)
+		{
+			$limite_inferior = floor($value->buscar * $porcentaje);
+
+			$sql = "SELECT id FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND id_operadora = ".$value->id_operadora." LIMIT ".$limite_inferior.", 999999";
+
+			$sql = Yii::app()->db_masivo_premium->createCommand($sql);
+	    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+	    	$sql = $sql->queryAll();
+
+	    	$ids = array();
+
+	    	foreach ($sql as $value)
+	        {
+	            $ids[] = $value["id"];
+	        }
+	        
+	        $ids = implode(",", $ids);
+
+	    	if ($ids != "")
+			{
+				$sql = "UPDATE tmp_procesamiento SET estado = 10 WHERE id IN(".$ids.")";
+				Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+			}
+		}
+	}
 }
 
 ?>

@@ -8,6 +8,7 @@
  * @property integer $id_operadora_bcp
  * @property string $prefijo
  * @property string $descripcion
+ * @property string $desp_op
  */
 class OperadorasRelacion extends CActiveRecord
 {
@@ -32,10 +33,10 @@ class OperadorasRelacion extends CActiveRecord
 			array('id_operadora_bcnl, id_operadora_bcp, prefijo, descripcion', 'required'),
 			array('id_operadora_bcnl, id_operadora_bcp', 'numerical', 'integerOnly'=>true),
 			array('prefijo', 'length', 'max'=>4),
-			array('descripcion', 'length', 'max'=>15),
+			array('descripcion, desp_op', 'length', 'max'=>15),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_operadora_bcnl, id_operadora_bcp, prefijo, descripcion', 'safe', 'on'=>'search'),
+			array('id_operadora_bcnl, id_operadora_bcp, prefijo, descripcion, desp_op', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -60,6 +61,7 @@ class OperadorasRelacion extends CActiveRecord
 			'id_operadora_bcp' => 'Id Operadora Bcp',
 			'prefijo' => 'Prefijo',
 			'descripcion' => 'Descripcion',
+			'desp_op' => 'Desp Op',
 		);
 	}
 
@@ -85,6 +87,7 @@ class OperadorasRelacion extends CActiveRecord
 		$criteria->compare('id_operadora_bcp',$this->id_operadora_bcp);
 		$criteria->compare('prefijo',$this->prefijo,true);
 		$criteria->compare('descripcion',$this->descripcion,true);
+		$criteria->compare('desp_op',$this->desp_op,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
