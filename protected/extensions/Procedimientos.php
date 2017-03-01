@@ -17,6 +17,7 @@ class Procedimientos extends CApplicationComponent
 				$model = new ProcesosActivos;
 				$model->id_proceso = $proceso;
 				$model->hora = date("H:i:s");
+				$model->fecha = date("Y-m-d");
 				$model->save();
 				$valido = false;
 			}

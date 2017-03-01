@@ -264,17 +264,22 @@ class PromocionesPremium extends CActiveRecord
 		if ($this->ano == "")
 			$this->ano = date("Y");
 
+		$ids_promo = "null";
+
 		$criteria=new CDbCriteria;
 
 		$sql = "SELECT GROUP_CONCAT(id_promo) AS id FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
 		$id_promo = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+		if ($id_promo["id"] != "")
+			$ids_promo = $id_promo["id"];
 
 		$sql = "SELECT id AS id, sc, SUM(total) AS total, SUM(enviados) AS enviados FROM (
 					SELECT p.sc, p.id_promo AS id,
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 					FROM promociones_premium p
-					WHERE p.id_promo IN(".$id_promo["id"].")  
+					WHERE p.id_promo IN(".$ids_promo.")  
 					GROUP BY p.sc, p.id_promo) AS tabla
 					GROUP BY sc";
 		

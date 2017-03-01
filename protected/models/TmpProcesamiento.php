@@ -9,6 +9,8 @@
  * @property string $numero
  * @property integer $id_operadora
  * @property integer $estado
+ * @property integer $numero_btl
+ * @property string $id_insignia_alarmas
  * @property integer $id_promo
  * @property string $mensaje
  * @property string $fecha_inicio
@@ -43,13 +45,14 @@ class TmpProcesamiento extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_proceso, numero', 'required'),
-			array('id_proceso, id_operadora, estado, id_promo', 'numerical', 'integerOnly'=>true),
+			array('id_proceso, id_operadora, estado, numero_btl, id_promo', 'numerical', 'integerOnly'=>true),
 			array('numero', 'length', 'max'=>10),
+			array('id_insignia_alarmas', 'length', 'max'=>100),
 			array('mensaje', 'length', 'max'=>160),
 			array('fecha_inicio, fecha_fin, hora_inicio, hora_fin', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_proceso, numero, id_operadora, estado, id_promo, mensaje, fecha_inicio, fecha_fin, hora_inicio, hora_fin', 'safe', 'on'=>'search'),
+			array('id, id_proceso, numero, id_operadora, estado, numero_btl, id_insignia_alarmas, id_promo, mensaje, fecha_inicio, fecha_fin, hora_inicio, hora_fin', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -76,6 +79,8 @@ class TmpProcesamiento extends CActiveRecord
 			'numero' => 'Numero',
 			'id_operadora' => 'Id Operadora',
 			'estado' => 'Estado',
+			'numero_btl' => 'Numero Btl',
+			'id_insignia_alarmas' => 'Id Insignia Alarmas',
 			'id_promo' => 'Id Promo',
 			'mensaje' => 'Mensaje',
 			'fecha_inicio' => 'Fecha Inicio',
@@ -108,6 +113,8 @@ class TmpProcesamiento extends CActiveRecord
 		$criteria->compare('numero',$this->numero,true);
 		$criteria->compare('id_operadora',$this->id_operadora);
 		$criteria->compare('estado',$this->estado);
+		$criteria->compare('numero_btl',$this->numero_btl);
+		$criteria->compare('id_insignia_alarmas',$this->id_insignia_alarmas,true);
 		$criteria->compare('id_promo',$this->id_promo);
 		$criteria->compare('mensaje',$this->mensaje,true);
 		$criteria->compare('fecha_inicio',$this->fecha_inicio,true);

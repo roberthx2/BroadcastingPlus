@@ -142,7 +142,7 @@ class Filtros extends CApplicationComponent
 		$sql = "SELECT GROUP_CONCAT(CONCAT('^', SUBSTRING(e.numero, 2)) SEPARATOR '|') AS regexp_ex FROM exentos e WHERE LENGTH(numero) < 11";
         $regexp_exentos = Yii::app()->db->createCommand($sql)->queryRow();
 
-        $sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND ( numero REGEXP ('".$regexp_exentos['regexp_ex']."') OR numero IN (SELECT SUBSTRING(numero, 2) AS numero FROM insignia_masivo.exentos WHERE LENGTH(numero) = 11) )";
+        $sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND ( numero REGEXP ('".$regexp_exentos['regexp_ex']."') OR numero IN (SELECT SUBSTRING(numero, 2) AS numero FROM insignia_masivo.exentos WHERE LENGTH(numero) = 11) )";
         $sql = Yii::app()->db_masivo_premium->createCommand($sql);
     	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
     	$id = $sql->queryRow();
@@ -183,14 +183,14 @@ class Filtros extends CApplicationComponent
 
 		if ($tipo == 1)
 		{
-			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero)";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero)";
 		}
 		else if ($tipo == 2)
 		{
 			$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidas.") ";
             $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
-			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
 		}
 
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);

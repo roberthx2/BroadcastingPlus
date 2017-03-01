@@ -5,6 +5,8 @@
  *
  * The followings are the available columns in table 'procesos_activos':
  * @property integer $id_proceso
+ * @property string $hora
+ * @property string $fecha
  *
  * The followings are the available model relations:
  * @property TmpProcesamiento[] $tmpProcesamientos
@@ -29,9 +31,10 @@ class ProcesosActivos extends CActiveRecord
 		return array(
 			array('id_proceso', 'required'),
 			array('id_proceso', 'numerical', 'integerOnly'=>true),
+			array('hora, fecha', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_proceso', 'safe', 'on'=>'search'),
+			array('id_proceso, hora, fecha', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -54,6 +57,8 @@ class ProcesosActivos extends CActiveRecord
 	{
 		return array(
 			'id_proceso' => 'Id Proceso',
+			'hora' => 'Hora',
+			'fecha' => 'Fecha',
 		);
 	}
 
@@ -76,6 +81,8 @@ class ProcesosActivos extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id_proceso',$this->id_proceso);
+		$criteria->compare('hora',$this->hora,true);
+		$criteria->compare('fecha',$this->fecha,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

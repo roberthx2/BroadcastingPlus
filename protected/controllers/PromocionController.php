@@ -71,7 +71,8 @@ class PromocionController extends Controller
                             if ($btl_destinatarios != "")
                             {
                                 Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
-                                $sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
+                                //Marco los numeros que vienen de BTL para no aplicar el filtro segun sea el caso
+                                $sql = "UPDATE tmp_procesamiento SET numero_btl = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
 
                                 $sql = Yii::app()->db_masivo_premium->createCommand($sql);
                                 $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
@@ -106,7 +107,7 @@ class PromocionController extends Controller
                             Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 1, null);
                         }
 
-                        //Update en estado 8 todos los numeros exentos
+                        //Update en estado 8 todos los numeros que sobrepasen el porcentaje permitido por operadora
                         Yii::app()->Filtros->filtrarPorcentajeOperadora($id_proceso, $model->id_cliente);
                         
                         //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
@@ -237,7 +238,8 @@ class PromocionController extends Controller
                             if ($btl_destinatarios != "")
                             {
                                 Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
-                                $sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
+                                //Marco los numeros que vienen de BTL para no aplicar el filtro segun sea el caso
+                                $sql = "UPDATE tmp_procesamiento SET numero_btl = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
                                 $sql = Yii::app()->db_masivo_premium->createCommand($sql);
                                 $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
                                 $sql->execute();
