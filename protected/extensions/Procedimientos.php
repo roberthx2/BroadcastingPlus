@@ -227,6 +227,23 @@ class Procedimientos extends CApplicationComponent
 		$model->estado = 0;
 		$model->save();
 	}
+
+	public function getNumerosValidosPorOperadoraBCP($id_proceso)
+    {
+        $sql = "SELECT o.descripcion, id_operadora_bcnl, SUM(cantidad) AS total FROM operadoras_relacion o "
+                . "INNER JOIN ("
+                    . "SELECT id_operadora, COUNT(*) AS cantidad FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." GROUP BY id_operadora"
+                . ") p ON o.id_operadora_bcp = p.id_operadora "
+                . " GROUP BY o.id_operadora_bcnl";
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+        
+        foreach($sql as $value)
+        {
+            $objeto[$value["id_operadora_bcnl"]] = array("nombre"=>$value["descripcion"], "total"=>$value["total"]);
+        }
+        
+        return $objeto;
+    }
 }
 
 ?>

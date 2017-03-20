@@ -233,6 +233,12 @@ class Funciones extends CApplicationComponent
 
 		return $numero_tmp;
 	}
+
+	public function actionGetNombreDia($dia)
+    {
+        $array = array(0=>'domingo', 1=>'lunes', 2=>'martes', 3=>'miercoles', 4=>'jueves', 5=>'viernes', 6=>'sabado');
+        return $array[$dia];
+    }
 }
 
 ?>

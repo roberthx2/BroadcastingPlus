@@ -16,6 +16,8 @@
  * @property string $fecha_cargada
  * @property string $hora_cargada
  * @property integer $verificada
+ * @property integer $total_sms
+ * @property integer $id_operadora
  */
 class PromocionesPremium extends CActiveRecord
 {
@@ -46,7 +48,7 @@ class PromocionesPremium extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('nombrePromo, id_cliente, estado, fecha, hora, loaded_by, contenido, fecha_cargada, hora_cargada', 'required'),
-			array('verificada', 'numerical', 'integerOnly'=>true),
+			array('verificada, total_sms, id_operadora', 'numerical', 'integerOnly'=>true),
 			array('nombrePromo', 'length', 'max'=>100),
 			array('id_cliente', 'length', 'max'=>45),
 			array('sc, estado, loaded_by', 'length', 'max'=>10),
@@ -87,6 +89,8 @@ class PromocionesPremium extends CActiveRecord
 			'hora_cargada' => 'Hora Cargada',
 			'verificada' => 'Verificada',
 			'ano' => 'Año',
+			'total_sms' => 'Total Sms',
+			'id_operadora' => 'Id Operadora',
 		);
 	}
 
@@ -120,6 +124,8 @@ class PromocionesPremium extends CActiveRecord
 		$criteria->compare('fecha_cargada',$this->fecha_cargada,true);
 		$criteria->compare('hora_cargada',$this->hora_cargada,true);
 		$criteria->compare('verificada',$this->verificada);
+		$criteria->compare('total_sms',$this->total_sms);
+		$criteria->compare('id_operadora',$this->id_operadora);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
