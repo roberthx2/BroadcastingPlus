@@ -15,4 +15,26 @@ foreach ($_SESSION["timeslot"] as $value)
 }
 
 echo $mensaje;
+
+print_r("<br><br>");
 ?>
+
+<?php $this->widget(
+    'booster.widgets.TbButton',
+    array(
+        'label' => 'Volver',
+        'url' => '#',
+        'htmlOptions' => array('data-dismiss' => 'modal'),
+    )
+); ?>
+
+<?php $this->widget(
+    'booster.widgets.TbButton',
+    array(
+        'context' => 'success',
+        'label' => 'Crear Promoción',
+        'buttonType' =>'link',
+        'icon' => 'glyphicon glyphicon-ok',
+        'url' => Yii::app()->controller->createUrl("promocion/generarPromocionBCP", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot, "alfanumerico"=>$alfanumerico)),
+    )
+); ?>

@@ -203,6 +203,7 @@ Class PromocionForm extends CFormModel
 		else if ($this->tipo == 3) //BCP
 		{
 	    	$cliente_alarmas = ClienteAlarmas::model()->find("id =? ", array($this->id_cliente));
+	    	$sc = Yii::app()->Procedimientos->getScNumerico($this->id_cliente);
 
 	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($cliente_alarmas->id_cliente_sms))
 	    	{
@@ -211,11 +212,11 @@ Class PromocionForm extends CFormModel
 
 		        $mensaje = strtoupper(substr($this->$attribute, 0, $caracteres["valor"]));
 
-		        $tam_sc = strlen($cliente_alarmas->sc);
+		        $tam_sc = strlen($sc);
 
-		        preg_match_all('/[0-9]{'.$tam_sc.'}|[A-Za-z]{'.$tam_sc.'}/', $mensaje, $mensaje_partes);
+		        preg_match_all('/[0-9]{'.$tam_sc.'}/', $mensaje, $mensaje_partes);
 
-		        if (!in_array($cliente_alarmas->sc, $mensaje_partes[0]))
+		        if (!in_array($sc, $mensaje_partes[0]))
 		        {
 		            $this->addError($attribute, "El mensaje debe incluir el Short Code seleccionado en los primeros ".$caracteres["valor"]." caracteres");
 		        }

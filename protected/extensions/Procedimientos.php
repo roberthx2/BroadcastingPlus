@@ -230,9 +230,11 @@ class Procedimientos extends CApplicationComponent
 
 	public function getNumerosValidosPorOperadoraBCP($id_proceso)
     {
+    	$objeto = array();
+
         $sql = "SELECT o.descripcion, id_operadora_bcnl, SUM(cantidad) AS total FROM operadoras_relacion o "
                 . "INNER JOIN ("
-                    . "SELECT id_operadora, COUNT(*) AS cantidad FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." GROUP BY id_operadora"
+                    . "SELECT id_operadora, COUNT(*) AS cantidad FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1 GROUP BY id_operadora"
                 . ") p ON o.id_operadora_bcp = p.id_operadora "
                 . " GROUP BY o.id_operadora_bcnl";
         $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
@@ -243,6 +245,18 @@ class Procedimientos extends CApplicationComponent
         }
         
         return $objeto;
+    }
+
+    public function getScNumerico($id_cliente)
+    {
+        $sql = "SELECT CASE 
+                    WHEN c.sc NOT REGEXP '[a-zA-Z]+' 
+                    THEN c.sc 
+                    ELSE (SELECT cc.sc FROM cliente cc WHERE cc.id = c.id_cliente_sc_numerico) END AS sc FROM cliente c 
+                    WHERE c.id = ".$id_cliente;
+        $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+        return $sql["sc"];
     }
 }
 
