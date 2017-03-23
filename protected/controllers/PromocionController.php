@@ -496,9 +496,11 @@ class PromocionController extends Controller
         $evento = $sql->queryRow();
 
         $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $id_operadoras_bcp);
+        
+        $sc_numerico = Yii::app()->Procedimientos->getScNumerico($model->id_cliente);
 
         $model_promocion = new PromocionesPremium;
-        $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $clienteBCP->sc, $model->nombre, $model->fecha);
+        $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $sc_numerico, $model->nombre, $model->fecha);
         $model_promocion->id_cliente = $model->id_cliente;
         $model_promocion->sc = $clienteBCP->sc;
         $model_promocion->estado = 0;
@@ -575,8 +577,6 @@ class PromocionController extends Controller
         $model_cupo_historial->hora = date("H:i:s");
         $model_cupo_historial->tipo_operacion = 3; //Consumido
         $model_cupo_historial->save();
-
-        $sc_numerico = Yii::app()->Procedimientos->getScNumerico($model->id_cliente);
 
         //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
         $sql = "INSERT INTO tmp_numeros_cargados_por_dia (sc, numero, id_operadora, fecha) SELECT ".$sc_numerico.", numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$id_operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
@@ -901,8 +901,8 @@ class PromocionController extends Controller
         $dia_semana = date("w", strtotime($fecha));
         $objeto["timeslot"] = false;
         $objeto["mostrarMensaje"] = false;
-        $hora_ini = date_create($hora_ini)->format('H:i');
-        $hora_fin = date_create($hora_fin)->format('H:i');
+        $hora_ini = date_create($hora_ini)->format('H:i:00');
+        $hora_fin = date_create($hora_fin)->format('H:i:00');
 
         $dia_activo = ConfiguracionReservacionPorDia::model()->COUNT("id_dia=:id_dia AND estado = 1", array(":id_dia"=>$dia_semana));
 
@@ -958,7 +958,10 @@ class PromocionController extends Controller
                 $hora_fin_reservacion = $value["valor"];
         }
         
-        $hora_fin = date("H:i", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
+        $timeslot_actual = $this->actionGetTimeSlot($hora_ini);
+        $hora_ini = $timeslot_actual["hora_ini"];
+
+        $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
         
         $resultado_x_operadora = array();
         $i=0;
@@ -991,7 +994,7 @@ class PromocionController extends Controller
             {
                 if ($this->actionValidarHistorial($fecha, $hora_ini, $id_operadora))
                 {
-                    if (strtotime($hora_fin) > strtotime(date("H:i")))
+                    if (strtotime($hora_fin) > strtotime(date("H:i:00")))
                     {
                         $total_sms_restante = $total_sms - $capacidad_maxima;
 
@@ -1007,12 +1010,12 @@ class PromocionController extends Controller
             }
             else if ($capacidad_maxima === "unlimited")
             {
-                $arreglo[] = array("hora_ini"=>$hora_ini, "hora_fin"=>date("H:i", strtotime ( '+30 minute' , strtotime ( $hora_fin ) )), "total"=>$total_sms);
+                $arreglo[] = array("hora_ini"=>$hora_ini, "hora_fin"=>date("H:i:00", strtotime ( '+30 minute' , strtotime ( $hora_fin ) )), "total"=>$total_sms);
                 $total_sms_restante = 0;
             }
             
             $hora_ini = $hora_fin;
-            $hora_fin = date("H:i", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
+            $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
             return $this->actionGetTimeSlotXoperPrivate($fecha, $hora_ini, $hora_fin, $intervalo, $total_sms_restante, $id_operadora, $hora_fin_reservacion, $arreglo);
         }
     }
@@ -1075,6 +1078,41 @@ class PromocionController extends Controller
         }
         
         return false;
+    }
+
+    private function actionGetTimeSlot($hora_actual)
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "propiedad, valor";
+        $criteria->addInCondition("propiedad", array('intervalo_reservacion', 'hora_inicio_bcp'));
+        $resultado = ConfiguracionSistema::model()->findAll($criteria);
+        
+        foreach ($resultado as $value)
+        {
+            if ($value["propiedad"] == 'intervalo_reservacion')
+                $intervalo = $value["valor"];
+            else if ($value["propiedad"] == 'hora_inicio_bcp')
+                $hora_ini = $value["valor"];
+        }
+        
+        $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
+        return $this->actionGetTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
+    }
+    
+    private function actionGetTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo)
+    {
+        if ( strtotime($hora_actual) >= strtotime($hora_ini) && strtotime($hora_actual) < strtotime($hora_fin) )
+        {
+            $objeto = array("hora_ini"=>$hora_ini, "hora_fin"=>$hora_fin);
+            return $objeto;
+        }
+        else
+        {
+            $hora_ini = $hora_fin;
+            $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_fin ) ));
+            return $this->actionGetTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
+        
+        }
     }
 
     public function actionMensajeTimeSlot($id_proceso, $timeslot, $alfanumerico)
