@@ -447,26 +447,24 @@ class PromocionController extends Controller
                     }
                     else
                     {*/
-                        $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
-
                         foreach ($total_x_oper as $key=>$value)
                         {
                             $alfanumerico = $operadoras_bcp[$key][0];
-print_r($alfanumerico);
+
                             if ($alfanumerico == 1) //ALfanumerico
                             {
                                 $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF";
-                                //$model_aux->id_cliente = $clienteBCP->id;
                             }
                             else
                             {
                                 $model_aux->nombre = $model->nombre."_".$value["nombre"];
-                                //$model_aux->id_cliente = $clienteBCP->id_cliente_sc_numerico;
                             }
-print_r($model_aux->nombre);
-                            //$id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $operadora_relacion[$key], 0);
 
-                            //$ids_promo .= ",".$id_promo; 
+                            $model_aux->id_cliente = $this->actionGetIdClienteBCP($model->id_cliente, $model->sc_bcp, $key, $alfanumerico);
+
+                            $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $alfanumerico, 0);
+
+                            $ids_promo .= ",".$id_promo; 
                         }
                         exit;
                    // }
@@ -492,7 +490,7 @@ print_r($model_aux->nombre);
             }
     }
 
-    private function actionRegistrarPromocionBCP($id_proceso, $model, $total_sms, $id_operadora, $id_operadoras_bcp, $limite_ini)
+    private function actionRegistrarPromocionBCP($id_proceso, $model, $total_sms, $id_operadora, $alfanumerico, $limite_ini)
     {
         $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
 
@@ -501,12 +499,27 @@ print_r($model_aux->nombre);
         $sql->bindParam(":id_cliente", $model->id_cliente, PDO::PARAM_INT);
         $evento = $sql->queryRow();
 
-        $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $id_operadoras_bcp);
+        //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
+        $sql = "INSERT INTO tmp_numeros_cargados_por_dia (sc, numero, id_operadora, fecha) SELECT ".$model->sc_bcp.", numero, id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$id_operadora.") LIMIT ".$limite_ini.",".$total_sms;
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+        $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+        $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
+        $sql->execute();
+
+        $sql = "SELECT GROUP_CONCAT(id_operadora_bcp) AS id_operadoras_bcp FROM operadoras_relacion 
+                WHERE id_operadora_bcnl = ".$id_operadora." AND alfanumerico = ".$alfanumerico;
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+        $operadoras_bcp = $sql["id_operadoras_bcp"];
+
+        $this->actionUpdateOperBCP($id_proceso, $operadoras_bcp);
+
+        $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $operadoras_bcp);
         
-        $sc_numerico = Yii::app()->Procedimientos->getScNumerico($model->id_cliente);
+        //$sc_numerico = Yii::app()->Procedimientos->getScNumerico($model->id_cliente);
 
         $model_promocion = new PromocionesPremium;
-        $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $sc_numerico, $model->nombre, $model->fecha);
+        $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $model->sc_bcp, $model->nombre, $model->fecha);
         $model_promocion->id_cliente = $model->id_cliente;
         $model_promocion->sc = $clienteBCP->sc;
         $model_promocion->estado = 0;
@@ -531,8 +544,9 @@ print_r($model_aux->nombre);
         $model_promocion_acciones->id_promo = $id_promo;
         $model_promocion_acciones->save();
 
-        $sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$id_operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
-        
+        $sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
+        print_r($sql."<br><br>");
+
         $sql = Yii::app()->db_masivo_premium->createCommand($sql);
         $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
         $sql->bindParam(":mensaje", $model->mensaje, PDO::PARAM_STR);
@@ -584,19 +598,52 @@ print_r($model_aux->nombre);
         $model_cupo_historial->tipo_operacion = 3; //Consumido
         $model_cupo_historial->save();
 
-        //Guarda todos los numeros cargados para realizar el filtrado en las proximas cargas de promociones
-        $sql = "INSERT INTO tmp_numeros_cargados_por_dia (sc, numero, id_operadora, fecha) SELECT ".$sc_numerico.", numero, CASE id_operadora WHEN 6 THEN 5 ELSE id_operadora END AS id_operadora, :fecha FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$id_operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
-        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
-        $sql->bindParam(":fecha", $model->fecha, PDO::PARAM_STR);
-        $sql->execute();
-
         //$url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
 
         $log = "PROMOCION BCP CREADA | id_promo: ".$id_promo." | id_cliente_sms: ".$clienteBCP->id_cliente_sms." | id_cliente_bcp: ".$model->id_cliente." | Destinatarios: ".$total_sms;
         Yii::app()->Procedimientos->setLog($log);
 
         return $id_promo;
+    }
+
+    private function actionUpdateOperBCP($id_proceso, $operadoras_bcp)
+    {   
+        $criteria = new CDbCriteria;
+        $criteria->select = "id_operadora_bcp AS id_operadora, prefijo";
+        $criteria->addInCondition('id_operadora_bcp', explode(",", $operadoras_bcp));
+
+        $operadoras = OperadorasRelacion::model()->findAll($criteria);
+
+        foreach ($operadoras as $value)
+        {
+            $sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = :id_proceso AND estado = 1 AND numero REGEXP '^".$value["prefijo"]."'";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+            $sql->execute();
+        }
+    }
+
+    private function actionGetIdClienteBCP($id_cliente_sms, $sc, $id_operadora, $alfanumerico)
+    {
+        if (Yii::app()->user->isAdmin())
+        {
+            $sql = "SELECT c.id_cliente_bcp FROM clientes_bcp c "
+                    ." WHERE c.id_cliente_sms = ".$id_cliente_sms." AND c.sc = ".$sc." "
+                    ." AND c.id_operadora = ".$id_operadora." AND c.alfanumerico = ".$alfanumerico;
+        }
+        else
+        {
+            $sql = "SELECT c.id_cliente_bcp FROM usuario_clientes_bcp u "
+                    ." INNER JOIN clientes_bcp c ON u.id_cliente_bcp = c.id "
+                    ." WHERE u.id_usuario = ".Yii::app()->user->id." AND c.id_cliente_sms = ".$id_cliente_sms." "
+                    ." AND c.sc = ".$sc." AND c.id_operadora = ".$id_operadora." AND c.alfanumerico = ".$alfanumerico;
+        }
+
+        $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+        $resultado = ($sql["id_cliente_bcp"] == "") ? "null" : $sql["id_cliente_bcp"];
+
+        return $resultado;
     }
 
     public function actionGetCliente()
@@ -842,9 +889,9 @@ print_r($model_aux->nombre);
         return $nombre_completo;
     }
 
-    protected function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $operadorasPermitidasBCP)
+    protected function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $id_operadoras_bcp)
     {
-        $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".$operadorasPermitidasBCP.")";
+        $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".$id_operadoras_bcp.")";
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
         
         foreach ($sql as $value)
@@ -856,8 +903,8 @@ print_r($model_aux->nombre);
         {
             $sql = "UPDATE tmp_procesamiento SET id_insignia_alarmas = CONCAT('".$descripcion_cliente.$value["prefijo"]."', SUBSTRING(numero,4,7)) WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora = :id_operadora";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-            $sql->bindParam(":id_operadora", $value["id_operadora"], PDO::PARAM_STR);
+            $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+            $sql->bindParam(":id_operadora", $value["id_operadora"], PDO::PARAM_INT);
             $sql->execute();
         }
     }

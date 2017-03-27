@@ -34,13 +34,13 @@ class Filtros extends CApplicationComponent
 		{
 			$sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = :id_proceso AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
 			$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+        	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
         	$sql->execute();
 		}
 
 		$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND id_operadora IS NULL";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
     	$id = $sql->queryRow();
 
     	if ($id["ids"] != "")
