@@ -60,7 +60,7 @@ class WebUser extends CWebUser
     {
         $model = $this->modelSMS();
 
-        if ($model->id_perfil == 2)
+        if ($model->id_perfil == 2 || $model->id_perfil == 1)
             return true;
         return false;
     }     

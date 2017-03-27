@@ -15,6 +15,7 @@ Class PromocionForm extends CFormModel
 	public $listas;
 	public $puertos;
 	public $all_puertos;
+	public $sc_bcp;
 
 	/*BTL*/
 
@@ -36,7 +37,7 @@ Class PromocionForm extends CFormModel
 			array('nombre', 'length', 'max'=>25),
 			array('mensaje', 'length', 'max'=>158),
 			//Safe
-			array("prefijo, puertos, destinatarios, listas, sc, productos, fecha_inicio, fecha_fin, operadoras, desc_producto, all_operadoras", "safe"),
+			array("prefijo, puertos, destinatarios, listas, sc, productos, fecha_inicio, fecha_fin, operadoras, desc_producto, all_operadoras, sc_bcp", "safe"),
 			//array("prefijo, puertos, destinatarios, listas", "safe"),
 			array('all_puertos', 'boolean'),
 			array('fecha', 'date', 'format'=>'yyyy-M-d'),
@@ -58,6 +59,7 @@ Class PromocionForm extends CFormModel
 			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
 			array("destinatarios, listas, sc", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
 			array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
+			array("sc_bcp", "validarScBCP"),
 			
 		);
 	}
@@ -78,6 +80,7 @@ Class PromocionForm extends CFormModel
 			'all_puertos' => 'Todos',
 			'duracion' => 'Duración',
 			'sc' => 'Short Code',
+			'sc_bcp' => 'Short Code',
 		);
 	}
 
@@ -120,18 +123,34 @@ Class PromocionForm extends CFormModel
 		}
 		else if ($this->tipo == 3) //BCP
 		{
-			$cliente_alarmas = ClienteAlarmas::model()->find("id =? ", array($this->id_cliente));
+			$criteria = new CDbCriteria;
+            $criteria->select = "DISTINCT descripcion";
+            $criteria->group = "id_operadora_bcnl";
+            $operadoras = OperadorasRelacion::model()->findAll($criteria);
+
 			$criteria = new CDbCriteria;
 			$criteria->select = "SUBSTRING(iniciales_cliente, 1, 4) AS iniciales_cliente";
-			$criteria->compare("id_cliente", $cliente_alarmas->id_cliente_sms);
+			$criteria->compare("id_cliente", $this->id_cliente);
 			$cliente = ClienteSms::model()->find($criteria);
-			$nombre_completo = strtoupper(str_replace(" ", "_", str_replace("-", "", $this->fecha)."_BCP_".$cliente->iniciales_cliente."_".$cliente_alarmas->sc."_".$this->$attribute));
 
-			$model = PromocionesPremium::model()->find("fecha =? AND id_cliente =? AND nombrePromo =?", array($this->fecha, $this->id_cliente, $nombre_completo));
+			foreach ($operadoras as $value)
+			{
+				$nombre_completo = preg_replace('/_{2,}/', "_",strtoupper(str_replace(" ", "_", str_replace("-", "", $this->fecha)."_BCP_".$cliente->iniciales_cliente."_".$this->sc_bcp."_".$this->$attribute)))."_".$value->descripcion;
+
+				$criteria = new CDbCriteria;
+				$criteria->select = "id_promo";
+				$criteria->condition = "t.fecha = '".$this->fecha."'";
+				$criteria->condition .= " AND (t.nombrePromo LIKE '".$nombre_completo."%') ";
+				$model = PromocionesPremium::model()->find($criteria);
+
+				if($model != null)
+				{
+					$this->addError($attribute, "El nombre de la promoción ya existe");
+					break;	
+				}
+			}
+			
 		}
-		
-		if($model != null)
-			$this->addError($attribute, "El nombre de la promoción ya existe");	
 	}
 
 	public function spam($attribute, $params)
@@ -202,21 +221,18 @@ Class PromocionForm extends CFormModel
 		}
 		else if ($this->tipo == 3) //BCP
 		{
-	    	$cliente_alarmas = ClienteAlarmas::model()->find("id =? ", array($this->id_cliente));
-	    	$sc = Yii::app()->Procedimientos->getScNumerico($this->id_cliente);
-
-	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($cliente_alarmas->id_cliente_sms))
+	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($this->id_cliente))
 	    	{
 		        $sql = "SELECT valor FROM configuracion_sistema WHERE propiedad = 'sc_en_n_caracteres'";
 		        $caracteres = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
 		        $mensaje = strtoupper(substr($this->$attribute, 0, $caracteres["valor"]));
 
-		        $tam_sc = strlen($sc);
+		        $tam_sc = strlen($this->sc_bcp);
 
 		        preg_match_all('/[0-9]{'.$tam_sc.'}/', $mensaje, $mensaje_partes);
 
-		        if (!in_array($sc, $mensaje_partes[0]))
+		        if (!in_array($this->sc_bcp, $mensaje_partes[0]))
 		        {
 		            $this->addError($attribute, "El mensaje debe incluir el Short Code seleccionado en los primeros ".$caracteres["valor"]." caracteres");
 		        }
@@ -232,7 +248,7 @@ Class PromocionForm extends CFormModel
 	    	{
 	    		$sql = "SELECT GROUP_CONCAT(cadena_sc) AS cadena_sc FROM usuario WHERE id_cliente = :id_cliente";
 	    		$sql = Yii::app()->db_sms->createCommand($sql);
-        		$sql->bindParam(":id_cliente", $this->id_cliente, PDO::PARAM_STR);
+        		$sql->bindParam(":id_cliente", $this->id_cliente, PDO::PARAM_INT);
         		$cadena_sc = $sql->queryRow();
 
         		$cadena_sc = trim(preg_replace('/,{2,}/', ",", $cadena_sc["cadena_sc"]), ",");
@@ -268,13 +284,11 @@ Class PromocionForm extends CFormModel
 	    }
 	    else if ($this->tipo == 3) //BCP
 		{
-	    	$cliente_alarmas = ClienteAlarmas::model()->find("id =? ", array($this->id_cliente));
-
-	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($cliente_alarmas->id_cliente_sms))
+	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($this->id_cliente))
 	    	{
-		        preg_match_all('/\d{3,}/', $this->$attribute, $mensaje_partes);
+		        preg_match_all('/\d{6,}/', $this->$attribute, $mensaje_partes);
 		        $mensaje_partes = array_unique($mensaje_partes[0]);
-		        $posicion = array_search($cliente_alarmas->sc, $mensaje_partes);
+		        $posicion = array_search($this->sc_bcp, $mensaje_partes);
 		       
 		        if ($posicion ==! 'false')
 		        {
@@ -417,6 +431,17 @@ Class PromocionForm extends CFormModel
     		return true;
     	if (isset($this->sc) && $this->sc != "")
     		return false;
+    }
+
+    public function validarScBCP($attribute, $params)
+    {
+    	if ($this->tipo == 3)
+    	{
+    		if ($this->$attribute == null || $this->$attribute == "")
+	    	{
+	    		$this->addError($attribute, "No ha seleccionado ningún short code");
+	    	}		
+    	}
     }
 }
 ?>

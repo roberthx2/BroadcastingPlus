@@ -58,10 +58,13 @@
                                     });
                                     $("#cupo").val(response.cupo);
                                     hideShowFormPromocion($("#PromocionForm_tipo").val());
+                                    getScBCP();
                                 }
                                 else
                                 {
                                     $("#'.CHTML::activeId($model,'id_cliente').'").empty();
+                                    $("#'.CHTML::activeId($model,'sc_bcp').'").empty();
+                                    $("#div_sc_oper").html("");
                                     hideShowFormPromocion($("#PromocionForm_tipo").val());
                                     console.log(response.status);
                                 }
@@ -85,13 +88,78 @@
 					'widgetOptions' => array(
 						//'data' => test(),
 						//'value' => 'null',
-						'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+						'htmlOptions' => array('prompt' => 'Seleccionar...',
+						'ajax' => array(
+	                        'type'=>'POST', //request type
+	                        'dataType' => 'json',
+	                        'url'=>Yii::app()->createUrl('/promocion/getScBCP'), //url to call.
+	                        'data' => array('id_cliente' => 'js:$("#PromocionForm_id_cliente").val()', 'tipo' => 'js:$("#PromocionForm_tipo").val()'),
+	                        'success' => 'function(response){
+	                                if (response.error == "false")
+	                                {
+	                                    $("#'.CHTML::activeId($model,'sc_bcp').'").empty();
+	                                    var sc = response.data;
+	                                    $.each(sc, function(i, value) {
+	                                        $("#'.CHTML::activeId($model,'sc_bcp').'").append($("<option>").text(value.sc).attr("value",value.sc));
+	                                    });
+	                                    getScOperadorasBCP();
+	                                }
+	                                else
+	                                {
+	                                    $("#'.CHTML::activeId($model,'sc_bcp').'").empty();
+	                                    console.log(response.status);
+	                                }
+	                            }'
+	                		),
+						),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
 				)
 			); ?>
 			<div style="float: right; font: bold 13px Arial;"><strong>Cupo disponible:</strong>
 				<?php echo CHTML::textField('cupo','',array('size'=>4 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
+		</div>
+
+		<div id="div_id_sc" style="display:none;">
+			<?php echo $form->dropDownListGroup(
+				$model,
+				'sc_bcp',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+						'style'=>'display: none;',
+					),
+					'widgetOptions' => array(
+						//'data' => test(),
+						//'value' => 'null',
+						'htmlOptions' => array('prompt' => 'Seleccionar...',
+						'ajax' => array(
+	                        'type'=>'POST', //request type
+	                        'dataType' => 'json',
+	                        'url'=>Yii::app()->createUrl('/promocion/getScOperadorasBCP'), //url to call.
+	                        'data' => array('id_cliente' => 'js:$("#PromocionForm_id_cliente").val()', 'sc' => 'js:$("#PromocionForm_sc_bcp").val()'),
+	                        'success' => 'function(response){
+	                                if (response.error == "false")
+	                                {
+	                                    $("#div_sc_oper").html("");
+	                                    var radios = response.data;
+	                                    $("#div_sc_oper").html(radios);
+	                                }
+	                                else
+	                                {
+	                                    $("#div_sc_oper").html(response.status);
+	                                    console.log(response.status);
+	                                }
+	                            }'
+	                		),
+	                	), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'hint' => 'Short Code desde el cual será enviado el SMS por operadora',
+					'prepend' => '<i class="glyphicon glyphicon-tags"></i>',
+				)
+			); ?>
+
+			<div id="div_sc_oper" style="display:block;">	</div>
 		</div>
 
 		<div class="clearfix visible-xs-block"></div>
@@ -419,13 +487,17 @@
 	                    });
 	                    $("#cupo").val(response.cupo);
 	                    $("#PromocionForm_id_cliente option[value='" + id_cliente + "']").prop("selected", true);
+
 	                    hideShowFormPromocion($("#PromocionForm_tipo").val());
+	                    getScBCP();
 	                }
 	                else
 	                {
+	                	$("#PromocionForm_sc_bcp").empty();
+                        $("#div_sc_oper").html("");
 	                    $("#PromocionForm_id_cliente").empty();
 	                    hideShowFormPromocion($("#PromocionForm_tipo").val());
-	                    console.log(response.status);
+	                    //console.log(response.status);
 	                }
 	            },
 	            error: function()
@@ -435,5 +507,84 @@
 	        });
 	    }
 	});
+
+	function getScBCP()
+	{
+		$.ajax({
+            url: "<?php echo Yii::app()->createUrl('/promocion/getScBCP'); ?>",
+            type: "POST",
+            dataType: 'json',    
+            data:{id_cliente:$("#PromocionForm_id_cliente").val(), tipo:$("#PromocionForm_tipo").val()},
+            
+            complete: function()
+            {
+                
+            },
+            success: function(response)
+            {
+                if (response.error == "false")
+                {
+                    $("#PromocionForm_sc_bcp").empty();
+                    var sc = response.data;
+                    $.each(sc, function(i, value) {
+                        $("#PromocionForm_sc_bcp").append($("<option>").text(value.sc).attr("value",value.sc));
+                    });
+
+                    var sc = "<?php echo $model->sc_bcp; ?>";
+                    $("#PromocionForm_sc_bcp option[value='" + sc + "']").prop("selected", true);
+                    getScOperadorasBCP();
+                }
+                else
+                {
+                    $("#PromocionForm_sc_bcp").empty();
+                    //console.log(response.status);
+                }
+            },
+            error: function()
+            {
+                alert("Ocurrio un error al cargar los short codes del cliente");
+            }
+        });
+	}
+
+	function getScOperadorasBCP()
+	{
+		$.ajax({
+            url: "<?php echo Yii::app()->createUrl('/promocion/getScOperadorasBCP'); ?>",
+            type: "POST",
+            dataType: 'json',    
+            data:{id_cliente:$("#PromocionForm_id_cliente").val(), sc:$("#PromocionForm_sc_bcp").val()},
+            
+            complete: function()
+            {
+                
+            },
+            success: function(response)
+            {
+                if (response.error == "false")
+                {
+                    $("#div_sc_oper").html("");
+                    var radios = response.data;
+                    $("#div_sc_oper").html(radios);
+
+                	var operadoras_bcp = <?php echo json_encode($operadoras_bcp);?>;
+
+                	$.each(operadoras_bcp, function(i, value) {
+                    	$('.operadoras_bcp_'+i).filter('[value="'+ value +'"]').click();
+                	});
+                	//console.log(operadoras_bcp);
+                }
+                else
+                {
+                    $("#div_sc_oper").html(response.status);
+                    //console.log(response.status);
+                }
+            },
+            error: function()
+            {
+                alert("Ocurrio un error al cargar los short codes del cliente");
+            }
+        });
+	}
 
 </script>

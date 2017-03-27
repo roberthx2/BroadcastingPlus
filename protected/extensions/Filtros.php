@@ -12,7 +12,8 @@ class Filtros extends CApplicationComponent
 		return OperadorasRelacion::model()->findAll($criteria);
 	}
 
-	private function getOperadorasBCP($digitel_alf)
+	//COMENTADO POR CAMBIO DE VERSION
+	/*private function getOperadorasBCP($digitel_alf)
 	{
 		if ($digitel_alf)
 			$digitel = 5;
@@ -25,22 +26,6 @@ class Filtros extends CApplicationComponent
 		$criteria->params = array(":id_operadora_bcp"=>$digitel);
 
 		return OperadorasRelacion::model()->findAll($criteria);
-	}
-
-	/*private function updateOperadoraTblProcesamiento($id_proceso, $operadoras)
-	{
-		foreach ($operadoras as $value)
-		{
-			$sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = :id_proceso AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
-			$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-        	$sql->execute();
-		}
-
-		$sql = "UPDATE tmp_procesamiento SET estado = 2 WHERE id_proceso = :id_proceso AND id_operadora IS NULL";
-		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-    	$sql->execute();
 	}*/
 
 	private function updateOperadoraTblProcesamiento($id_proceso, $operadoras)
@@ -66,19 +51,9 @@ class Filtros extends CApplicationComponent
 	}
 
 	//$tipo = 1 (BCNL) / 2 (BCP).... $alfanumerico (DIGITEL) = true / false
-	public function filtrarInvalidosPorOperadora($id_proceso, $tipo, $alfnumerico)
+	public function filtrarInvalidosPorOperadora($id_proceso)
 	{
-		//TIPO = 1 BCNL
-		//TIPO = 2 BCP
-
-		if ($tipo == 1)
-		{
-			$operadoras = $this->getOperadorasBCNL();
-		} 
-		else if ($tipo == 2)
-		{
-			$operadoras = $this->getOperadorasBCP($alfnumerico);
-		}
+		$operadoras = $this->getOperadorasBCNL();
 
 		$this->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
 	}
@@ -93,7 +68,7 @@ class Filtros extends CApplicationComponent
 				HAVING total > 0";
 
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
     	$model = $sql->queryAll();
 				
 		foreach ($model as $value)
@@ -107,7 +82,7 @@ class Filtros extends CApplicationComponent
 	{
 		$sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
     	$sql->execute();
 	}
 
@@ -115,7 +90,7 @@ class Filtros extends CApplicationComponent
 	{
 		$sql = "UPDATE tmp_procesamiento SET estado = 6 WHERE id_proceso = :id_proceso AND estado IS NULL AND id_operadora NOT IN (".$operadorasPermitidas.")";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
     	$sql->execute();	
 	}
 
@@ -125,17 +100,6 @@ class Filtros extends CApplicationComponent
 
 		$this->fltrarExentosF2($id_proceso);
 	}
-
-	/*private function fltrarExentosF2($id_proceso)
-	{
-		$sql = "SELECT GROUP_CONCAT(CONCAT('^', SUBSTRING(e.numero, 2)) SEPARATOR '|') AS regexp_ex FROM exentos e WHERE LENGTH(numero) < 11";
-        $regexp_exentos = Yii::app()->db->createCommand($sql)->queryRow();
-
-        $sql = "UPDATE tmp_procesamiento SET estado = 4 WHERE id_proceso = :id_proceso AND estado IS NULL AND ( numero REGEXP ('".$regexp_exentos['regexp_ex']."') OR numero IN (SELECT SUBSTRING(numero, 2) AS numero FROM insignia_masivo.exentos WHERE LENGTH(numero) = 11) )";
-        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-    	$sql->execute();
-	}*/
 
 	private function fltrarExentosF2($id_proceso)
 	{
@@ -154,28 +118,6 @@ class Filtros extends CApplicationComponent
 		}
 	}
 
-	/*public function filtrarSmsXNumero($id_proceso, $tipo, $operadorasPermitidas)
-	{
-		//TIPO = 1 BCNL / CPEI
-		//TIPO = 2 BCP
-
-		if ($tipo == 1)
-		{
-			$sql = "UPDATE tmp_procesamiento SET estado = 5 WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp)";
-		}
-		else if ($tipo == 2)
-		{
-			$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidas.") ";
-            $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-
-			$sql = "UPDATE tmp_procesamiento SET estado = 5 WHERE id_proceso = :id_proceso AND estado IS NULL AND numero NOT IN (SELECT numero FROM smsxnumero_temp WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
-		}
-
-		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-		$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-		$sql->execute();
-	}*/
-
 	public function filtrarSmsXNumero($id_proceso, $tipo, $operadorasPermitidas)
 	{
 		//TIPO = 1 BCNL / CPEI
@@ -187,14 +129,11 @@ class Filtros extends CApplicationComponent
 		}
 		else if ($tipo == 2)
 		{
-			$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidas.") ";
-            $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-
-			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero WHERE id_operadora IN(".$operadoras["id_operadora"]."))";
+			$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND numero NOT IN (SELECT numero FROM tmp_smsxnumero WHERE id_operadora IN(".$operadorasPermitidas."))";
 		}
 
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-		$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+		$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
 		$id = $sql->queryRow();
 
 		if ($id["ids"] != "")
@@ -203,37 +142,6 @@ class Filtros extends CApplicationComponent
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 		}
 	}
-
-	/*public function filtrarPorCargaDiaria($id_proceso, $fecha, $operadorasPermitidas)
-	{
-		//Obtengo el numero del dia de la semana para la fecha en que sera enviada la promocion
-        $dia_semana = date("w", strtotime($fecha));
-
-        //Reemplaza el id de digitel alfanumerico por el id de digitel numerico
-        $id_operadoras = str_replace("6", "5", $operadorasPermitidas);
-
-        $sql = "SELECT cantidad FROM configuracion_sms_por_dia WHERE id_dia = ".$dia_semana;
-        $cant_sms = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-
-        //Obtengo la cadena de numeros cargados para el dia en que se enviara la promocion.
-        //Solo los numeros cuya operadora este permitida para el envio y que exedan el maximo permitido por dia.
-        $sql = "SELECT GROUP_CONCAT(numero) AS numeros FROM ("
-                . "SELECT numero FROM numeros_cargados_por_dia_temp "
-                . "WHERE fecha = '".$fecha."'  AND id_operadora IN(".$id_operadoras.") "
-                . "GROUP BY numero HAVING COUNT(id) >= ".$cant_sms["cantidad"].") AS tabla";
-        $numeros_cargados = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-
-        //En caso de ser la primera promocion no existiran numeros para el dia
-        if ($numeros_cargados["numeros"] != "") 
-        {
-            $numeros_cargados = '"'.str_replace(',', '","', $numeros_cargados["numeros"]).'"';
-            
-            $sql = "UPDATE tmp_procesamiento SET estado = 9 WHERE id_proceso = :id_proceso AND estado IS NULL AND numero IN (".$numeros_cargados.")";
-            $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-			$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
-			$sql->execute();
-        }	
-	}*/
 
 	public function filtrarPorCargaDiaria($id_proceso, $fecha, $operadorasPermitidas)
 	{

@@ -35,6 +35,6 @@ print_r("<br><br>");
         'label' => 'Crear Promoción',
         'buttonType' =>'link',
         'icon' => 'glyphicon glyphicon-ok',
-        'url' => Yii::app()->controller->createUrl("promocion/generarPromocionBCP", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot, "alfanumerico"=>$alfanumerico)),
+        'url' => Yii::app()->controller->createUrl("promocion/generarPromocionBCP", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot)),
     )
 ); ?>

@@ -15,7 +15,7 @@ class PromocionController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('create', 'getCliente', 'reporteCreate', 'confirmarBCP', 'confirmarBCNL', 'verDetalles', 'mensajeTimeSlot', 'generarPromocionBCP', 'timeSlot2'),
+                'actions' => array('create', 'getCliente', 'getScBCP', 'getScOperadorasBCP', 'reporteCreate', 'confirmarBCP', 'confirmarBCNL', 'verDetalles', 'mensajeTimeSlot', 'generarPromocionBCP', 'timeSlot2'),
                 'users' => array('@'),
             ),
 
@@ -40,12 +40,16 @@ class PromocionController extends Controller
 
         $listas = array();
         $dataTipo = array();
+        $operadoras_bcp = array();
 
         $this->performAjaxValidation($model);
 
         if(isset($_POST['PromocionForm']))
         {
             $model->attributes=$_POST['PromocionForm'];
+
+            if (isset($_POST['operadoras_bcp']))
+                $operadoras_bcp=$_POST['operadoras_bcp'];
             
             if ($model->validate())
             {
@@ -93,7 +97,7 @@ class PromocionController extends Controller
                         }
 
                         //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
 
                         //Updatea en estado 3 todos los números duplicados
                         Yii::app()->Filtros->filtrarDuplicados($id_proceso);
@@ -220,15 +224,9 @@ class PromocionController extends Controller
                     //BCP
                     if ($model->tipo == 3)
                     {
-                        $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
                         $cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
 
-                        if(is_numeric($clienteBCP->sc))
-                            $alfanumerico = false;
-                        else
-                            $alfanumerico = true; //En caso de ser alfanumerico
-
-                        $operadorasPermitidasBCP = $this->actionGetOperadorasPermitidasBCP(Yii::app()->user->id, $model->id_cliente, $alfanumerico);
+                        $operadorasPermitidasBCP = $this->actionGetOperadorasPermitidasBCP($model->id_cliente, $model->sc_bcp);
 
                         //BTL
                         if (isset($model->sc) && $model->sc != "")
@@ -260,7 +258,7 @@ class PromocionController extends Controller
                         }
 
                         //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 2, $alfanumerico);
+                        Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
 
                         //Updatea en estado 3 todos los números duplicados
                         Yii::app()->Filtros->filtrarDuplicados($id_proceso);
@@ -278,6 +276,7 @@ class PromocionController extends Controller
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
                             Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
+                            ////////////REVISAR FILTRO LUEGO DE CREAR LA PROMOCION///////****************
                         }
 
                         //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
@@ -298,9 +297,11 @@ class PromocionController extends Controller
                     if ($model->tipo == 3) //BCP
                     {
                         $_SESSION["model"] = $model;
+                        $_SESSION["operadoras_bcp"] = $operadoras_bcp;
+
                         if ($objeto_timeslot["timeslot"] && $objeto_timeslot["mostrarMensaje"])
-                           $this->redirect(array("mensajeTimeSlot", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"], "alfanumerico"=>$alfanumerico));
-                        else $this->redirect(array("generarPromocionBCP", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"], "alfanumerico"=>$alfanumerico));
+                           $this->redirect(array("mensajeTimeSlot", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
+                        else $this->redirect(array("generarPromocionBCP", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
                     }
                     else //BCNL/CPEI
                         $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
@@ -333,10 +334,10 @@ class PromocionController extends Controller
             }
         }
 
-        $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas));
+        $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas, 'operadoras_bcp'=>$operadoras_bcp));
     }
 
-    public function actionGenerarPromocionBCP($id_proceso, $timeslot, $alfanumerico)
+    public function actionGenerarPromocionBCP($id_proceso, $timeslot)
     {
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
@@ -349,7 +350,9 @@ class PromocionController extends Controller
             $model = clone $_SESSION["model"];
             $model_aux = new PromocionForm;
             $model_aux = clone $model;
+            $operadoras_bcp = $_SESSION["operadoras_bcp"];
             //unset($_SESSION["model"]);
+            //unset($_SESSION["operadoras_bcp"]);
             //print_r("<br><br>");
 
             //En caso de existir numeros validos procedo a crear la promocion
@@ -382,7 +385,7 @@ class PromocionController extends Controller
                                 $j=1;
                                 foreach ($value["resultado"] as $key)
                                 {
-                                    $model_aux->nombre = $model->nombre."_".$j."_".$value["nombre"];
+                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_".$j;
                                     $model_aux->hora_inicio = $key["hora_ini"];
                                     $model_aux->hora_fin = $key["hora_fin"];
                                     
@@ -405,7 +408,7 @@ class PromocionController extends Controller
                                 {
                                     if ($value["id_operadora"] == 4) //ALfanumerico Digitel
                                     {
-                                        $model_aux->nombre = $model->nombre."_".$j."_".$value["nombre"]."_ALF";
+                                        $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF"."_".$j;
                                         $model_aux->id_cliente = $clienteBCP->id;
                                     }
                                     else
@@ -433,7 +436,7 @@ class PromocionController extends Controller
                 }
                 else
                 {
-                    if(!$alfanumerico)
+                    /*if(!$alfanumerico)
                     {
                         foreach ($total_x_oper as $key=>$value)
                         {
@@ -443,27 +446,30 @@ class PromocionController extends Controller
                         }
                     }
                     else
-                    {
+                    {*/
                         $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
 
                         foreach ($total_x_oper as $key=>$value)
                         {
-                            if ($key == 4) //ALfanumerico Digitel
+                            $alfanumerico = $operadoras_bcp[$key][0];
+print_r($alfanumerico);
+                            if ($alfanumerico == 1) //ALfanumerico
                             {
                                 $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF";
-                                $model_aux->id_cliente = $clienteBCP->id;
+                                //$model_aux->id_cliente = $clienteBCP->id;
                             }
                             else
                             {
                                 $model_aux->nombre = $model->nombre."_".$value["nombre"];
-                                $model_aux->id_cliente = $clienteBCP->id_cliente_sc_numerico;
+                                //$model_aux->id_cliente = $clienteBCP->id_cliente_sc_numerico;
                             }
+print_r($model_aux->nombre);
+                            //$id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $operadora_relacion[$key], 0);
 
-                            $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $operadora_relacion[$key], 0);
-
-                            $ids_promo .= ",".$id_promo; 
+                            //$ids_promo .= ",".$id_promo; 
                         }
-                    }
+                        exit;
+                   // }
                 }
 
                 $id_promo = trim($ids_promo, ",");
@@ -659,45 +665,130 @@ class PromocionController extends Controller
         
     }
 
-    protected function actionGetOperadorasPermitidasBCP($id_usuario, $id_cliente, $alfanumerico)
+    public function actionGetScBCP()
     {
-        if ($alfanumerico)
-        {
-            $sql = "SELECT id FROM cliente WHERE id = (SELECT id_cliente_sc_numerico FROM cliente WHERE id = ".$id_cliente.") AND onoff = 1";
-            $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+        $id_cliente = Yii::app()->request->getParam('id_cliente');
+        $tipo = Yii::app()->request->getParam('tipo');
 
-            if($sql)
-                $id_cliente .= ",".$sql["id"];
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if ($tipo == 3) //BCP
+            {
+                $data = Yii::app()->Procedimientos->getScClienteBCP($id_cliente);
+
+                if($data)
+                {
+                    echo CJSON::encode(array(
+                                            'error' => 'false',
+                                            'status' => 'SC obtenidos correctamente',
+                                            'data' => $data
+                                       )                                
+                         );
+                    Yii::app()->end();
+                } else {
+                    echo CJSON::encode(array(
+                        'error' => 'true',
+                        'status' => 'No posee sc asociado'
+                    ));
+                    Yii::app()->end();
+                }
+            }
+            else
+            {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => 'No posee sc asociado'
+                ));
+                Yii::app()->end();
+            }
+        }
+    }
+
+    public function actionGetScOperadorasBCP()
+    {
+        $id_cliente = Yii::app()->request->getParam('id_cliente');
+        $sc = Yii::app()->request->getParam('sc');
+        
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            $data = Yii::app()->Procedimientos->getScOperadorasBCP($id_cliente, $sc);
+
+            if($data)
+            {
+                $criteria = new CDbCriteria;
+                $criteria->select = "id_operadora_bcnl, descripcion";
+                $criteria->group = "id_operadora_bcnl";
+                $resultado = OperadorasRelacion::model()->findAll($criteria);
+
+                foreach ($resultado as $value)
+                {
+                    $operadora_relacion[$value["id_operadora_bcnl"]] = $value["descripcion"];
+                }
+
+                $resultado = "";
+                $radios = "<table>";
+
+                foreach ($data as $value)
+                {
+                    $resultado[$value["id_operadora"]][] = array("sc"=>$value["sc"], "alfanumerico"=>$value["alfanumerico"]);
+                }
+
+                foreach ($resultado as $id_operadora => $value)
+                {
+                    $radios .= "<tr><td style='padding: 3px 10px 3px 10px; color: ".Yii::app()->Funciones->getColorOperadoraBCNL($id_operadora).";'><strong>".$operadora_relacion[$id_operadora]."</strong></td><td style='padding: 3px 10px 3px 10px'>";
+
+                    $checked = "checked";
+
+                    foreach ($value as $key)
+                    {
+                        $radios .= "<input type='radio' class='operadoras_bcp_".$id_operadora."' name='operadoras_bcp[".$id_operadora."][]' ".$checked." value='".$key["alfanumerico"]."'> ".$key["sc"]." ";
+                        $checked = "";
+                    }
+
+                    $radios .= "</td></tr>";
+                }
+                $radios .= "</table>";
+
+                echo CJSON::encode(array(
+                                        'error' => 'false',
+                                        'status' => 'operadoras obtenidas correctamente',
+                                        'data' => $radios
+                                   )                                
+                     );
+                Yii::app()->end();
+            } else {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => '<font color="#a94442">No posee operadoras asociadas</font>'
+                ));
+                Yii::app()->end();
+            }
+        }
+    }
+
+    protected function actionGetOperadorasPermitidasBCP($id_cliente_sms, $sc)
+    {
+        if (Yii::app()->user->isAdmin())
+        {
+            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM clientes_bcp cb 
+                    INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+                    WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
+        }
+        else
+        {
+            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM usuario_clientes_bcp uc
+                    INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+                    INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+                    WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
         }
 
-        $sql = "SELECT * FROM usuario_cliente_operadora WHERE id_usuario = :id_usuario AND id_cliente IN(".$id_cliente.")";
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
-        $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
-        $sql = $sql->queryAll();
+        $sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
+        $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
 
-        foreach ($sql as $oper)
-        {
-            if ($oper["movistar"] == 1) //Movistar
-            {
-                $operadoras[] = 1; //0414
-                $operadoras[] = 2; //0424
-            }
-            if ($oper["movilnet"] == 1) //Movilnet
-            {
-                $operadoras[] = 3; //0416
-                $operadoras[] = 4; //0426
-            }
-            if ($oper["digitel"] == 1) //Digitel
-            {
-                $operadoras[] = 5; //0412
-            }
-            if($oper["digitel_alfanumerico"] == 1) //Digitel alfanumerico
-            {
-                $operadoras[] = 6; //SC alfanumerico
-            }
-        }
+        $sql = $sql->queryRow();
 
-        $operadoras = implode(",",$operadoras);
+        $operadoras = ($sql["id_operadora"] == "") ? "0" : $sql["id_operadora"];
 
         return $operadoras;
     }
@@ -707,18 +798,14 @@ class PromocionController extends Controller
         if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
         {
             $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") ";
-            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
         }
 
         else if ($tipo == 3) //BCP
         {
-            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora_bcnl) AS id_operadora FROM operadoras_relacion WHERE id_operadora_bcp IN(".$operadorasPermitidasBCP.") ";
-            $operadorasPermitidas = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-
-            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND id_operadora IN(".$operadorasPermitidas["id_operadora"].")";
-
-            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND id_operadora IN(".$operadorasPermitidasBCP.")";
         }
+
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
         return $sql["numeros"];   
     }
@@ -1115,9 +1202,9 @@ class PromocionController extends Controller
         }
     }
 
-    public function actionMensajeTimeSlot($id_proceso, $timeslot, $alfanumerico)
+    public function actionMensajeTimeSlot($id_proceso, $timeslot)
     {
-        $this->render("timeSlot", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot, "alfanumerico"=>$alfanumerico));
+        $this->render("timeSlot", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot));
     }
 
     public function actionTimeSlot2()

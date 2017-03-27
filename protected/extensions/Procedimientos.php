@@ -71,15 +71,20 @@ class Procedimientos extends CApplicationComponent
 	}
 
 	public function getClientesBCP($id_usuario)
-	{
-		$sql = "SELECT c.id AS id_cliente, REPLACE(c.descripcion, '@', '') AS descripcion FROM usuario_cliente_operadora u "
-                . "INNER JOIN cliente c ON u.id_cliente = c.id "
-                . "WHERE u.id_usuario = :id_usuario AND c.onoff = 1 "
-                . "ORDER BY c.descripcion ASC";
-        $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
-        $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_STR);
+	{   
+        $sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente_sms) AS ids_clientes FROM clientes_bcp "
+        		. "WHERE id_cliente_sms IN (".$this->getClienteBCNLHerencia($id_usuario).")";
+       	$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
-        return $sql->queryAll();
+       	$ids_clientes = ($sql["ids_clientes"] == "") ? "null" : $sql["ids_clientes"];
+        
+		$sql = "SELECT c.id_cliente AS id_cliente, c.Des_cliente AS descripcion FROM cliente c "
+				. "WHERE c.id_cliente IN (".$ids_clientes.") " 
+				. "ORDER BY c.Des_cliente ASC";        
+
+        $model = Yii::app()->db_sms->createCommand($sql)->queryAll();
+
+        return $model;
 	}
 
 	public function getClienteBCNLHerencia($id_usuario)
@@ -164,6 +169,53 @@ class Procedimientos extends CApplicationComponent
         return implode(",", $ids_usuarios);
 	}
 
+	public function getScClienteBCP($id_cliente_sms)
+	{
+		if (Yii::app()->user->isAdmin())
+		{
+			$sql = "SELECT DISTINCT c.sc FROM clientes_bcp cb 
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+				WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.onoff = 1"; 
+		}
+		else
+		{
+			$sql = "SELECT DISTINCT c.sc FROM usuario_clientes_bcp uc
+				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+				WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+        $sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
+        $sql = $sql->queryAll();
+
+        return $sql;
+	}
+
+	public function getScOperadorasBCP($id_cliente_sms, $sc)
+	{
+		if (Yii::app()->user->isAdmin())
+		{
+			$sql = "SELECT c.sc, id_operadora, alfanumerico FROM clientes_bcp cb 
+					INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+					WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
+		}
+		else
+		{
+			$sql = "SELECT c.sc, id_operadora, alfanumerico FROM usuario_clientes_bcp uc
+					INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+					INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+					WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+        $sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
+        $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
+        $sql = $sql->queryAll();
+
+        return $sql;
+	}
+
 	public function clienteIsHipicoLotero($id_cliente)
 	{
 		$sql = "SELECT COUNT(*) t FROM clientes_tipos AS t, clientes_etiquetas AS e 
@@ -232,11 +284,12 @@ class Procedimientos extends CApplicationComponent
     {
     	$objeto = array();
 
-        $sql = "SELECT o.descripcion, id_operadora_bcnl, SUM(cantidad) AS total FROM operadoras_relacion o "
+        $sql = "SELECT o.descripcion, id_operadora_bcnl, COUNT(id) AS total FROM tmp_procesamiento t "
                 . "INNER JOIN ("
-                    . "SELECT id_operadora, COUNT(*) AS cantidad FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1 GROUP BY id_operadora"
-                . ") p ON o.id_operadora_bcp = p.id_operadora "
-                . " GROUP BY o.id_operadora_bcnl";
+                    . "SELECT descripcion, id_operadora_bcnl FROM operadoras_relacion GROUP BY id_operadora_bcnl"
+                . ") o ON o.id_operadora_bcnl = t.id_operadora "
+                . "WHERE t.id_proceso = ".$id_proceso." AND t.estado = 1 "
+                . "GROUP BY t.id_operadora";
         $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
         
         foreach($sql as $value)

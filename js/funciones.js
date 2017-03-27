@@ -169,6 +169,7 @@ function hideShowFormPromocion(tipo)
         $("#div_listas").show();
         $("#div_btl").show();
         $("#div_botones").show();
+        $("#div_id_sc").hide();
     }
     //CPEI
     else if (tipo == 2)
@@ -188,6 +189,7 @@ function hideShowFormPromocion(tipo)
         $("#div_listas").show();
         $("#div_btl").show();
         $("#div_botones").show();
+        $("#div_id_sc").hide();
     }
     //BCP
     else if (tipo == 3)
@@ -205,6 +207,7 @@ function hideShowFormPromocion(tipo)
         $("#div_listas").show();
         $("#div_btl").show();
         $("#div_botones").show();
+        $("#div_id_sc").show();
     }
     //Desconocido
     else
@@ -222,6 +225,7 @@ function hideShowFormPromocion(tipo)
         $("#div_listas").hide();
         $("#div_btl").hide();
         $("#div_botones").hide();
+        $("#div_id_sc").hide();
     }
 }
 
