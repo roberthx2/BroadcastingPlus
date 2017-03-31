@@ -143,13 +143,10 @@ class Filtros extends CApplicationComponent
 		}
 	}
 
-	public function filtrarPorCargaDiaria($id_proceso, $fecha, $operadorasPermitidas)
+	public function filtrarPorCargaDiaria($id_proceso, $sc, $fecha, $operadorasPermitidas)
 	{
 		//Obtengo el numero del dia de la semana para la fecha en que sera enviada la promocion
         $dia_semana = date("w", strtotime($fecha));
-
-        //Reemplaza el id de digitel alfanumerico por el id de digitel numerico
-        $id_operadoras = str_replace("6", "5", $operadorasPermitidas);
 
         $sql = "SELECT cantidad FROM configuracion_sms_por_dia WHERE id_dia = ".$dia_semana;
         $cant_sms = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
@@ -158,7 +155,7 @@ class Filtros extends CApplicationComponent
         //Solo los numeros cuya operadora este permitida para el envio y que exedan el maximo permitido por dia.
         $sql = "SELECT GROUP_CONCAT(numero) AS numeros FROM ("
                 . "SELECT numero FROM tmp_numeros_cargados_por_dia "
-                . "WHERE fecha = '".$fecha."'  AND id_operadora IN(".$id_operadoras.") "
+                . "WHERE fecha = '".$fecha."' AND sc = ".$sc." AND id_operadora IN(".$operadorasPermitidas.") "
                 . "GROUP BY numero HAVING COUNT(id) >= ".$cant_sms["cantidad"].") AS tabla";
         $numeros_cargados = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
@@ -169,7 +166,7 @@ class Filtros extends CApplicationComponent
             
             $sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero IN (".$numeros_cargados.")";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-			$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+			$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
 			$id = $sql->queryRow();
         }
 

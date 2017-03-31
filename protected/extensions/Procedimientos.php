@@ -87,6 +87,27 @@ class Procedimientos extends CApplicationComponent
         return $model;
 	}
 
+	public function getClienteBCPHostgator()
+	{
+		if (Yii::app()->user->isAdmin())
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT id) AS id_clientes FROM cliente"; 
+		}
+		else
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT cb.id_cliente_bcp) AS id_clientes FROM usuario_clientes_bcp uc
+				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+				WHERE uc.id_usuario = ".Yii::app()->user->id." AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+		$resultado = ($sql["id_clientes"] == "") ? "null" : $sql["id_clientes"];
+
+        return $resultado;
+	}
+
 	public function getClienteBCNLHerencia($id_usuario)
 	{
 		$model_sms = UsuarioSms::model()->findByPk($id_usuario);
@@ -310,6 +331,80 @@ class Procedimientos extends CApplicationComponent
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
         return $sql["sc"];
+    }
+
+    public function getIntervalMinute()
+    {
+        $dia_semana = date("w", strtotime(date("Y-m-d")));
+        $hora_ini = date("H:i:s");
+        $interval_minute["interval_minute"] = 1;
+        $interval_minute["hora_ini"] = date("H:i");
+        $interval_minute["hora_fin"] = date('H:i' , strtotime('+1 hours', strtotime(date("H:i"))));
+
+        $dia_activo = ConfiguracionReservacionPorDia::model()->COUNT("id_dia=:id_dia AND estado = 1", array(":id_dia"=>$dia_semana));
+
+        if ($dia_activo > 0)
+        {
+            $criteria = new CDbCriteria;
+            $criteria->select = "propiedad, valor";
+            $criteria->addInCondition("propiedad", array('intervalo_reservacion', 'hora_inicio_bcp', 'hora_fin_reservacion'));
+            $resultado = ConfiguracionSistema::model()->findAll($criteria);
+
+            foreach ($resultado as $value)
+            {
+                if ($value["propiedad"] == 'intervalo_reservacion')
+                    $intervalo_reservacion = $value["valor"];
+                else if ($value["propiedad"] == 'hora_inicio_bcp')
+                    $hora_ini_reservacion = $value["valor"];
+                else if ($value["propiedad"] == 'hora_fin_reservacion')
+                    $hora_fin_reservacion = $value["valor"];
+            }
+            
+            if ( strtotime($hora_ini) >= strtotime($hora_ini_reservacion) && strtotime($hora_ini) <= strtotime($hora_fin_reservacion) ) 
+            {
+				$interval_minute["interval_minute"] = (int)$intervalo_reservacion;
+				$resultado = $this->getTimeSlot($hora_ini);
+				$interval_minute["hora_ini"] = $resultado["hora_ini"];
+				$interval_minute["hora_fin"] = $resultado["hora_fin"];
+            } 
+        }
+
+        return $interval_minute;
+    }
+
+    public function getTimeSlot($hora_actual)
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "propiedad, valor";
+        $criteria->addInCondition("propiedad", array('intervalo_reservacion', 'hora_inicio_bcp'));
+        $resultado = ConfiguracionSistema::model()->findAll($criteria);
+        
+        foreach ($resultado as $value)
+        {
+            if ($value["propiedad"] == 'intervalo_reservacion')
+                $intervalo = $value["valor"];
+            else if ($value["propiedad"] == 'hora_inicio_bcp')
+                $hora_ini = $value["valor"];
+        }
+        
+        $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
+        return $this->getTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
+    }
+    
+    private function getTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo)
+    {
+        if ( strtotime($hora_actual) >= strtotime($hora_ini) && strtotime($hora_actual) < strtotime($hora_fin) )
+        {
+            $objeto = array("hora_ini"=>$hora_ini, "hora_fin"=>$hora_fin);
+            return $objeto;
+        }
+        else
+        {
+            $hora_ini = $hora_fin;
+            $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_fin ) ));
+            return $this->getTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
+        
+        }
     }
 }
 

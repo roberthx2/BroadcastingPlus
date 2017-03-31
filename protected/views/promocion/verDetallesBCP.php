@@ -90,7 +90,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
             ),
             array(
             	'header' => 'Total',
-                'name' => 'total',
+                'name' => 'total_sms',
             	'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             ),

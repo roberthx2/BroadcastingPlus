@@ -23,8 +23,8 @@ print_r("<br><br>");
     'booster.widgets.TbButton',
     array(
         'label' => 'Volver',
-        'url' => '#',
-        'htmlOptions' => array('data-dismiss' => 'modal'),
+        'url' => Yii::app()->createUrl($this->route),
+        //'onclick' => "history.go(-1)"
     )
 ); ?>
 

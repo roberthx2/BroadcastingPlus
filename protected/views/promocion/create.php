@@ -24,7 +24,10 @@
                 //'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
             ),
 		)
-	); ?>
+	); 
+
+		$interval_minute = Yii::app()->Procedimientos->getIntervalMinute();
+	?>
 	 
 	<fieldset>
  
@@ -238,7 +241,7 @@
 							'language' => 'es',
 							'format' => 'yyyy-mm-dd',
 							'startDate' => date("Y-m-d"),
-							'endDate' => date('Y-m-d' , strtotime('+1 month', strtotime(date("Y-m-d")))),
+							'endDate' => date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))),
 							'autoclose' => true,
 						),
 						'htmlOptions' => array('value'=>date("Y-m-d"), 'readonly'=>true, 'style'=>'background-color: white;'),
@@ -277,10 +280,10 @@
 					'id'=>'PromocionesForm_hora_inicio',
 					'widgetOptions' => array(
 						'options' => array(
-							'defaultTime' => date("H:i"),
+							'defaultTime' => $interval_minute["hora_ini"],
 							'showMeridian' => false,
 							'showSeconds' => false,
-							'minuteStep' => 1,
+							'minuteStep' => $interval_minute["interval_minute"],
 						),
 						'wrapperHtmlOptions' => array(
 							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'
@@ -299,10 +302,10 @@
 				array(
 					'widgetOptions' => array(
 						'options' => array(
-							'defaultTime' => date('H:i' , strtotime('+1 hours', strtotime(date("H:i")))),
+							'defaultTime' => $interval_minute["hora_fin"],
 							'showMeridian' => false,
 							'showSeconds' => false,
-							'minuteStep' => 1,
+							'minuteStep' => $interval_minute["interval_minute"],
 						),
 						'wrapperHtmlOptions' => array(
 							'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5'

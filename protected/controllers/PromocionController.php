@@ -275,8 +275,7 @@ class PromocionController extends Controller
                             //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
-                            Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->fecha, $operadorasPermitidasBCP);
-                            ////////////REVISAR FILTRO LUEGO DE CREAR LA PROMOCION///////****************
+                            Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->sc_bcp, $model->fecha, $operadorasPermitidasBCP);
                         }
 
                         //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
@@ -377,55 +376,34 @@ class PromocionController extends Controller
 
                     if ($_SESSION["timeslot"] === $array_promociones) //Verificar si aun queda espacio
                     {
-                        if(!$alfanumerico) //ShortCode numerico
+                        foreach ($array_promociones as $value)
                         {
-                            foreach ($array_promociones as $value)
+                            $i=0;
+                            $j=1;
+                            
+                            foreach ($value["resultado"] as $key)
                             {
-                                $i=0;
-                                $j=1;
-                                foreach ($value["resultado"] as $key)
+                                $alfanumerico = $operadoras_bcp[$value["id_operadora"]][0];
+
+                                if ($alfanumerico == 1) //ALfanumerico
                                 {
-                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_".$j;
-                                    $model_aux->hora_inicio = $key["hora_ini"];
-                                    $model_aux->hora_fin = $key["hora_fin"];
-                                    
-                                    //$id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $key["total"], $value["id_operadora"], $operadora_relacion[$value["id_operadora"]], $i);
-                                    $ids_promo .= ",".$id_promo;
-                                    $i+=$key["total"];
-                                    $j++;
+                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF"."_".$j;;
                                 }
-                            }
-                        }
-                        else //ShorCode Alfanumerico
-                        {
-                            $clienteBCP = ClienteAlarmas::model()->findByPk($model->id_cliente);
-
-                            foreach ($array_promociones as $value)
-                            {
-                                $i=0;
-                                $j=1;
-                                foreach ($value["resultado"] as $key)
+                                else
                                 {
-                                    if ($value["id_operadora"] == 4) //ALfanumerico Digitel
-                                    {
-                                        $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF"."_".$j;
-                                        $model_aux->id_cliente = $clienteBCP->id;
-                                    }
-                                    else
-                                    {
-                                        $model_aux->nombre = $model->nombre."_".$j."_".$value["nombre"];
-                                        $model_aux->id_cliente = $clienteBCP->id_cliente_sc_numerico;
-                                    }
-
-                                    $model_aux->hora_inicio = $key["hora_ini"];
-                                    $model_aux->hora_fin = $key["hora_fin"];
-
-                                    //$id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $key["total"], $value["id_operadora"], $operadora_relacion[$value["id_operadora"]], $i);
-
-                                    $ids_promo .= ",".$id_promo; 
-                                    $i+=$key["total"];
-                                    $j++;
+                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_".$j;;
                                 }
+
+                                $model_aux->hora_inicio = $key["hora_ini"];
+                                $model_aux->hora_fin = $key["hora_fin"];
+
+                                $model_aux->id_cliente = $this->actionGetIdClienteBCP($model->id_cliente, $model->sc_bcp, $value["id_operadora"], $alfanumerico);
+
+                                $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $key["total"], $value["id_operadora"], $alfanumerico, $i);
+
+                                $ids_promo .= ",".$id_promo; 
+                                $i+=$key["total"];
+                                $j++;
                             }
                         }
                     }
@@ -436,47 +414,36 @@ class PromocionController extends Controller
                 }
                 else
                 {
-                    /*if(!$alfanumerico)
+                    foreach ($total_x_oper as $key=>$value)
                     {
-                        foreach ($total_x_oper as $key=>$value)
+                        $alfanumerico = $operadoras_bcp[$key][0];
+
+                        if ($alfanumerico == 1) //ALfanumerico
+                        {
+                            $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF";
+                        }
+                        else
                         {
                             $model_aux->nombre = $model->nombre."_".$value["nombre"];
-                            $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $operadora_relacion[$key], 0);
-                            $ids_promo .= ",".$id_promo;
                         }
+
+                        $model_aux->id_cliente = $this->actionGetIdClienteBCP($model->id_cliente, $model->sc_bcp, $key, $alfanumerico);
+
+                        $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $alfanumerico, 0);
+
+                        $ids_promo .= ",".$id_promo; 
                     }
-                    else
-                    {*/
-                        foreach ($total_x_oper as $key=>$value)
-                        {
-                            $alfanumerico = $operadoras_bcp[$key][0];
-
-                            if ($alfanumerico == 1) //ALfanumerico
-                            {
-                                $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF";
-                            }
-                            else
-                            {
-                                $model_aux->nombre = $model->nombre."_".$value["nombre"];
-                            }
-
-                            $model_aux->id_cliente = $this->actionGetIdClienteBCP($model->id_cliente, $model->sc_bcp, $key, $alfanumerico);
-
-                            $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $alfanumerico, 0);
-
-                            $ids_promo .= ",".$id_promo; 
-                        }
-                   // }
                 }
 
                 $id_promo = trim($ids_promo, ",");
                 $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
             }
 
-            //unset($_SESSION["model"]);
-
             $transaction->commit();
-                        exit;
+
+            unset($_SESSION["model"]);
+            unset($_SESSION["operadoras_bcp"]);
+            unset($_SESSION["timeslot"]);
 
             $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
 
@@ -510,14 +477,8 @@ class PromocionController extends Controller
                 WHERE id_operadora_bcnl = ".$id_operadora." AND alfanumerico = ".$alfanumerico;
         $operadoras_bcp = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 
-        //$operadoras_bcp = $sql["id_operadoras_bcp"];
-
-        //$this->actionUpdateOperBCP($id_proceso, $operadoras_bcp);
-
-        $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $operadoras_bcp);
+        $this->actionUpdateIdAlarmas($id_proceso, $clienteBCP->descripcion, $id_operadora, $operadoras_bcp);
         
-        //$sc_numerico = Yii::app()->Procedimientos->getScNumerico($model->id_cliente);
-
         $model_promocion = new PromocionesPremium;
         $model_promocion->nombrePromo = $this->actionGetNombrePromo($clienteBCP->id_cliente_sms, $model->tipo, $model->sc_bcp, $model->nombre, $model->fecha);
         $model_promocion->id_cliente = $model->id_cliente;
@@ -544,13 +505,14 @@ class PromocionController extends Controller
         $model_promocion_acciones->id_promo = $id_promo;
         $model_promocion_acciones->save();
 
-        $sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, CASE WHEN id_operadora REGEXP 'not cool' THEN 'Not Cool' WHEN id_operadora REGEXP 'very cool' THEN 'Cool'  END AS id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
+        $sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, CASE";
         
         foreach ($operadoras_bcp as $value)
         {
-            
+            $sql .= " WHEN numero REGEXP '^".$value["prefijo"]."' THEN ".$value["id_operadora_bcp"];
         }
-        //$sql = "INSERT INTO outgoing_premium (id_promo, destinatario, mensaje, fecha_in, hora_in, tipo_evento, cliente, operadora, id_insignia_alarmas) SELECT :id_promo, SUBSTRING(numero, 4,7), :mensaje, :fecha, :hora, :evento, :id_cliente, CASE WHEN id_operadora REGEXP 'not cool' THEN 'Not Cool' WHEN id_operadora REGEXP 'very cool' THEN 'Cool'  END AS id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora IN(".$operadoras_bcp.") LIMIT ".$limite_ini.",".$total_sms;
+
+        $sql .= " END AS id_operadora, id_insignia_alarmas FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora = :id_operadora LIMIT ".$limite_ini.",".$total_sms;
 
         $sql = Yii::app()->db_masivo_premium->createCommand($sql);
         $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
@@ -560,6 +522,7 @@ class PromocionController extends Controller
         $sql->bindParam(":evento", $evento["id"], PDO::PARAM_INT);
         $sql->bindParam(":id_cliente", $model->id_cliente, PDO::PARAM_INT);
         $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+        $sql->bindParam(":id_operadora", $id_operadora, PDO::PARAM_INT);
         $sql->execute();
 
         $dia_semana = date("w", strtotime($model->fecha));
@@ -602,8 +565,6 @@ class PromocionController extends Controller
         $model_cupo_historial->hora = date("H:i:s");
         $model_cupo_historial->tipo_operacion = 3; //Consumido
         $model_cupo_historial->save();
-
-        //$url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
 
         $log = "PROMOCION BCP CREADA | id_promo: ".$id_promo." | id_cliente_sms: ".$clienteBCP->id_cliente_sms." | id_cliente_bcp: ".$model->id_cliente." | Destinatarios: ".$total_sms;
 
@@ -895,22 +856,28 @@ class PromocionController extends Controller
         return $nombre_completo;
     }
 
-    protected function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $id_operadoras_bcp)
-    {
-        $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".$id_operadoras_bcp.")";
+    protected function actionUpdateIdAlarmas($id_proceso, $descripcion_cliente, $id_operadora, $operadoras_bcp)
+    {   
+        foreach ($operadoras_bcp as $value)
+        {
+            $id_operadoras_bcp[$value["id_operadora_bcp"]] = array("prefijo_general"=>$value["prefijo"], "prefijo_bcp"=>"");
+            $cadena_id_oper_bcp[] = $value["id_operadora_bcp"];
+        }
+
+        $sql = "SELECT id, prefijo FROM operadora WHERE id IN(".implode(",", $cadena_id_oper_bcp).")";
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
         
         foreach ($sql as $value)
         {
-            $operadoras[] = array("id_operadora" => $value["id"], "prefijo" => $value["prefijo"]);
+            $id_operadoras_bcp[$value["id"]]["prefijo_bcp"] = $value["prefijo"];
         }
-        
-        foreach ($operadoras as $value)
+
+        foreach ($id_operadoras_bcp as $value)
         {
-            $sql = "UPDATE tmp_procesamiento SET id_insignia_alarmas = CONCAT('".$descripcion_cliente.$value["prefijo"]."', SUBSTRING(numero,4,7)) WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora = :id_operadora";
+            $sql = "UPDATE tmp_procesamiento SET id_insignia_alarmas = CONCAT('".$descripcion_cliente.$value["prefijo_bcp"]."', SUBSTRING(numero,4,7)) WHERE id_proceso = :id_proceso AND estado = 1 AND id_operadora = :id_operadora AND numero REGEXP '^".$value["prefijo_general"]."' ";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
             $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
-            $sql->bindParam(":id_operadora", $value["id_operadora"], PDO::PARAM_INT);
+            $sql->bindParam(":id_operadora", $id_operadora, PDO::PARAM_INT);
             $sql->execute();
         }
     }
@@ -1098,7 +1065,7 @@ class PromocionController extends Controller
                 $hora_fin_reservacion = $value["valor"];
         }
         
-        $timeslot_actual = $this->actionGetTimeSlot($hora_ini);
+        $timeslot_actual = Yii::app()->Procedimientos->getTimeSlot($hora_ini);
         $hora_ini = $timeslot_actual["hora_ini"];
 
         $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
@@ -1220,7 +1187,7 @@ class PromocionController extends Controller
         return false;
     }
 
-    private function actionGetTimeSlot($hora_actual)
+    /*public function actionGetTimeSlot($hora_actual)
     {
         $criteria = new CDbCriteria;
         $criteria->select = "propiedad, valor";
@@ -1253,7 +1220,7 @@ class PromocionController extends Controller
             return $this->actionGetTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
         
         }
-    }
+    }*/
 
     public function actionMensajeTimeSlot($id_proceso, $timeslot)
     {
