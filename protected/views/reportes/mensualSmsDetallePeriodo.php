@@ -1,14 +1,14 @@
 <?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
-<div class="panel-group" id="accordionBCP">
+<div class="panel-group" id="accordionBCPPeriodo">
 	<div class="panel panel-primary">
 	    <div class="panel-heading">
 	      	<h4 class="panel-title">
-	        	<a data-toggle="collapse" data-parent="#accordionBCP" href="#collapseBCP">
+	        	<a data-toggle="collapse" data-parent="#accordionBCPPeriodo" href="#collapseBCPPeriodo">
 	          		<span class="glyphicon glyphicon-list-alt"></span> Totales
 	        	</a>
 	      	</h4>
 	    </div>
-	    <div id="collapseBCP" class="panel-collapse collapse in">
+	    <div id="collapseBCPPeriodo" class="panel-collapse collapse in">
 	      	<div class="panel-body">
 	        	<ul class="list-group">
 		        	<li class="list-group-item">

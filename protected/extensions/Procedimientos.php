@@ -108,6 +108,27 @@ class Procedimientos extends CApplicationComponent
         return $resultado;
 	}
 
+	public function getClienteBCPHostgatorForClienteSMS($id_cliente_sms)
+	{
+		if (Yii::app()->user->isAdmin())
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT id) AS id_clientes FROM cliente WHERE id_cliente_sms = ".$id_cliente_sms; 
+		}
+		else
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT cb.id_cliente_bcp) AS id_clientes FROM usuario_clientes_bcp uc
+				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+				WHERE uc.id_usuario = ".Yii::app()->user->id." AND id = ".$id_cliente_sms." AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+		$resultado = ($sql["id_clientes"] == "") ? "null" : $sql["id_clientes"];
+
+        return $resultado;
+	}
+
 	public function getClienteBCNLHerencia($id_usuario)
 	{
 		$model_sms = UsuarioSms::model()->findByPk($id_usuario);
@@ -405,6 +426,13 @@ class Procedimientos extends CApplicationComponent
             return $this->getTimeSlotPrivate($hora_actual, $hora_ini, $hora_fin, $intervalo);
         
         }
+    }
+
+    public function getMinDateHistorial()
+    {
+    	$model = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>"max_mes_consultas_historial"));
+    
+    	return date('Y-m-d' , strtotime(-$model->valor.' month', strtotime(date("Y-m-d"))));
     }
 }
 

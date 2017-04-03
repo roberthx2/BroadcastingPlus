@@ -50,12 +50,12 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'No enviados',
 	            'value' => function($data)
 	            {
-	            	$estado = ($data["total"]-$data["enviados"]) == 0 ? 0 : 1;
+	            	$estado = ($data["total_sms"]-$data["enviados"]) == 0 ? 0 : 1;
 
 	            	$this->widget(
                         'booster.widgets.TbLabel',
                         array(
-                            'label' => $data["total"]-$data["enviados"],
+                            'label' => $data["total_sms"]-$data["enviados"],
                             'htmlOptions'=>array('class'=>'label-no-enviados', 'style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoReportes($estado).';'),    
                         )
                     );
@@ -82,14 +82,14 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
-        		'name' => 'total',
+        		'name' => 'total_sms',
 	            'header' => 'Total',
 	            'value' => function($data)
 	            {
 	            	$this->widget(
                         'booster.widgets.TbLabel',
                         array(
-                            'label' => $data["total"],
+                            'label' => $data["total_sms"],
                             'htmlOptions'=>array('class'=>'label-total', 'style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoReportes(3).';'),    
                         )
                     );

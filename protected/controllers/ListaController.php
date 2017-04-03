@@ -89,7 +89,7 @@ class ListaController extends Controller
 					Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->numeros);
 
 					//Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
 
 					//Updatea en estado 3 todos los numeros duplicados
 					Yii::app()->Filtros->filtrarDuplicados($id_proceso);
@@ -209,7 +209,7 @@ class ListaController extends Controller
 					Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $model->numeros);
 
 					//Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+					Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
 
 					//Updatea en estado 3 todos los numeros duplicados
 					Yii::app()->Filtros->filtrarDuplicados($id_proceso);

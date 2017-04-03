@@ -199,12 +199,16 @@ class PromocionesPremium extends CActiveRecord
 		//$sql = "SELECT GROUP_CONCAT(id_cliente) AS id_clientes FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
 		//$id_clientes = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
+		$fecha_min = Yii::app()->Procedimientos->getMinDateHistorial();
+		$fecha_max = date("Y-m-d");
+
 		$id_clientes = Yii::app()->Procedimientos->getClienteBCPHostgator();
 
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, total_sms";
 		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
 		$criteria->addInCondition("t.id_cliente", explode(",", $id_clientes));
+		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);
 		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
@@ -233,25 +237,22 @@ class PromocionesPremium extends CActiveRecord
 
 		if ($this->id_cliente == "")
 		{
-			$sql = "SELECT GROUP_CONCAT(id_cliente) AS ids FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
-    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-    		$id_cliente = $sql["ids"];
+			$model = Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id);
 
-    		//ESTE QUERY SOLO SE HACE PARA QUE EL RESULTADO DE LA TABLA CONCUERDE CON EL VALOR POR DEFECTO DEL SELECT DE LOS CLIENTES 
-    		$sql = "SELECT id FROM cliente WHERE id IN(".$id_cliente.") LIMIT 1";
-    		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-    		$id_cliente = $sql["id"];
-
-    		if ($id_cliente == "")
-    			$this->id_cliente = "null";
-    		else $this->id_cliente = $id_cliente;
+			//Obtengo el primer cliente para la busqueda automatica al ingresar por primera vez al modulo
+			foreach ($model as $value)
+			{
+				$this->id_cliente = $value["id_cliente"];
+				break;
+			}
 		}
 
+		$id_clientes = Yii::app()->Procedimientos->getClienteBCPHostgatorForClienteSMS($this->id_cliente);
+
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_cliente,t.nombrePromo, t.fecha, 
-			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+		$criteria->select = "t.id_cliente,t.nombrePromo, t.fecha, total_sms,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
-		$criteria->compare("id_cliente", $this->id_cliente);
+		$criteria->addInCondition("id_cliente", explode(",", $id_clientes));
 		$criteria->addBetweenCondition("fecha", date($this->ano."-".$this->mes."-01"), Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes));
 
 		return new CActiveDataProvider($this, array(
@@ -259,7 +260,7 @@ class PromocionesPremium extends CActiveRecord
 			'sort'=>array(
 				'defaultOrder'=>'id_promo DESC',
         		'attributes'=>array(
-             		'nombrePromo'
+             		'nombrePromo', 'fecha', 'total_sms'
         		),
     		),
 		));
@@ -285,7 +286,7 @@ class PromocionesPremium extends CActiveRecord
 
 		$sql = "SELECT id AS id, sc, SUM(total) AS total, SUM(enviados) AS enviados FROM (
 					SELECT p.sc, p.id_promo AS id,
-					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
+					total_sms AS total, 
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 					FROM promociones_premium p
 					WHERE p.id_promo IN(".$ids_promo.")  
@@ -298,7 +299,7 @@ class PromocionesPremium extends CActiveRecord
 
 			'sort'=>array(
         		'attributes'=>array(
-             		//'fecha', 'id_promo',
+             		'sc', 'total',
         		),
     		),
     		'pagination'=>array(

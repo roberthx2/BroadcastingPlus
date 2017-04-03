@@ -157,7 +157,8 @@ class OutgoingPremium extends CActiveRecord
 		if ($this->ano == "")
 			$this->ano = date("Y");
 
-		$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
+		//$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
+		$sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 		$id_promo = $sql["ids"];
 

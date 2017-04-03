@@ -26,12 +26,6 @@
 				<div class="form-group">
 
 					<?php 
-						$sql = "SELECT GROUP_CONCAT(id_cliente) AS ids FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
-						$id_clientes = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-						$id_clientes = $id_clientes["ids"];
-
-						if ($id_clientes == "")
-							$id_clientes = "null";
 
 						echo $form->dropDownListGroup(
 						$model,
@@ -41,7 +35,7 @@
 								//'class' => 'col-sm-5',
 							),
 							'widgetOptions' => array(
-								'data' => CHtml::listData(ClienteAlarmas::model()->findAll(array("select"=>"id, REPLACE(descripcion, '@', '') AS descripcion", "condition"=>"id IN(".$id_clientes.")", "order"=>"descripcion")), 'id', 'descripcion'),
+								'data' => CHtml::listData(Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id), 'id_cliente', 'descripcion'),
 								//'htmlOptions' => array('prompt' => 'Seleccionar...'),
 							),
 							'prepend' => '<i class="glyphicon glyphicon-user"></i>',

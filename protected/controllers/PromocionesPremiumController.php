@@ -435,16 +435,18 @@ class PromocionesPremiumController extends Controller
         $fecha_ini = date($ano."-".$mes."-01");
         $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
 
+        $id_cliente = Yii::app()->Procedimientos->getClienteBCPHostgatorForClienteSMS($id_cliente);
+
         $sql = "SELECT IFNULL(SUM(total),0) AS total, IFNULL(SUM(enviados),0) AS enviados FROM 
                 (SELECT  
-                    (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+                    total_sms AS total,
                     (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados
                     FROM promociones_premium t
-                    WHERE t.id_cliente = :id_cliente AND t.fecha BETWEEN :fecha_ini AND :fecha_fin
+                    WHERE t.id_cliente IN(".$id_cliente.") AND t.fecha BETWEEN :fecha_ini AND :fecha_fin
                 ) AS tabla";
 
         $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        $sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_INT);
+        //$sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_INT);
         $sql->bindParam(":fecha_ini", $fecha_ini, PDO::PARAM_STR);
         $sql->bindParam(":fecha_fin", $fecha_fin, PDO::PARAM_STR);
         $sql = $sql->queryRow();
@@ -557,7 +559,7 @@ class PromocionesPremiumController extends Controller
 
 		$sql = "SELECT SUM(total) AS total, SUM(enviados) AS enviados FROM (
 					SELECT p.sc, p.id_promo AS id,
-					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total, 
+					total_sms AS total, 
 					(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 					FROM promociones_premium p
 					WHERE p.id_promo IN(".$ids_promo.") 

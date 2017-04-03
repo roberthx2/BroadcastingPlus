@@ -154,10 +154,14 @@ class Promociones extends CActiveRecord
 	{
 		$cadena_usuarios = Yii::app()->Procedimientos->getUsuariosBCNLHerencia(Yii::app()->user->id);
 
+		$fecha_min = Yii::app()->Procedimientos->getMinDateHistorial();
+		$fecha_max = date("Y-m-d");
+
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
 		$criteria->join = "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
 		$criteria->addInCondition("t.cadena_usuarios", explode(",", $cadena_usuarios));
+		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);
 		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
