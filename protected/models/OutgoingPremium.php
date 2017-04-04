@@ -156,15 +156,49 @@ class OutgoingPremium extends CActiveRecord
 
 		if ($this->ano == "")
 			$this->ano = date("Y");
-
+$this->mes = '03';
+$this->ano = '2017';
 		//$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
-		$sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
+		$sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente) AS ids_clientes, GROUP_CONCAT(id_promo) AS ids_promos FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-		$id_promo = $sql["ids"];
+		$ids_clientes = $sql["ids_clientes"];
+		$id_promo = $sql["ids_promos"];
 
 		if ($id_promo == "")
+		{
 			$this->id_promo = "null";
-		else $this->id_promo = $id_promo;
+			$ids_clientes = "null";
+		}
+		else 
+		{
+			$sql = "SELECT id_cliente_sms, GROUP_CONCAT(id) AS ids_clientes FROM cliente WHERE id IN(".$ids_clientes.") GROUP BY id_cliente_sms";
+			$result = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
+
+			$sql = "SELECT * FROM (";
+
+			foreach ($result as $value)
+			{
+				$array[] = "SELECT ".$value["id_cliente_sms"]." AS id, SUM(total_sms) AS total, (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN (".$id_promo.") AND cliente IN (".$value["ids_clientes"].") AND status = 1) AS enviados FROM promociones_premium WHERE id_promo IN (".$id_promo.") AND id_cliente IN (".$value["ids_clientes"].")";
+			}
+
+			$sql.= implode(" UNION ", $array);
+			$sql .= ") AS tabla WHERE id IS NOT NULL";
+		}
+
+		$model = new CSqlDataProvider($sql, array(
+			'db'=>Yii::app()->db_masivo_premium, 
+			//'totalItemCount'=>$total["total"],
+			'sort'=>array(
+        		'attributes'=>array(
+             		'cliente', 'total',
+        		),
+    		),
+    		'pagination'=>array(
+        		'pageSize'=>10,
+    		),
+    	));
+
+		return $model; /*
     		
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.cliente, 
@@ -181,7 +215,7 @@ class OutgoingPremium extends CActiveRecord
              		//'cliente'
         		),
     		),
-		));
+		));*/
 	}
 
 	private function ultimoDiaMes($ano, $mes)

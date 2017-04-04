@@ -38,7 +38,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Cliente',
 	            'value' => function($data)
 	            {
-	            	return $this->actionGetDescripcionClienteBCP($data["cliente"]);
+	            	return $this->actionGetDescripcionClienteBCNL($data["id"]);
 	            },
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),

@@ -72,6 +72,16 @@ class ReportesController extends Controller
         else return "NO EXISTE";
     }
 
+    public function actionGetDescripcionClienteBCNL($id_cliente)
+    {
+        $sql = "SELECT Des_cliente FROM cliente WHERE id_cliente = ".$id_cliente;
+        $sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
+
+        if ($sql)
+            return $sql["Des_cliente"];
+        else return "NO EXISTE";
+    }
+
     public function actionMensualSmsBCP()
     {
         $id_cliente = 102;//$_POST['PromocionesPremium']["id_cliente"];
