@@ -166,25 +166,31 @@ class ConfiguracionSistemaAccionesController extends Controller
 	public function actionScInSMS()
 	{
 		$model=$this->loadModel($_GET["id"]);
+		$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
+		$model->valor = $model_configuracion->valor;
 		$this->renderPartial("updateSCInSMS", array("model"=>$model));
 	}
 
 	public function actionUpdateSCInSMS()
 	{
-		$model=new ConfiguracionSistemaAccionesForm;
+		$model=new ConfiguracionSistemaAcciones;
 		$model->scenario = "updateSCInSMS";
 		$valido = 'false';
 
 		$this->performAjaxValidation($model);
 
-		if(isset($_POST['ConfiguracionSistemaAccionesForm']))
+		if(isset($_POST['ConfiguracionSistemaAcciones']))
 		{
-			$model->attributes=$_POST['ConfiguracionSistemaAccionesForm'];
+			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
 			//$model->id_usuario=Yii::app()->user->id;
 
 			if ($model->validate())
             {
-				if($model->save())
+            	$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
+            	//$model_configuracion->valor = $model->valor;
+            	print_r($model_configuracion);
+            	exit;
+				if($model_configuracion->save())
 				{
 					$valido = "true";
 					header('Content-Type: application/json; charset="UTF-8"');

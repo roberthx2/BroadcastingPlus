@@ -106,6 +106,24 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'url'=>'Yii::app()->createUrl("lista/viewDelete", array("id_lista" => $data["id_lista"]))',
 	            			//'visible'=>'visibleCancelar($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-trash', 'title'=>'Eliminar Lista', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminar'),
+	            			'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalEliminar").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalEliminar").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalEliminar").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar el formulario, intente de nuevo.");
+                                        }
+                                    });
+                                }'
 	            			)
 	            ),
 	        ),

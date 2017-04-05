@@ -17,20 +17,23 @@
             ?>
             <div id="respuesta" class="alert alert-success" role="alert" style="display: none;"></div>
             <?php 
-            echo $form->textFieldGroup(
-                $model,
-                'valor',
-                array(
-                    'wrapperHtmlOptions' => array(
-                        //'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-                    ),
-                    'widgetOptions' => array(
-                        'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'class'=>'input_prefijo'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
-                    ),
-                    'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
-                )
-            );
-        ?>
+                echo $form->textFieldGroup(
+                    $model,
+                    'valor',
+                    array(
+                        'wrapperHtmlOptions' => array(
+                            //'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+                        ),
+                        'widgetOptions' => array(
+                            'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'class'=>'input_prefijo'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+                        ),
+                        'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
+                    )
+                );
+            ?>
+            <?php echo $form->hiddenField($model, 'id'); ?>
+            <?php echo $form->hiddenField($model, 'propiedad'); ?>
+            
     <div class="modal-footer" id="modal_footer">
 	     <?php $this->widget('booster.widgets.TbButton', array(
 	    	'label'=>'Guardar',
@@ -69,7 +72,7 @@
                 {
                    // $("#bontonCrear").attr("disabled",true);
                    $("#updateSCInSMS-form div.form-group").removeClass("has-error").removeClass("has-success");
-                   $("#ConfiguracionSistemaAccionesForm_valor_em_").hide();
+                   $("#ConfiguracionSistemaAcciones_valor_em_").hide();
                    $("#respuesta").hide();
                 },
                 complete: function()
@@ -91,12 +94,12 @@
                     else (data.salida == 'false')
                     {
                     	$("#updateSCInSMS-form div.form-group").addClass("has-error");
-                    	$("#ConfiguracionSistemaAccionesForm_valor_em_").show();
+                    	$("#ConfiguracionSistemaAcciones_valor_em_").show();
 
                         var error = data.error.valor;
 
                         $.each(error, function(i, value) {
-                            $("#ConfiguracionSistemaAccionesForm_valor_em_").html(value);
+                            $("#ConfiguracionSistemaAcciones_valor_em_").html(value);
                         });
                         return;
                     }

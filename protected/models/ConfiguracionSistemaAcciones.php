@@ -14,6 +14,8 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+	public $valor;
+
 	public function tableName()
 	{
 		return 'configuracion_sistema_acciones';
@@ -27,12 +29,16 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('nombre, propiedad, action', 'required'),
+			/*array('nombre, propiedad, action', 'required'),
 			array('nombre, propiedad', 'length', 'max'=>50),
-			array('action', 'length', 'max'=>300),
+			array('action', 'length', 'max'=>300),*/
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, nombre, propiedad, action', 'safe', 'on'=>'search'),
+			array('id, nombre, propiedad, action, valor', 'safe', 'on'=>'search'),
+			//Required
+			array("valor", "required","message"=>"{attribute} requerido"),
+			//updateSCInSMS
+			array('valor', 'numerical', 'min'=>6, 'max'=>158, 'integerOnly'=>true, "on"=>"updateSCInSMS"),
 		);
 	}
 
@@ -57,6 +63,7 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			'nombre' => 'Nombre',
 			'propiedad' => 'Propiedad',
 			'action' => 'Action',
+			'valor' => 'Valor',
 		);
 	}
 
