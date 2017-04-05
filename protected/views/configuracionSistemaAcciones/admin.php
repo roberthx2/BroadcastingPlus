@@ -150,4 +150,69 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 		$('[data-tooltip="tooltip"]').tooltip();
 	});
+
+	function enviar(form,data,hasError)
+    {alert("ok");
+        if(!hasError)
+        {
+            $.ajax({
+                url:"<?php echo Yii::app()->createUrl('prefijoPromocion/create2'); ?>",
+                type:"POST",    
+                data:$("#prefijo-promocion-form").serialize(),
+                
+                beforeSend: function()
+                {
+                   // $("#bontonCrear").attr("disabled",true);
+                   $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
+                   $("#PrefijoPromocion_prefijo_em_").hide();
+                   $("#respuesta").hide();
+                },
+                complete: function()
+                {
+                    //alert("termine");
+                   // $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
+                   // $("#PrefijoPromocion_prefijo_em_").hide();
+                    //$("#respuesta").hide();
+                },
+                success: function(data)
+                {
+                    if (data.salida == 'true')
+                    {
+                    	$("#PrefijoPromocion_prefijo").val("");
+                    	$("#prefijo-promocion-form div.form-group").addClass("has-success");
+                        $("#respuesta").html("El prefijo fue creado correctamente");
+                        $("#respuesta").show();
+
+                        $('#prefijo-promocion-grid').yiiGridView('update', {
+							data: $(this).serialize()
+						});
+						return;
+                    }
+                    else (data.salida == 'false')
+                    {
+                    	$("#prefijo-promocion-form div.form-group").addClass("has-error");
+                    	$("#PrefijoPromocion_prefijo_em_").show();
+
+                        var error = data.error.prefijo;
+
+                        $.each(error, function(i, value) {
+                            $("#PrefijoPromocion_prefijo_em_").html(value);
+                        });
+                        return;
+                    }
+                    
+                   // $("#bontonCrear").attr("disabled",false);
+                },
+                error: function()
+                {
+                	//$("#respuesta").show();
+                    //$("#respuesta").html("Ocurrio un error al procesar los datos intente nuevamente" + data);
+                    //$("#bontonCrear").attr("disabled",false);
+                }
+            });
+        }
+
+        return false;
+    }
+
 </script>

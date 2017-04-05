@@ -28,7 +28,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete', 'index', 'view', 'updateSCInSMS'),
+				'actions'=>array('create','update', 'admin', 'delete', 'index', 'view', 'scInSMS', 'updateSCInSMS'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -163,8 +163,44 @@ class ConfiguracionSistemaAccionesController extends Controller
 		}
 	}
 
-	public function actionUpdateSCInSMS($id)
+	public function actionScInSMS()
 	{
-		$this->renderPartial("updateSCInSMS");
+		$model=$this->loadModel($_GET["id"]);
+		$this->renderPartial("updateSCInSMS", array("model"=>$model));
+	}
+
+	public function actionUpdateSCInSMS()
+	{
+		$model=new ConfiguracionSistemaAccionesForm;
+		$model->scenario = "updateSCInSMS";
+		$valido = 'false';
+
+		$this->performAjaxValidation($model);
+
+		if(isset($_POST['ConfiguracionSistemaAccionesForm']))
+		{
+			$model->attributes=$_POST['ConfiguracionSistemaAccionesForm'];
+			//$model->id_usuario=Yii::app()->user->id;
+
+			if ($model->validate())
+            {
+				if($model->save())
+				{
+					$valido = "true";
+					header('Content-Type: application/json; charset="UTF-8"');
+					echo CJSON::encode(array('salida' => $valido, 'error'=>array()));
+				}
+				else
+				{
+					header('Content-Type: application/json; charset="UTF-8"');
+					echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
+				}
+			}
+			else
+			{
+				header('Content-Type: application/json; charset="UTF-8"');
+				echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
+			}
+		}
 	}
 }
