@@ -128,7 +128,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 		$model=new ConfiguracionSistemaAcciones('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['ConfiguracionSistemaAcciones']))
-			$model->attributes=$_GET['ConfiguracionSistemaAcciones'];
+			$model->buscar=$_GET['ConfiguracionSistemaAcciones']["buscar"];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -180,16 +180,15 @@ class ConfiguracionSistemaAccionesController extends Controller
 		$this->performAjaxValidation($model);
 
 		if(isset($_POST['ConfiguracionSistemaAcciones']))
+
 		{
 			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
-			//$model->id_usuario=Yii::app()->user->id;
 
 			if ($model->validate())
             {
             	$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
-            	//$model_configuracion->valor = $model->valor;
-            	print_r($model_configuracion);
-            	exit;
+            	$model_configuracion->valor = $model->valor;
+
 				if($model_configuracion->save())
 				{
 					$valido = "true";

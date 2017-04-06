@@ -15,6 +15,8 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 	 * @return string the associated database table name
 	 */
 	public $valor;
+	public $descripcion;
+	public $buscar;
 
 	public function tableName()
 	{
@@ -34,7 +36,8 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			array('action', 'length', 'max'=>300),*/
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, nombre, propiedad, action, valor', 'safe', 'on'=>'search'),
+			//array('id, nombre, propiedad, action, valor', 'safe', 'on'=>'search'),
+			array('id, nombre, propiedad, action', 'safe'),
 			//Required
 			array("valor", "required","message"=>"{attribute} requerido"),
 			//updateSCInSMS
@@ -79,7 +82,7 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	/*public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
@@ -92,6 +95,28 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function search()
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id, t.nombre, t.action, c.valor, c.descripcion";
+		$criteria->join = "INNER JOIN configuracion_sistema c ON t.propiedad = c.propiedad";
+		$criteria->condition = "t.nombre LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "c.valor LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "c.descripcion LIKE '%".$this->buscar."%'";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'nombre ASC',
+        		'attributes'=>array(
+             		'id', 'nombre', 'action', 'c.valor', 'c.descripcion'
+        		),
+    		),
 		));
 	}
 
