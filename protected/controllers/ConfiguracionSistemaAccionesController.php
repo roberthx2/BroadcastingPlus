@@ -28,7 +28,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete', 'index', 'view', 'scInSMS', 'updateSCInSMS'),
+				'actions'=>array('create','update', 'admin', 'delete', 'index', 'view', 'formulario'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -76,7 +76,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionUpdate($id)
+	/*public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
 
@@ -93,7 +93,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 		$this->render('update',array(
 			'model'=>$model,
 		));
-	}
+	}*/
 
 	/**
 	 * Deletes a particular model.
@@ -163,18 +163,18 @@ class ConfiguracionSistemaAccionesController extends Controller
 		}
 	}
 
-	public function actionScInSMS()
+	public function actionFormulario()
 	{
 		$model=$this->loadModel($_GET["id"]);
 		$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
 		$model->valor = $model_configuracion->valor;
-		$this->renderPartial("updateSCInSMS", array("model"=>$model));
+
+		$this->renderPartial($model->vista, array("model"=>$model),false,true);
 	}
 
-	public function actionUpdateSCInSMS()
+	public function actionUpdate()
 	{
 		$model=new ConfiguracionSistemaAcciones;
-		$model->scenario = "updateSCInSMS";
 		$valido = 'false';
 
 		$this->performAjaxValidation($model);
@@ -183,6 +183,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 
 		{
 			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
+			$model->scenario = $model->escenario;
 
 			if ($model->validate())
             {

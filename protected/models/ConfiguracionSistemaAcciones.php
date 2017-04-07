@@ -7,13 +7,15 @@
  * @property integer $id
  * @property string $nombre
  * @property string $propiedad
- * @property string $action
+ * @property string $escenario
+ * @property string $vista
  */
 class ConfiguracionSistemaAcciones extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
+
 	public $valor;
 	public $descripcion;
 	public $buscar;
@@ -31,17 +33,39 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			/*array('nombre, propiedad, action', 'required'),
-			array('nombre, propiedad', 'length', 'max'=>50),
-			array('action', 'length', 'max'=>300),*/
+			//array('nombre, propiedad, escenario, vista', 'required'),
+			//array('nombre, propiedad, vista', 'length', 'max'=>50),
+			//array('escenario', 'length', 'max'=>300),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			//array('id, nombre, propiedad, action, valor', 'safe', 'on'=>'search'),
-			array('id, nombre, propiedad, action', 'safe'),
+			//array('id, nombre, propiedad, escenario, vista', 'safe', 'on'=>'search'),
+
+			array('id, nombre, propiedad, escenario, vista', 'safe'),
 			//Required
 			array("valor", "required","message"=>"{attribute} requerido"),
 			//updateSCInSMS
-			array('valor', 'numerical', 'min'=>6, 'max'=>158, 'integerOnly'=>true, "on"=>"updateSCInSMS"),
+			array('valor', 'numerical', 'min'=>6, 'max'=>158, 'integerOnly'=>true, "on"=>"scInSMS"),
+			//SmsXnumero
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"smsXnumero"),
+			//Clave de recargas
+			array("valor","filter","filter"=>array($this, "password"), "on"=>"cupoClave"),
+			//Multiplicacion base cupo BCP
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"cupoMultBase"),
+			//Tipo consulta cupo BCP
+			array('valor', 'numerical', 'min'=>1, 'max'=>2, 'integerOnly'=>true, "on"=>"cupoTipoConsulta"),
+			//Cantidad de dia para la consulta de cupo BCP
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"cupoDiasConsulta"),
+			//Cantidad de meses para la consulta de cupo BCP
+			array('valor', 'numerical', 'min'=>1, 'max'=>12, 'integerOnly'=>true, "on"=>"cupoMesesConsulta"),
+			//Cantidad de dias para inhabilitar los puertos BCNL
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"puertoDiasInhab"),
+			//Cantidad de dias para inhabilitar los puertos BCNL
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"puertoDiasWarning"),
+			//Intervalo de reservacion
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"reservacionIntervalo"),
+			//Cantidad de meses maximos que pueden ser consultados por los reportes
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"reservacionIntervalo"),
+			
 		);
 	}
 
@@ -65,9 +89,14 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			'id' => 'ID',
 			'nombre' => 'Nombre',
 			'propiedad' => 'Propiedad',
-			'action' => 'Action',
-			'valor' => 'Valor',
+			'escenario' => 'eScenario',
+			'vista' => 'Vista',
 		);
+	}
+
+	public function password($password)
+	{
+		return md5($password);
 	}
 
 	/**
@@ -91,7 +120,8 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 		$criteria->compare('id',$this->id);
 		$criteria->compare('nombre',$this->nombre,true);
 		$criteria->compare('propiedad',$this->propiedad,true);
-		$criteria->compare('action',$this->action,true);
+		$criteria->compare('escenario',$this->escenario,true);
+		$criteria->compare('vista',$this->vista,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -103,7 +133,7 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id, t.nombre, t.action, c.valor, c.descripcion";
+		$criteria->select = "t.id, t.nombre, c.valor, c.descripcion";
 		$criteria->join = "INNER JOIN configuracion_sistema c ON t.propiedad = c.propiedad";
 		$criteria->condition = "t.nombre LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "c.valor LIKE '%".$this->buscar."%' OR ";
@@ -114,7 +144,7 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			'sort'=>array(
 				'defaultOrder'=>'nombre ASC',
         		'attributes'=>array(
-             		'id', 'nombre', 'action', 'c.valor', 'c.descripcion'
+             		'id', 'nombre', 'c.valor', 'c.descripcion'
         		),
     		),
 		));

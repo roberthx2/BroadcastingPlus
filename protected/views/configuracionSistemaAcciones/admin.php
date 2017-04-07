@@ -95,7 +95,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'buttons' => array(
 	            	'Editar'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl($data["action"], array("id" => $data["id"]))',
+	            			'url'=>'Yii::app()->createUrl("configuracionSistemaAcciones/formulario", array("id" => $data["id"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'title'=>'Editar Configuración', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEditar'),
                     'click' => 'function(){
                           $.ajax({
@@ -152,5 +152,54 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 		$('[data-tooltip="tooltip"]').tooltip();
 	});
+
+  function enviar()
+  {
+    $.ajax({
+        url:"<?php echo Yii::app()->createUrl('configuracionSistemaAcciones/update'); ?>",
+        type:"POST",    
+        data:$("#configuracion-form").serialize(),
+        
+        beforeSend: function()
+        {
+          // $("#bontonCrear").attr("disabled",true);
+          $("#configuracion-form div.form-group").removeClass("has-error").removeClass("has-success");
+          $("#ConfiguracionSistemaAcciones_valor_em_").hide();
+          $("#respuesta").hide();
+        },
+        complete: function()
+        {
+        },
+        success: function(data)
+        {
+          if (data.salida == 'true')
+          {
+            $("#configuracion-form div.form-group").addClass("has-success");
+              $("#respuesta").html("Actualizacion realizada exitosamente");
+              $("#respuesta").show();
+
+              $('#configuracion-sistema-acciones-grid').yiiGridView('update', {
+                data: $(this).serialize()
+              });
+              return;
+          }
+          else (data.salida == 'false')
+          {
+            $("#configuracion-form div.form-group").addClass("has-error");
+            $("#ConfiguracionSistemaAcciones_valor_em_").show();
+
+              var error = data.error.valor;
+
+              $.each(error, function(i, value) {
+                  $("#ConfiguracionSistemaAcciones_valor_em_").html(value);
+              });
+              return;
+          }
+        },
+        error: function()
+        {
+        }
+    });
+  }
 
 </script>
