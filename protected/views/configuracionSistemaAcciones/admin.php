@@ -29,16 +29,12 @@ $('.search-form form').submit(function(){
 ?>
 
 <br>
-<?php if(Yii::app()->user->hasFlash('success')):?>
-	<br>
-    <div class="container-fluid alert alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span class="glyphicon glyphicon-ok"></span> <?php echo Yii::app()->user->getFlash('success'); ?>
-	</div>
-<?php endif; ?>
 
 <fieldset>
- 
+    <div class="container-fluid alert alert-success" id="div_success" style="display:none;">
+          <span class="glyphicon glyphicon-ok"></span> <?php echo "Actualización realizada exitosamente" ?>
+    </div>
+
     <legend>Configurar Sistema</legend>
 
 <div class="BCP">
@@ -165,7 +161,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
           // $("#bontonCrear").attr("disabled",true);
           $("#configuracion-form div.form-group").removeClass("has-error").removeClass("has-success");
           $("#ConfiguracionSistemaAcciones_valor_em_").hide();
-          $("#respuesta").hide();
+          $("#div_success").hide();
         },
         complete: function()
         {
@@ -176,11 +172,14 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
           {
             $("#configuracion-form div.form-group").addClass("has-success");
               $("#respuesta").html("Actualizacion realizada exitosamente");
-              $("#respuesta").show();
+              $("#div_success").show();
 
               $('#configuracion-sistema-acciones-grid').yiiGridView('update', {
                 data: $(this).serialize()
               });
+
+              $("#modalEditar .close").click()
+
               return;
           }
           else (data.salida == 'false')

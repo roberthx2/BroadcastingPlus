@@ -63,7 +63,19 @@ class WebUser extends CWebUser
         if ($model->id_perfil == 2 || $model->id_perfil == 1)
             return true;
         return false;
-    }     
+    }
+
+    public function isMaster()
+    {
+        $model = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>"usuarios_master"));
+        $array = explode(",", $model->valor);
+
+        if (in_array(Yii::app()->user->id, $array) || Yii::app()->user->id == 1)
+        {
+            return true;
+        }
+        else return false;
+    }      
 }
 
 ?>

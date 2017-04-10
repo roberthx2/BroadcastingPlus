@@ -15,20 +15,47 @@
     );
 ?>
 
+<?php
+
+    if ($model->escenario == 'operBase')
+    {
+        $data = CHtml::listData(OperadorasRelacion::model()->findAll(array("group"=>"id_operadora_bcnl")), 'id_operadora_bcnl', 'descripcion');
+    }
+    else if ($model->escenario == '')
+    {
+
+    }
+?>
+
 <?php 
-    echo $form->textFieldGroup(
+    $model->valor = explode(",", $model->valor);
+    
+    echo $form->select2Group(
         $model,
         'valor',
         array(
             'wrapperHtmlOptions' => array(
-                //'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+                'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
             ),
             'widgetOptions' => array(
-                'htmlOptions' => array('maxlength' => 20, 'autocomplete' => 'off'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+                'asDropDownList' => true,
+                'data'=>CHtml::listData(UsuarioSms::model()->findAll(array("condition"=>"id_perfil IN(1,2)", "order"=>"login")), 'id_usuario', 'login'),
+                
+                'options' => array(
+                    //'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
+                    'placeholder' => 'Seleccione sus listas...',
+                    'allowClear'=>true,
+                    /* 'width' => '40%', */
+                    'tokenSeparators' => array(',', ' ')
+                ),
+                'htmlOptions'=>array(
+                    'multiple'=>'multiple',
+                    //'disabled'=>true,
+                ),
             ),
-            'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
+            'prepend' => '<i class="glyphicon glyphicon-user"></i>',
         )
-    );
+    ); 
 ?>
 <?php echo $form->hiddenField($model, 'id'); ?>
 <?php echo $form->hiddenField($model, 'propiedad'); ?>

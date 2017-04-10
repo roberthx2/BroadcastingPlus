@@ -14,7 +14,6 @@
         )
     );
 ?>
-<div id="respuesta" class="alert alert-success" role="alert" style="display: none;"></div>
 
 <?php echo $form->timePickerGroup(
     $model,

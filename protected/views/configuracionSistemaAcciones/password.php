@@ -14,7 +14,7 @@
         )
     );
 ?>
-<div id="respuesta" class="alert alert-success" role="alert" style="display: none;"></div>
+
 <?php echo $form->passwordFieldGroup($model,'valor',array(
     'prepend' => '<i class="glyphicon glyphicon-pencil"></i>',
     'widgetOptions' => array(

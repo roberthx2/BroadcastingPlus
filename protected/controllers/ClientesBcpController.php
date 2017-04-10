@@ -1,6 +1,6 @@
 <?php
 
-class ConfiguracionSistemaAccionesController extends Controller
+class ClientesBcpController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -28,7 +28,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete', 'index', 'view', 'formulario'),
+				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -54,14 +54,14 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new ConfiguracionSistemaAcciones;
+		$model=new ClientesBcp;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['ConfiguracionSistemaAcciones']))
+		if(isset($_POST['ClientesBcp']))
 		{
-			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
+			$model->attributes=$_POST['ClientesBcp'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -76,16 +76,16 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	/*public function actionUpdate($id)
+	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['ConfiguracionSistemaAcciones']))
+		if(isset($_POST['ClientesBcp']))
 		{
-			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
+			$model->attributes=$_POST['ClientesBcp'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
@@ -93,7 +93,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 		$this->render('update',array(
 			'model'=>$model,
 		));
-	}*/
+	}
 
 	/**
 	 * Deletes a particular model.
@@ -114,7 +114,7 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('ConfiguracionSistemaAcciones');
+		$dataProvider=new CActiveDataProvider('ClientesBcp');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -125,10 +125,10 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new ConfiguracionSistemaAcciones('search');
+		$model=new ClientesBcp('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['ConfiguracionSistemaAcciones']))
-			$model->buscar=$_GET['ConfiguracionSistemaAcciones']["buscar"];
+		if(isset($_GET['ClientesBcp']))
+			$model->buscar = $_GET['ClientesBcp']["buscar"];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -139,12 +139,12 @@ class ConfiguracionSistemaAccionesController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return ConfiguracionSistemaAcciones the loaded model
+	 * @return ClientesBcp the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=ConfiguracionSistemaAcciones::model()->findByPk($id);
+		$model=ClientesBcp::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -152,61 +152,14 @@ class ConfiguracionSistemaAccionesController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param ConfiguracionSistemaAcciones $model the model to be validated
+	 * @param ClientesBcp $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='configuracion-sistema-acciones-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='clientes-bcp-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
-		}
-	}
-
-	public function actionFormulario()
-	{
-		$model=$this->loadModel($_GET["id"]);
-		$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
-		$model->valor = $model_configuracion->valor;
-
-		$this->renderPartial($model->vista, array("model"=>$model));
-	}
-
-	public function actionUpdate()
-	{
-		$model=new ConfiguracionSistemaAcciones;
-		$valido = 'false';
-
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['ConfiguracionSistemaAcciones']))
-
-		{
-			$model->attributes=$_POST['ConfiguracionSistemaAcciones'];
-			$model->scenario = $model->escenario;
-
-			if ($model->validate())
-            {
-            	$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
-            	$model_configuracion->valor = $model->valor;
-
-				if($model_configuracion->save())
-				{
-					$valido = "true";
-					header('Content-Type: application/json; charset="UTF-8"');
-					echo CJSON::encode(array('salida' => $valido, 'error'=>array()));
-				}
-				else
-				{
-					header('Content-Type: application/json; charset="UTF-8"');
-					echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
-				}
-			}
-			else
-			{
-				header('Content-Type: application/json; charset="UTF-8"');
-				echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
-			}
 		}
 	}
 }

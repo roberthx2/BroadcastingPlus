@@ -19,7 +19,7 @@
  
     <div align="left" class="modal-header" style="background-color:#428bca">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Clave de transacciones</h4>
+        <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Clave de transacciones</h4>
     </div>
     
     <div align="left" class="modal-body" id="divModalBTL" >
@@ -51,7 +51,7 @@
                     'widgetOptions' => array(
                         'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'class'=>'input_btl'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
                     ),
-                    'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
+                    'prepend' => '<i class="glyphicon glyphicon-lock"></i>'
                 )
             );
         ?>

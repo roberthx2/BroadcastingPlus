@@ -43,28 +43,24 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			array('id, nombre, propiedad, escenario, vista', 'safe'),
 			//Required
 			array("valor", "required","message"=>"{attribute} requerido"),
-			//updateSCInSMS
-			array('valor', 'numerical', 'min'=>6, 'max'=>158, 'integerOnly'=>true, "on"=>"scInSMS"),
-			//SmsXnumero
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"smsXnumero"),
-			//Clave de recargas
-			array("valor","filter","filter"=>array($this, "password"), "on"=>"cupoClave"),
-			//Multiplicacion base cupo BCP
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"cupoMultBase"),
+			//Valores numericos que tienen como minimo el 1
+			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"smsXnumero, cupoMultBase, cupoDiasConsulta, puertoDiasInhab, puertoDiasWarning, reservacionIntervalo, reporteMesesConsulta"),
 			//Tipo consulta cupo BCP
 			array('valor', 'numerical', 'min'=>1, 'max'=>2, 'integerOnly'=>true, "on"=>"cupoTipoConsulta"),
-			//Cantidad de dia para la consulta de cupo BCP
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"cupoDiasConsulta"),
 			//Cantidad de meses para la consulta de cupo BCP
 			array('valor', 'numerical', 'min'=>1, 'max'=>12, 'integerOnly'=>true, "on"=>"cupoMesesConsulta"),
-			//Cantidad de dias para inhabilitar los puertos BCNL
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"puertoDiasInhab"),
-			//Cantidad de dias para inhabilitar los puertos BCNL
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"puertoDiasWarning"),
-			//Intervalo de reservacion
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"reservacionIntervalo"),
-			//Cantidad de meses maximos que pueden ser consultados por los reportes
-			array('valor', 'numerical', 'min'=>1, 'integerOnly'=>true, "on"=>"reservacionIntervalo"),
+			//updateSCInSMS
+			array('valor', 'numerical', 'min'=>6, 'max'=>158, 'integerOnly'=>true, "on"=>"scInSMS"),
+			//Clave de recargas
+			array("valor","filter","filter"=>array($this, "password"), "on"=>"cupoClave"),
+			//Horas
+			array('valor', 'date', 'format'=>'H:m',"message"=>"El formato de Valor es inválido. Ej: 14:30", "on"=>"horaIniBCP, horaFinBCP, horaIniBCNL, horaIniBCNL, horaFinReservacion"),
+			//Validar horas menor/mayor
+			array('valor', 'validarHora'),
+			//Validar usuarios master
+			array('valor', 'validarUserMaster'),
+			//Cambiar formato de usuarios master
+			array("valor","filter","filter"=>array($this, "usuariosMaster"), "on"=>"usersMaster"),
 			
 		);
 	}
@@ -96,9 +92,76 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 
 	public function password($password)
 	{
-		return md5($password);
+		$count = ConfiguracionSistema::model()->COUNT("propiedad=:propiedad AND valor=:valor", array(":propiedad"=>"clave_recarga_bcp", ":valor"=>$password));
+
+		if ($count == 0)
+			return md5($password);
+		else
+			return $password;
 	}
 
+	public function validarHora($attribute, $params)
+	{
+		$array = array("horaIniBCP", "horaFinBCP", "horaIniBCNL", "horaFinBCNL", "horaFinReservacion");
+
+		if (in_array($this->escenario, $array))
+		{
+			if ($this->escenario == "horaIniBCP") {
+				$propiedad = "hora_fin_bcp";
+			}
+			else if ($this->escenario == "horaFinBCP" || $this->escenario == "horaFinReservacion") {
+				$propiedad = "hora_inicio_bcp";
+			}
+			else if ($this->escenario == "horaIniBCNL") {
+				$propiedad = "hora_fin_bcnl";
+			}
+			else if ($this->escenario == "horaFinBCNL") {
+				$propiedad = "hora_inicio_bcnl";
+			}
+
+			$model = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$propiedad));
+
+			if ($this->escenario == "horaIniBCP" || $this->escenario == "horaIniBCNL") 
+			{
+				if (strtotime($this->$attribute) > strtotime($model->valor))
+		    	{
+		    		$this->addError($attribute, "La hora inicio debe ser menor que la hora fin (".$model->valor.")");
+		    	}
+			}
+			elseif ($this->escenario == "horaFinBCP" || $this->escenario == "horaFinBCNL" || $this->escenario == "horaFinReservacion") 
+			{
+				if (strtotime($this->$attribute) < strtotime($model->valor))
+		    	{
+		    		$this->addError($attribute, "La hora fin debe ser mayor que la hora inicio (".$model->valor.")");
+		    	}
+			}			
+    	}
+	}
+
+	public function validarUserMaster($attribute, $params)
+	{
+		if ($this->escenario == "usersMaster")
+		{
+			if (!Yii::app()->user->isMaster())
+			{
+				$this->addError($attribute, "Debe ser un usuario master para poder realizar cambios a esta configuración");
+			}
+		}
+	}
+
+	function cmp($a, $b)
+	{
+	    if ($a == $b) {
+	        return 0;
+	    }
+	    return ($a < $b) ? -1 : 1;
+	}
+
+	public function usuariosMaster($usuarios)
+	{
+		sort($usuarios);
+		return implode(",", $usuarios);
+	}
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
 	 *
