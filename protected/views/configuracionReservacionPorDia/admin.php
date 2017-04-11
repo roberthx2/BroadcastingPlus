@@ -14,13 +14,17 @@ $('.search-form form').submit(function(){
 ?>
 
 <br>
-
-<fieldset>
-    <div class="container-fluid alert alert-success" id="div_success" style="display:none;">
+<div class="container-fluid alert alert-success" id="div_success" style="display:none;">
           <span class="glyphicon glyphicon-ok"></span> <?php echo "Actualización realizada exitosamente" ?>
     </div>
 
-    <legend>Configurar Reservación por dia</legend>
+    <div class="container-fluid alert alert-danger" id="div_error" style="display:none;">
+          <span class="glyphicon glyphicon-remove"></span> <?php echo "Ocurrio un error al realizar la actualización" ?>
+    </div>
+
+<fieldset>
+
+    <legend>Configurar reservación por día</legend>
 
 
 <?php
@@ -50,8 +54,11 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 					    'booster.widgets.TbSwitch',
 					    array(
 					        'name' => $data["id_dia"],
+						    'value' => $data["estado"],
 					        'events' => array(
-					            'switchChange' => 'js:function(event, state){enviar(this, state);}'
+					            'switchChange' => 'js:function(event, state){
+									enviar($(this).attr("name"), state);
+					            }'
 					        )
 					    )
 					);
@@ -68,17 +75,26 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	function enviar(id, value)
 	{
 	    $.ajax({
-	        url:"<?php echo Yii::app()->createUrl('configuracionReservacionPorDia/update'); ?>",
+	        url:"<?php echo Yii::app()->createUrl('/configuracionReservacionPorDia/update'); ?>",
 	        type:"POST",    
-	        data:{id_dia:id,valor:value},
+	        dataType: 'json',  
+	        data:{id:id, valor:value},
 	        
+	        beforeSend: function()
+            {
+               $("#div_success").hide();
+               $("#div_error").hide();
+            },
 	        success: function(data)
 	        {
+	          	if (data.error == 'true')
+	          		$("#div_error").show();
+	          	else $("#div_success").show();
 	          	
 	        },
 	        error: function()
 	        {
-
+	        	alert("Ocurrio un error al cargar los datos de btl");
 	        }
 	    });
 	}

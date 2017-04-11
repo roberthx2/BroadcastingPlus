@@ -1,6 +1,6 @@
 <?php
 
-class ConfiguracionReservacionPorDiaController extends Controller
+class ConfiguracionSmsPorDiaController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -54,14 +54,14 @@ class ConfiguracionReservacionPorDiaController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new ConfiguracionReservacionPorDia;
+		$model=new ConfiguracionSmsPorDia;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['ConfiguracionReservacionPorDia']))
+		if(isset($_POST['ConfiguracionSmsPorDia']))
 		{
-			$model->attributes=$_POST['ConfiguracionReservacionPorDia'];
+			$model->attributes=$_POST['ConfiguracionSmsPorDia'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id_dia));
 		}
@@ -76,16 +76,16 @@ class ConfiguracionReservacionPorDiaController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	/*public function actionUpdate($id)
+	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['ConfiguracionReservacionPorDia']))
+		if(isset($_POST['ConfiguracionSmsPorDia']))
 		{
-			$model->attributes=$_POST['ConfiguracionReservacionPorDia'];
+			$model->attributes=$_POST['ConfiguracionSmsPorDia'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id_dia));
 		}
@@ -93,33 +93,6 @@ class ConfiguracionReservacionPorDiaController extends Controller
 		$this->render('update',array(
 			'model'=>$model,
 		));
-	}*/
-
-	public function actionUpdate()
-	{
-		$id = Yii::app()->request->getParam('id');
-		$valor = Yii::app()->request->getParam('valor');
-
-        if (Yii::app()->request->isAjaxRequest)
-        {
-        	$model=$this->loadModel($id);
-        	$model->estado = ($valor == 'true') ? 1 : 0;
-        	
-        	if ($model->save())
-        	{
-	            echo CJSON::encode(array(
-	                'error' => 'false',
-	            ));
-	            Yii::app()->end();
-	        }
-	        else
-	        {
-	        	echo CJSON::encode(array(
-                'error' => 'true',
-	            ));
-	            Yii::app()->end();
-	        }
-        }
 	}
 
 	/**
@@ -141,7 +114,7 @@ class ConfiguracionReservacionPorDiaController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('ConfiguracionReservacionPorDia');
+		$dataProvider=new CActiveDataProvider('ConfiguracionSmsPorDia');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -152,10 +125,10 @@ class ConfiguracionReservacionPorDiaController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new ConfiguracionReservacionPorDia('search');
+		$model=new ConfiguracionSmsPorDia('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['ConfiguracionReservacionPorDia']))
-			$model->attributes=$_GET['ConfiguracionReservacionPorDia'];
+		if(isset($_GET['ConfiguracionSmsPorDia']))
+			$model->attributes=$_GET['ConfiguracionSmsPorDia'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -166,12 +139,12 @@ class ConfiguracionReservacionPorDiaController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return ConfiguracionReservacionPorDia the loaded model
+	 * @return ConfiguracionSmsPorDia the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=ConfiguracionReservacionPorDia::model()->findByPk($id);
+		$model=ConfiguracionSmsPorDia::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -179,11 +152,11 @@ class ConfiguracionReservacionPorDiaController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param ConfiguracionReservacionPorDia $model the model to be validated
+	 * @param ConfiguracionSmsPorDia $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='configuracion-reservacion-por-dia-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='configuracion-sms-por-dia-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

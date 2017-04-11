@@ -106,8 +106,9 @@ class Notificaciones extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->condition = "(id_usuario = ".$id_usuario." AND ";
-		$criteria->condition .= "estado = 0 ) AND (";
+		$criteria->condition = "(id_usuario = ".$id_usuario.") AND ";
+		$criteria->condition .= "(fecha BETWEEN '".date('Y-m-d' , strtotime('-1 month', strtotime(date("Y-m-d"))))."' AND '".date("Y-m-d")."') AND (";
+		//$criteria->condition .= "estado = 0 ) AND (";
 		$criteria->condition .= "asunto LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "fecha LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "hora LIKE '%".$this->buscar."%')";

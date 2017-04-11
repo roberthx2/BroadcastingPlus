@@ -34,7 +34,7 @@
 <?php
 	$color = "";
 	$label = "";
-	$total = Notificaciones::model()->count("id_usuario =:id_usuario AND estado = 0", array("id_usuario"=>Yii::app()->user->id));
+	$total = Notificaciones::model()->count("fecha BETWEEN :fecha_ini AND :fecha_fin AND id_usuario =:id_usuario AND estado = 0", array(":id_usuario"=>Yii::app()->user->id, ":fecha_ini"=>date('Y-m-d' , strtotime('-1 month', strtotime(date("Y-m-d")))), ":fecha_fin"=>date("Y-m-d")));
 	
 	if ($total > 0)
 	{

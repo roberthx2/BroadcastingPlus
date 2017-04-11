@@ -1,22 +1,21 @@
 <?php
 
 /**
- * This is the model class for table "configuracion_operadora_reservacion".
+ * This is the model class for table "configuracion_sms_por_dia".
  *
- * The followings are the available columns in table 'configuracion_operadora_reservacion':
- * @property integer $id_operadora
+ * The followings are the available columns in table 'configuracion_sms_por_dia':
+ * @property string $id_dia
  * @property string $descripcion
- * @property integer $sms_x_seg
- * @property integer $porcentaje_permitido
+ * @property integer $cantidad
  */
-class ConfiguracionOperadoraReservacion extends CActiveRecord
+class ConfiguracionSmsPorDia extends CActiveRecord
 {
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'configuracion_operadora_reservacion';
+		return 'configuracion_sms_por_dia';
 	}
 
 	/**
@@ -27,12 +26,13 @@ class ConfiguracionOperadoraReservacion extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_operadora, descripcion, sms_x_seg, porcentaje_permitido', 'required', 'message'=>'{attribute} requerido'),
-			array('sms_x_seg, porcentaje_permitido', 'numerical', 'min'=>0, 'integerOnly'=>true),
-			array('descripcion', 'length', 'max'=>20),
+			array('id_dia, descripcion, cantidad', 'required','message'=>'{attribute} requerido'),
+			array('cantidad', 'numerical', 'min'=>1, 'integerOnly'=>true),
+			array('id_dia', 'length', 'max'=>2),
+			array('descripcion', 'length', 'max'=>15),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_operadora, descripcion, sms_x_seg, porcentaje_permitido', 'safe', 'on'=>'search'),
+			array('id_dia, descripcion, cantidad', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -53,10 +53,9 @@ class ConfiguracionOperadoraReservacion extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_operadora' => 'Id Operadora',
+			'id_dia' => 'Id Dia',
 			'descripcion' => 'Descripcion',
-			'sms_x_seg' => 'SMS por seg.',
-			'porcentaje_permitido' => 'Porcentaje Permitido',
+			'cantidad' => 'Cantidad',
 		);
 	}
 
@@ -78,10 +77,9 @@ class ConfiguracionOperadoraReservacion extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id_operadora',$this->id_operadora);
+		$criteria->compare('id_dia',$this->id_dia,true);
 		$criteria->compare('descripcion',$this->descripcion,true);
-		$criteria->compare('sms_x_seg',$this->sms_x_seg);
-		$criteria->compare('porcentaje_permitido',$this->porcentaje_permitido);
+		$criteria->compare('cantidad',$this->cantidad);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -100,7 +98,7 @@ class ConfiguracionOperadoraReservacion extends CActiveRecord
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return ConfiguracionOperadoraReservacion the static model class
+	 * @return ConfiguracionSmsPorDia the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

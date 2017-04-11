@@ -20,7 +20,11 @@
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionSistemaAcciones/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Sistema </a></li>  <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionReservacionPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservación dias </a></li>  <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionSmsPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> SMS por dias </a></li>  <?php } ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionReservacionPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservación por dias </a></li>  <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionOperadoraReservacion/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservacion por operadora </a></li>  <?php } ?>
                     </ul>
                  <?php } ?>
                  <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>

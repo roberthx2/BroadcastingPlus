@@ -15,7 +15,29 @@ $('.search-form form').submit(function(){
 <h1>Notificaciones</h1>
 <br><br>
 
-<div class="search-form">
+<div class="clearfix visible-xs-block"></div>
+
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-10 hidden-xs ">
+    <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
+</div><!-- search-form -->
+
+<?php 
+	$this->widget(
+        'booster.widgets.TbButton',
+        array(
+        	'id'=>'agregar',
+        	'buttonType' => 'link',
+            'context' => 'dafault',
+            'label' => 'Agregar Números',
+            'icon' => 'glyphicon glyphicon-plus',
+            'url' => '#',
+            //'url' => Yii::app()->createUrl("lista/agregarNumeros", array("id_lista"=>$model_lista->id_lista)),
+            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),
+        )
+    ); 
+?>
+
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 visible-xs ">
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
 </div><!-- search-form -->
 
@@ -37,8 +59,19 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'type' => 'raw',
 	            'value' => function($data)
 	            {
+	            	$nuevo = "";
+
+	            	if ($data["estado"] == 0)
+	            	{
+	            		$nuevo=$this->widget('booster.widgets.TbBadge', array(
+					        'context' => 'success',
+					        // 'default', 'success', 'info', 'warning', 'danger'
+					        'label' => 'Nuevo',
+					    ), true);
+	            	}
+
 	            	$url = Yii::app()->createUrl('notificaciones/view', array("id_notificacion"=>$data["id_notificacion"]));
-	            	$var = '<a href="'.$url.'">'.$data["asunto"].'</a>';
+	            	$var = '<a href="'.$url.'">'.$data["asunto"].'</a>'." ".$nuevo;
 	            	return $var;
 	            },
 	            'htmlOptions' => array('style' => 'text-align: center;'),
