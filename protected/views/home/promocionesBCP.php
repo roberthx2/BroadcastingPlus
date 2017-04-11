@@ -161,12 +161,48 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'url'=>'Yii::app()->createUrl("promocionesPremium/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
 	            			'visible'=>'visibleConfirmar($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalConfirmar'),
+                            'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalConfirmar").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalConfirmar").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalConfirmar").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar el formulario, intente de nuevo.");
+                                        }
+                                    });
+                                }'
                             ),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promocionesPremium/viewCancelar", array("id_promo"=>$data["id_promo"]))',
 	            			'visible'=>'visibleCancelar($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminar'),
+                            'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalEliminar").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalEliminar").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalEliminar").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar el formulario, intente de nuevo.");
+                                        }
+                                    });
+                                }'
 	            			)
 	            ),
 	        ),

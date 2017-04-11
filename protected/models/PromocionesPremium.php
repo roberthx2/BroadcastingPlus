@@ -166,17 +166,19 @@ class PromocionesPremium extends CActiveRecord
 
 	public function searchHome()
 	{
-		$sql = "SELECT GROUP_CONCAT(id_cliente) AS id_clientes FROM usuario_cliente_operadora WHERE id_usuario = ".Yii::app()->user->id;
-		$id_clientes = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, u.login, t.nombrePromo, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite,
-			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = '".date("Y-m-d")."' AND id_promo = t.id_promo) AS total,
+		$criteria->select = "t.id_promo, u.login, t.nombrePromo, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite, total_sms AS total,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE fecha_in = '".date("Y-m-d")."' AND id_promo = t.id_promo AND status = 1) AS enviados";
 		$criteria->join = "INNER JOIN deadline_outgoing_premium d_o ON t.id_promo = d_o.id_promo ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
 		$criteria->condition = "t.fecha = '".date("Y-m-d")."'";
-		$criteria->addInCondition("t.id_cliente", explode(",", $id_clientes["id_clientes"]));
+
+		if (!Yii::app()->user->isAdmin())
+		{
+			$id_cliente = Yii::app()->Procedimientos->getClienteBCPHostgatorForClienteSMS(Yii::app()->user->modelSMS()->id_cliente);
+			$criteria->addInCondition("t.id_cliente", explode(",", $id_cliente));
+		}
+
 		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "u.login LIKE '%".$this->buscar."%' OR ";

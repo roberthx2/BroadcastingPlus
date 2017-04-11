@@ -119,7 +119,7 @@ class Procedimientos extends CApplicationComponent
 			$sql = "SELECT GROUP_CONCAT(DISTINCT cb.id_cliente_bcp) AS id_clientes FROM usuario_clientes_bcp uc
 				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
 				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
-				WHERE uc.id_usuario = ".Yii::app()->user->id." AND id = ".$id_cliente_sms." AND c.onoff = 1";
+				WHERE uc.id_usuario = ".Yii::app()->user->id." AND c.id_cliente_sms = ".$id_cliente_sms." AND c.onoff = 1";
 		}
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();

@@ -540,13 +540,8 @@ class PromocionController extends Controller
         }
         else
         {
-            $model_historial = HistorialReservacion::model()->find("id_usuario=:id_usuario AND id_operadora=:id_operadora AND ".$nombre_dia.">:nombre_dia", array(":id_usuario"=>Yii::app()->user->id, ":id_operadora"=>$id_operadora, ":nombre_dia"=>$model->hora_inicio));
-            
-            if ($model_historial)
-            {
-                $model_historial->$nombre_dia = $model->hora_inicio;
-                $model_historial->save();
-            }
+            $sql = "UPDATE historial_reservacion SET ".$nombre_dia." = '".$model->hora_inicio."' WHERE id_usuario = ".Yii::app()->user->id." AND id_operadora = ".$id_operadora." AND (".$nombre_dia." > '".$model->hora_inicio."' OR ".$nombre_dia." = '00:00:00')";
+            $sql = Yii::app()->db_masivo_premium->createCommand($sql)->execute();
         }
 
         $model_cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
