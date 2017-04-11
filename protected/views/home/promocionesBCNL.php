@@ -161,12 +161,48 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'url'=>'Yii::app()->createUrl("promociones/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
 	            			'visible'=>'visibleConfirmarBCNL($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-ok', 'title'=>'Confirmar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalConfirmarBCNL'),
+                            'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalConfirmarBCNL").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalConfirmarBCNL").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalConfirmarBCNL").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar la vista.");
+                                        }
+                                    });
+                                }'
                             ),
 	            	'Cancelar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promociones/viewCancelar", array("id_promo"=>$data["id_promo"]))',
 	            			'visible'=>'visibleCancelarBCNL($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-remove', 'title'=>'Cancelar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminarBCNL'),
+                            'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalEliminarBCNL").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalEliminarBCNL").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalEliminarBCNL").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar la vista.");
+                                        }
+                                    });
+                                }'
 	            			)
 	            ),
 	        ),

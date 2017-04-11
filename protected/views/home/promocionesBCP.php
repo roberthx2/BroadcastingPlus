@@ -175,7 +175,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                             $("#divModalConfirmar").html(data);
                                         },
                                         error: function() { 
-                                            alert("No se puede cargar el formulario, intente de nuevo.");
+                                            alert("No se puede cargar la vista.");
                                         }
                                     });
                                 }'
@@ -199,7 +199,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                             $("#divModalEliminar").html(data);
                                         },
                                         error: function() { 
-                                            alert("No se puede cargar el formulario, intente de nuevo.");
+                                            alert("No se puede cargar la vista.");
                                         }
                                     });
                                 }'

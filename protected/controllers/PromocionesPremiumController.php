@@ -205,8 +205,7 @@ class PromocionesPremiumController extends Controller
 	//Obtener el estado de la promocion
 	public function actionGetStatusPromocion($id_promo)
 	{
-		$sql = "SELECT p.estado,  p.fecha, p.hora, d_o.fecha_limite, d_o.hora_limite,
-			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo) AS total,
+		$sql = "SELECT p.estado,  p.fecha, p.hora, d_o.fecha_limite, d_o.hora_limite, total_sms AS total,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = p.id_promo AND status = 1) AS enviados
 			FROM promociones_premium AS p, deadline_outgoing_premium AS d_o
 			WHERE p.id_promo IN (".$id_promo.") AND p.id_promo = d_o.id_promo";

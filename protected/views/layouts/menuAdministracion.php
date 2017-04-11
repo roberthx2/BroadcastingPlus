@@ -14,11 +14,13 @@
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
                 <li data-toggle="collapse" data-target="#menu_configuracion" class="collapsed active">
-                    <a href="#"> Sistema <span class="caret brandMenu" aria-hidden="true"></span></a>
+                    <a href="#"> Configuraciones <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
                     <ul class="sub-menu collapse" id="menu_configuracion">
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionSistemaAcciones/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Configuraciones </a></li>  <?php } ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionSistemaAcciones/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Sistema </a></li>  <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionReservacionPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservación dias </a></li>  <?php } ?>
                     </ul>
                  <?php } ?>
                  <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
