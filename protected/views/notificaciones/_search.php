@@ -5,7 +5,7 @@
 	'method'=>'get',
 )); ?>
 
-<div class="form-group col-md-6">
+<div class="form-group col-md-12">
     <div class="input-group">
       <?php echo $form->textField($model,'buscar',array('class'=>'form-control','size' => 45, 'maxlength' => 45, 'placeholder' => 'Buscar...', 'autocomplete'=>'off')); ?>
       <span class="input-group-btn" title="Buscar">

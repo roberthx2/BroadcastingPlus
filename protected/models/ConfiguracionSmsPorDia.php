@@ -4,7 +4,7 @@
  * This is the model class for table "configuracion_sms_por_dia".
  *
  * The followings are the available columns in table 'configuracion_sms_por_dia':
- * @property string $id_dia
+ * @property integer $id_dia
  * @property string $descripcion
  * @property integer $cantidad
  */
@@ -18,6 +18,11 @@ class ConfiguracionSmsPorDia extends CActiveRecord
 		return 'configuracion_sms_por_dia';
 	}
 
+	public function primaryKey()
+    {
+        return 'id_dia';
+    }
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -26,9 +31,8 @@ class ConfiguracionSmsPorDia extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_dia, descripcion, cantidad', 'required','message'=>'{attribute} requerido'),
-			array('cantidad', 'numerical', 'min'=>1, 'integerOnly'=>true),
-			array('id_dia', 'length', 'max'=>2),
+			array('id_dia, descripcion, cantidad', 'required', 'message'=>'{attribute} requerido'),
+			array('id_dia, cantidad', 'numerical', 'min'=>1, 'integerOnly'=>true),
 			array('descripcion', 'length', 'max'=>15),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -77,7 +81,7 @@ class ConfiguracionSmsPorDia extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('id_dia',$this->id_dia,true);
+		$criteria->compare('id_dia',$this->id_dia);
 		$criteria->compare('descripcion',$this->descripcion,true);
 		$criteria->compare('cantidad',$this->cantidad);
 

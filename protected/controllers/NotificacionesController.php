@@ -13,7 +13,7 @@ class NotificacionesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view'),
+                'actions' => array('index', 'view', 'create'),
                 'users' => array('@'),
             ),
 
@@ -53,5 +53,12 @@ class NotificacionesController extends Controller
     		$this->redirect(array("index"));
     	}
     	
+    }
+
+    public function actionCreate()
+    {
+        $model = new Notificaciones;
+
+        $this->render("form", array("model"=>$model));
     }
 }

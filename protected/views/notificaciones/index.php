@@ -17,7 +17,7 @@ $('.search-form form').submit(function(){
 
 <div class="clearfix visible-xs-block"></div>
 
-<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-10 hidden-xs ">
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 hidden-xs ">
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>
 </div><!-- search-form -->
 
@@ -28,10 +28,10 @@ $('.search-form form').submit(function(){
         	'id'=>'agregar',
         	'buttonType' => 'link',
             'context' => 'dafault',
-            'label' => 'Agregar Números',
+            'label' => 'Enviar notificación',
             'icon' => 'glyphicon glyphicon-plus',
             'url' => '#',
-            //'url' => Yii::app()->createUrl("lista/agregarNumeros", array("id_lista"=>$model_lista->id_lista)),
+            'url' => Yii::app()->createUrl("notificaciones/create"),
             'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),
         )
     ); 

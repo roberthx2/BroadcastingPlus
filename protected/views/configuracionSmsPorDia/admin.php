@@ -53,6 +53,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                   	'params' => array("model"=>"ConfiguracionSmsPorDia"),
                   	'mode'=>'inline',
                   	'title' => '',
+                    //'pk'=>'id_dia',
                   	'success' => 'js: function(response, newValue) {
 				       if(!response.success) return response.msg;
 				    }',
