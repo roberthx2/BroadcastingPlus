@@ -13,6 +13,22 @@ function contarCaracterPromocion()
 	    }
 }
 
+function contarCaracterRestantes(objeto, tam)
+{
+    //alert(objeto);
+    var caracter;
+
+    caracter = new String(objeto.val());
+
+    if(caracter.length>tam)
+    {
+        objeto.val(caracter.substring(0, tam));
+    } else
+        {
+            $("#caracteres").val(tam-caracter.length);
+        }
+}
+
 /*function contarNumerosTextArea()
 {
     var destinatarios = $("#PromocionForm_destinatarios");

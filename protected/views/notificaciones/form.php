@@ -9,7 +9,7 @@
         'booster.widgets.TbActiveForm',
         array(
             'id' => 'lista-form',
-            'type' => 'horizontal',
+            'type' => 'vertical',
             'enableAjaxValidation'=>false,
             'htmlOptions' => array('class' => 'well'),
         )
@@ -19,7 +19,8 @@
      
         <legend>Crear Notificación</legend>
 
-    <?php if (Yii::app()->user->isAdmin()){ ?>
+
+    <?php if (!Yii::app()->user->isAdmin()){ ?>
         <div>
             <?php echo $form->dropDownListGroup(
                 $model,
@@ -33,13 +34,20 @@
                         'htmlOptions' => array('prompt' => 'Seleccionar...'),
                     ),
                     'prepend' => '<i class="glyphicon glyphicon-user"></i>',
-                    'hint' => 'En caso de no selecciionar un usuario, la notificación sera enviada a todos los usuarios.',
+                    'hint' => 'En caso de <em>NO</em> seleccionar un usuario, la notificación sera enviada a todos los usuarios.',
                 )
             ); ?>
         </div>
-    <?php } ?>
+    <?php } 
+        else
+        {
+            echo "Al crear una notificación esta sera enviada al area encargada de <em><strong>Insignia Mobile Communications, C.A.</strong></em> <br><br>";
+        }
+    ?>
 
-    <?php echo $form->html5EditorGroup(
+    <?php 
+
+    echo $form->html5EditorGroup(
             $model,
             'mensaje',
              array(
@@ -47,13 +55,33 @@
                     'editorOptions' => array(
                         'class' => 'span4',
                         'rows' => 5,
-                        'height' => '150',
-                        'options' => array('color' => true)
+                        'options' => array('color' => true),
                     ),
-                )
+                    'height' => '50%',
+                    'width' => '100%',
+                    'htmlOptions'=>array('id'=>'mensaje'),
+                ),
             )
         ); 
     ?>
+
+    <?php /*echo $form->textAreaGroup(
+        $model,
+        'mensaje',
+        array(
+            'wrapperHtmlOptions' => array(
+                'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+            ),
+            'widgetOptions' => array(
+                'htmlOptions' => array('rows' => 5, 'maxlength' => 1000, 'style'=> 'resize:none;','onMouseDown' => 'contarCaracterRestantes(this,1000)', 'onChange' => 'contarCaracterRestantes(this,1000)', 'onBlur' => 'contarCaracterRestantes(this,1000)','onKeyDown' => 'contarCaracterRestantes(this,1000)','onFocus' => 'contarCaracterRestantes(this,1000)','onKeyUp' => 'contarCaracterRestantes(this,1000)'),
+            ),
+            'prepend' => '<i class="glyphicon glyphicon-envelope"></i>'
+        )
+    );*/ ?>
+
+    <div style="float: right; font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
+                <?php echo CHTML::textField('caracteres',1000,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
+
     </fieldset>
         <br><br>
         <div>
@@ -64,7 +92,7 @@
                         array(
                             'buttonType' => 'submit',
                             'context' => 'success',
-                            'label' => 'Crear notificación',
+                            'label' => 'Enviar notificación',
                         )
                     ); ?>
             </div>
@@ -73,3 +101,19 @@
     <?php $this->endWidget(); ?>
 <div>
 
+<script type="text/javascript">
+    function contar()
+    {
+        var caracter;
+
+        caracter = new String(document.crearP.contenido.value);
+
+        if(caracter.length>158)
+        {
+            crearP.contenido.value = caracter.substring(0, 158);
+        } else
+            {
+                crearP.caracteres.value = (158-caracter.length);
+            }
+    }
+</script>

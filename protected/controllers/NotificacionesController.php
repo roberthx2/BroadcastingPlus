@@ -13,7 +13,7 @@ class NotificacionesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'create'),
+                'actions' => array('index', 'view', 'create', 'getNotificaciones', 'convertirValor'),
                 'users' => array('@'),
             ),
 
@@ -55,10 +55,53 @@ class NotificacionesController extends Controller
     	
     }
 
+    public function actionConvertirValor()
+    {
+        echo CJSON::encode(array(
+            'valor' => Yii::app()->createUrl("notificaciones/view", array("id_notificacion"=>Yii::app()->request->getParam('id_notificacion')))
+        ));
+        Yii::app()->end();
+    }
+
     public function actionCreate()
     {
         $model = new Notificaciones;
 
+        if(isset($_POST['Notificaciones']))
+        {
+            $model->attributes=$_POST['Notificaciones'];
+            
+            if ($model->validate())
+            {
+
+            }
+        }
         $this->render("form", array("model"=>$model));
+    }
+
+    public function actionGetNotificaciones()
+    {
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            $model = Notificaciones::model()->findAll("fecha BETWEEN :fecha_ini AND :fecha_fin AND id_usuario =:id_usuario AND estado = 0", array(":fecha_ini"=>date('Y-m-d' , strtotime('-1 month', strtotime(date("Y-m-d")))), ":fecha_fin"=>date("Y-m-d"), ":id_usuario"=>Yii::app()->user->id));
+
+            if ($model)
+            {
+                echo CJSON::encode(array(
+                    'error' => 'false',
+                    'data' => $model,
+                ));
+                Yii::app()->end();
+            }
+            else
+            {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => 'No posee cliente asociado'
+                ));
+                Yii::app()->end();
+            }
+        }
+
     }
 }
