@@ -1,6 +1,19 @@
 
 <div id="page-content-wrapper">
 
+    <?php
+        $flashMessages = Yii::app()->user->getFlashes();
+        if ($flashMessages) {
+            echo '<br><div class="container-fluid">';
+            foreach($flashMessages as $key => $message) {
+                echo '<div class="alert alert-'.$key.'">';
+                echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+                echo '<span class="glyphicon glyphicon-'. (($key == "success") ? "ok":"ban-circle").'"></span> '.$message;
+            }
+            echo '</div></div>';
+        }
+    ?>
+
     <div class="form col-xs-12 col-sm-12 col-md-12 col-lg-12" >
 
     <?php 
@@ -17,10 +30,10 @@
 
     <fieldset>
      
-        <legend>Crear Notificación</legend>
+        <legend><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Crear Notificación </legend>
 
 
-    <?php if (!Yii::app()->user->isAdmin()){ ?>
+    <?php if (Yii::app()->user->isAdmin()){ ?>
         <div>
             <?php echo $form->dropDownListGroup(
                 $model,
@@ -55,7 +68,7 @@
                     'editorOptions' => array(
                         'class' => 'span4',
                         'rows' => 5,
-                        'options' => array('color' => true),
+                        'options' => array('color' => true, 'id'=>'mensaje'),
                     ),
                     'height' => '50%',
                     'width' => '100%',
@@ -64,20 +77,6 @@
             )
         ); 
     ?>
-
-    <?php /*echo $form->textAreaGroup(
-        $model,
-        'mensaje',
-        array(
-            'wrapperHtmlOptions' => array(
-                'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-            ),
-            'widgetOptions' => array(
-                'htmlOptions' => array('rows' => 5, 'maxlength' => 1000, 'style'=> 'resize:none;','onMouseDown' => 'contarCaracterRestantes(this,1000)', 'onChange' => 'contarCaracterRestantes(this,1000)', 'onBlur' => 'contarCaracterRestantes(this,1000)','onKeyDown' => 'contarCaracterRestantes(this,1000)','onFocus' => 'contarCaracterRestantes(this,1000)','onKeyUp' => 'contarCaracterRestantes(this,1000)'),
-            ),
-            'prepend' => '<i class="glyphicon glyphicon-envelope"></i>'
-        )
-    );*/ ?>
 
     <div style="float: right; font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
                 <?php echo CHTML::textField('caracteres',1000,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
@@ -93,6 +92,7 @@
                             'buttonType' => 'submit',
                             'context' => 'success',
                             'label' => 'Enviar notificación',
+                            'icon' => 'glyphicon glyphicon-send',
                         )
                     ); ?>
             </div>
@@ -102,18 +102,24 @@
 <div>
 
 <script type="text/javascript">
-    function contar()
+    $(document).ready(function() 
     {
+        setInterval(function() {
+            contarCaracterRestantesSinLimite($("#mensaje"), 1000)
+        }, 1);
+    });
+
+    function contarCaracterRestantesSinLimite(objeto, tam)
+    {
+        //alert(objeto);
         var caracter;
 
-        caracter = new String(document.crearP.contenido.value);
+        caracter = new String(objeto.val());
 
-        if(caracter.length>158)
-        {
-            crearP.contenido.value = caracter.substring(0, 158);
-        } else
-            {
-                crearP.caracteres.value = (158-caracter.length);
-            }
+        $("#caracteres").val(tam-caracter.length);
+        $("ul.wysihtml5-toolbar").find("a[title='Insert image']").hide();
+        $("ul.wysihtml5-toolbar").find("a[title='Insert image']").addClass("disabled");
     }
+
+
 </script>

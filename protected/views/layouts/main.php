@@ -166,7 +166,7 @@ body {
 		    });
 	    }
 
-	    if (controlador == "site" || controlador == "home")
+	    if (controlador == "site" || controlador == "home" || controlador == "notificaciones")
 	    {
 	    	$(".boton_menu").find(".glyphicon-transfer").removeClass("glyphicon glyphicon-transfer").addClass("none");
 	    }
@@ -177,7 +177,7 @@ body {
 
 		setInterval(function() {
 			updateNotifations();
-		}, 60000);
+		}, 120000);
 	});
 
 	function updateNotifations()
@@ -238,7 +238,7 @@ body {
 	                        offset: 20,
 	                        spacing: 10,
 	                        z_index: 1031,
-	                        delay: 10000,
+	                        delay: 15000,
 	                        timer: 2000,
 	                        url_target: '_blank',
 	                        mouse_over: null,

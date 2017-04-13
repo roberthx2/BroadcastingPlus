@@ -264,7 +264,7 @@ class CrontabController extends Controller
                             $mensaje .= "<br><ul><li> Por inactividad: <b>".$value["puertos"]."</b></li>";
                             $mensaje .= "</ul><b>Nota:</b></b><ul><li>Puertos inhabilitados <b>NO</b> pueden ser usados para enviar promociones</li><li>Puertos inhabilitados <b>solo seran rehabilitados por un administrador del sistema</b></li></ul>";
 
-                            Yii::app()->Procedimientos->setNotificacion($value["id_usuario"], $asunto, $mensaje);   
+                            Yii::app()->Procedimientos->setNotificacion($value["id_usuario"], 0, $asunto, $mensaje);   
                         }
 
                         print_r("Actulizando en vacio la cadena de puertos de cada usuario<br>");
@@ -318,7 +318,7 @@ class CrontabController extends Controller
 
                             $mensaje = "Los siguientes puertos presentan poco uso y <b>están próximos a ser inhabilitados</b>, para evitar esta acción <b>deberá hacer uso de ellos</b>.<ul><li>El/los puerto(s): <b>".$value["puertos"]."</b> están a <b>".$aux."</b> día(s) de ser inhabilitados (Ultima vez usado ".$date_warning.")</ul>";
                             
-                            Yii::app()->Procedimientos->setNotificacion($value["id_usuario"], $asunto, $mensaje);   
+                            Yii::app()->Procedimientos->setNotificacion($value["id_usuario"], 0, $asunto, $mensaje);   
                         }
                     }
                 }
@@ -537,7 +537,7 @@ class CrontabController extends Controller
                         $descripcion_historial = "REINTEGRO - El sistema reintegro <strong>(".$total["no_enviados"].") SMS</strong> por la promoción BCP: <strong>".$value["nombrePromo"]."</strong>";
 
                         $asunto = "REINTEGRO DE CUPO BCP";
-                        Yii::app()->Procedimientos->setNotificacion($value["loaded_by"], $asunto, $descripcion_historial);
+                        Yii::app()->Procedimientos->setNotificacion($value["loaded_by"], 0, $asunto, $descripcion_historial);
 
                         $log = 'REINTEGRO - El sistema reintegro ('.$total["no_enviados"].') SMS al usuario '.$usuario["login"].' (id='.$value["loaded_by"].') por la promocion BCP (id_promo = '.$value["id_promo"].')';
 
@@ -663,7 +663,7 @@ class CrontabController extends Controller
                         $descripcion_historial = "REINTEGRO - El sistema reintegro <strong>(".$total["no_enviados"].") SMS</strong> por la promoción BCNL: <strong>".$value["nombrePromo"]."</strong>";
 
                         $asunto = "REINTEGRO DE CUPO BCNL";
-                        Yii::app()->Procedimientos->setNotificacion($value["cadena_usuarios"], $asunto, $descripcion_historial);
+                        Yii::app()->Procedimientos->setNotificacion($value["cadena_usuarios"], 0, $asunto, $descripcion_historial);
 
                         $log = 'REINTEGRO - El sistema reintegro ('.$total["no_enviados"].') SMS al usuario '.$usuario["login"].' (id='.$value["cadena_usuarios"].') por la promocion BCNL (id_promo = '.$value["id_promo"].')';
 

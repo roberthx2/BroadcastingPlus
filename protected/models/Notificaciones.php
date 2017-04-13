@@ -6,6 +6,7 @@
  * The followings are the available columns in table 'notificaciones':
  * @property integer $id_notificacion
  * @property integer $id_usuario
+ * @property integer $id_usuario_creador
  * @property string $asunto
  * @property string $mensaje
  * @property string $fecha
@@ -32,13 +33,14 @@ class Notificaciones extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario, asunto, mensaje, fecha, hora', 'required'),
-			array('id_usuario, estado', 'numerical', 'integerOnly'=>true),
-			array('asunto', 'length', 'max'=>50),
+			array('mensaje', 'required', 'message'=>'{attribute} requerido'),
+			array('id_usuario, id_usuario_creador', 'numerical', 'integerOnly'=>true),
 			array('mensaje', 'length', 'max'=>1000),
+			array("mensaje","filter","filter"=>array($this, "limpiarMensaje")),
+			array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_notificacion, id_usuario, asunto, mensaje, fecha, hora, estado', 'safe', 'on'=>'search'),
+			array('id_notificacion, id_usuario, id_usuario_creador, asunto, mensaje, fecha, hora, estado', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -61,12 +63,36 @@ class Notificaciones extends CActiveRecord
 		return array(
 			'id_notificacion' => 'Id Notificacion',
 			'id_usuario' => 'Id Usuario',
+			'id_usuario_creador' => 'Id Usuario Creador',
 			'asunto' => 'Asunto',
 			'mensaje' => 'Mensaje',
 			'fecha' => 'Fecha',
 			'hora' => 'Hora',
 			'estado' => 'Estado',
 		);
+	}
+
+	public function limpiarMensaje($cadena)
+	{
+		return Yii::app()->Funciones->limpiarMensajeNotificacion($cadena);
+	}
+
+	public function palabrasObscenas($attribute, $params)
+	{
+		$sql = "SELECT group_concat(palabra separator '|') AS palabras FROM palabras_obscenas";
+        $sql = Yii::app()->db->createCommand($sql)->queryRow();
+
+        $palabras = strtolower($sql["palabras"]);
+
+        $contenido = strtolower($this->$attribute);
+
+        preg_match_all('('.$palabras.')', $contenido, $palabras_obscenas);
+        
+        if (count($palabras_obscenas[0]) > 0)
+        {
+            $palabras_obscenas = "<br>(".implode(",",$palabras_obscenas[0]).")";
+            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$palabras_obscenas);
+        }
 	}
 
 	/**
@@ -89,6 +115,7 @@ class Notificaciones extends CActiveRecord
 
 		$criteria->compare('id_notificacion',$this->id_notificacion);
 		$criteria->compare('id_usuario',$this->id_usuario);
+		$criteria->compare('id_usuario_creador',$this->id_usuario_creador);
 		$criteria->compare('asunto',$this->asunto,true);
 		$criteria->compare('mensaje',$this->mensaje,true);
 		$criteria->compare('fecha',$this->fecha,true);
@@ -112,10 +139,16 @@ class Notificaciones extends CActiveRecord
 		$criteria->condition .= "asunto LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "fecha LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "hora LIKE '%".$this->buscar."%')";
-		$criteria->order = "fecha, hora DESC";
+		//$criteria->order = "fecha DESC";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'fecha DESC, hora DESC',
+        		'attributes'=>array(
+             		'fecha', 'hora'
+        		),
+    		),
 		));
 	}
 

@@ -46,6 +46,16 @@ class NotificacionesController extends Controller
     		$model->estado = 1;
     		$model->save();
 
+            if (!Yii::app()->user->isAdmin())
+                $model->id_usuario_creador = ($model->id_usuario_creador == 0) ? "SISTEMA":"EQUIPO TECNICO";
+            else 
+            {
+                $sql = "SELECT login FROM usuario WHERE id_usuario = ".$model->id_usuario_creador;
+                $sql = Yii::app()->db->createCommand($sql)->queryRow();
+
+                $model->id_usuario_creador = ($model->id_usuario_creador == 0) ? "SISTEMA":$sql["login"];
+            }
+
     		$this->render('view', array('model'=>$model));	
     	}
     	else
@@ -73,9 +83,65 @@ class NotificacionesController extends Controller
             
             if ($model->validate())
             {
+                $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
+                try
+                {
+                    if ($model->id_usuario == "")
+                    {
+                        $criteria = new CDbCriteria;
+                        $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
+                        $criteria->compare("acceso_sistema", 1);
+
+                        // Si el usuario es un asociado busca todos los usuarios administrativos
+                        if (!Yii::app()->user->isAdmin())
+                        {
+                            $criteria2 = new CDbCriteria;
+                            $criteria2->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
+                            $criteria2->addInCondition("id_perfil", array(1,2));
+                            $usuarios = UsuarioSms::model()->find($criteria2);
+                            $usuarios = ($usuarios["id_usuario"] == "") ? "null":$usuarios["id_usuario"];
+
+                            $criteria->addInCondition("id_usuario", explode(",", $usuarios));
+
+                            $asunto = "ASISTENCIA TECNICA";
+                        }
+                        else
+                        {
+                            $asunto = "NOTIFICACION";
+                        }
+
+                        $usuarios = Permisos::model()->find($criteria);
+                        $usuarios = ($usuarios["id_usuario"] == "") ? "null":$usuarios["id_usuario"];                            
+
+                        $ids_usuarios = explode(",", $usuarios);
+                    }
+                    else
+                    {
+                        $asunto = "NOTIFICACION";
+                        $ids_usuarios[] = $model->id_usuario;
+                    }
+
+                    foreach ($ids_usuarios as $value)
+                    {
+                        Yii::app()->Procedimientos->setNotificacion($value, Yii::app()->user->id, $asunto, $model->mensaje);
+                    }
+
+                    $model = new Notificaciones;
+
+                    $transaction->commit();
+
+                    $sms = "Notificación enviada correctamente";
+                    Yii::app()->user->setFlash("success", $sms);
+
+                } catch (Exception $e)
+                    {
+                        $sms = "Ocurrio un error al enviar la notificación, intente nuevamente.";
+                        Yii::app()->user->setFlash("danger", $sms);
+                        $transaction->rollBack();
+                    }
             }
-        }
+        }   
         $this->render("form", array("model"=>$model));
     }
 

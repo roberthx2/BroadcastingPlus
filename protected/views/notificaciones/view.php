@@ -10,6 +10,7 @@ $this->widget(
         'data' => $model,
         'type' => 'striped', 
         'attributes' => array(
+            array('name' => 'id_usuario_creador', 'label' => 'De'),
             array('name' => 'asunto', 'label' => 'Asunto'),
             array('name' => 'fecha', 'label' => 'Fecha'),
             array('name' => 'hora', 'label' => 'Hora'),

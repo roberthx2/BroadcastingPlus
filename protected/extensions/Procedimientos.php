@@ -310,10 +310,11 @@ class Procedimientos extends CApplicationComponent
 		$model->save();
 	}
 
-	public function setNotificacion($id_usuario, $asunto, $mensaje)
+	public function setNotificacion($id_usuario, $id_usuario_creador, $asunto, $mensaje)
 	{
 		$model = new Notificaciones;
 		$model->id_usuario = $id_usuario;
+		$model->id_usuario_creador = $id_usuario_creador;
 		$model->asunto = $asunto;
 		$model->mensaje = $mensaje;
 		$model->fecha = date("Y-m-d");
