@@ -79,20 +79,23 @@ class Notificaciones extends CActiveRecord
 
 	public function palabrasObscenas($attribute, $params)
 	{
-		$sql = "SELECT group_concat(palabra separator '|') AS palabras FROM palabras_obscenas";
-        $sql = Yii::app()->db->createCommand($sql)->queryRow();
+		if ($this->scenario != "update")
+		{
+			$sql = "SELECT group_concat(palabra separator '|') AS palabras FROM palabras_obscenas";
+	        $sql = Yii::app()->db->createCommand($sql)->queryRow();
 
-        $palabras = strtolower($sql["palabras"]);
+	        $palabras = strtolower($sql["palabras"]);
 
-        $contenido = strtolower($this->$attribute);
+	        $contenido = strtolower($this->$attribute);
 
-        preg_match_all('('.$palabras.')', $contenido, $palabras_obscenas);
-        
-        if (count($palabras_obscenas[0]) > 0)
-        {
-            $palabras_obscenas = "<br>(".implode(",",$palabras_obscenas[0]).")";
-            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$palabras_obscenas);
-        }
+	        preg_match_all('('.$palabras.')', $contenido, $palabras_obscenas);
+	        
+	        if (count($palabras_obscenas[0]) > 0)
+	        {
+	            $palabras_obscenas = "<br>(".implode(",",$palabras_obscenas[0]).")";
+	            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$palabras_obscenas);
+	        }
+	    }
 	}
 
 	/**
