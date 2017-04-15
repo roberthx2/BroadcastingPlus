@@ -37,7 +37,7 @@ $('.search-form form').submit(function(){
 
     <legend>Configurar Sistema</legend>
 
-<div class="BCP">
+<div class="BCP col-xs-12 col-sm-6 col-md-6 col-lg-6">
     <?php $this->renderPartial('/busqueda/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
 

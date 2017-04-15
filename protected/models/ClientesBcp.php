@@ -110,15 +110,20 @@ class ClientesBcp extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->select = " * FROM (SELECT t.id_cliente_sms, GROUP_CONCAT(DISTINCT c.sc) AS sc";
+		$criteria->select = "t.id_cliente_sms, GROUP_CONCAT(DISTINCT c.sc SEPARATOR ', ') AS sc";
 		$criteria->join = "INNER JOIN cliente c ON t.id_cliente_sms = c.id_cliente_sms";
 		$criteria->condition = "(c.sc != '') ";
-		$criteria->condition .= "GROUP BY t.id_cliente_sms) AS ta WHERE sc LIKE '%".$this->buscar."%' OR id_cliente_sms IN (".$id_clientes_sms.")";//" OR ";
-		//$criteria->condition .= "t.id_cliente_sms IN(".$id_clientes_sms.") )";
-		$criteria->group = "id_cliente_sms";
+		$criteria->group = "t.id_cliente_sms";
+		$criteria->having = "sc LIKE '%".$this->buscar."%' OR t.id_cliente_sms IN (".$id_clientes_sms.")";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_cliente_sms DESC',
+        		'attributes'=>array(
+             		'id_clientes_sms', 'sc'
+        		),
+    		),
 		));
 	}
 

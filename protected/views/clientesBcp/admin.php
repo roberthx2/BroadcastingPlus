@@ -26,7 +26,27 @@ $('.search-form form').submit(function(){
  
     <legend>Administrar Clientes</legend>
 
-<div class="search-form">
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 hidden-xs ">
+    <?php $this->renderPartial('/busqueda/busqueda',array('model'=>$model)); ?>
+</div><!-- search-form -->
+
+<?php 
+    $this->widget(
+        'booster.widgets.TbButton',
+        array(
+            'id'=>'agregar',
+            'buttonType' => 'link',
+            'context' => 'dafault',
+            'label' => 'Crear Cliente BCP',
+            'icon' => 'glyphicon glyphicon-user',
+            'url' => '#',
+            'url' => Yii::app()->createUrl("clientesBCP/create"),
+            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),
+        )
+    ); 
+?>
+
+<div class="search-form col-xs-12 col-sm-6 col-md-6 col-lg-6 visible-xs ">
     <?php $this->renderPartial('/busqueda/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
@@ -70,7 +90,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         'Editar'=>array(
                                 'label'=>' ',
                                 'url'=>'Yii::app()->createUrl("clientesBcp/update", array("id"=>$data["id_cliente_sms"]))',
-                                'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Lista', 'style'=>'color:black;'),
+                                'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
                                 ),
                         )
                 )

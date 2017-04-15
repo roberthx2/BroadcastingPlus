@@ -29,6 +29,15 @@ function contarCaracterRestantes(objeto, tam)
         }
 }
 
+function validarScAlf(caracter)
+{
+    tecla = (document.all) ? caracter.keyCode : caracter.which;
+    patron = /[a-zA-Z_\b]/;
+    te = String.fromCharCode(tecla);
+    te = te.toUpperCase();
+    return patron.test(te); 
+}
+
 /*function contarNumerosTextArea()
 {
     var destinatarios = $("#PromocionForm_destinatarios");

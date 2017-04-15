@@ -62,7 +62,7 @@ class Notificaciones extends CActiveRecord
 	{
 		return array(
 			'id_notificacion' => 'Id Notificacion',
-			'id_usuario' => 'Id Usuario',
+			'id_usuario' => 'Usuario',
 			'id_usuario_creador' => 'Id Usuario Creador',
 			'asunto' => 'Asunto',
 			'mensaje' => 'Mensaje',
