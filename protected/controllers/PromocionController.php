@@ -269,7 +269,7 @@ class PromocionController extends Controller
                         //Update en estado 4 todos los numeros exentos
                         Yii::app()->Filtros->filtrarExentos($id_proceso);
 
-                        if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
+                        if (Yii::app()->Procedimientos->clienteIsHipicoLotero(Yii::app()->user->modelSMS()->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
                             //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
@@ -1061,7 +1061,8 @@ class PromocionController extends Controller
         }
         
         $timeslot_actual = Yii::app()->Procedimientos->getTimeSlot($hora_ini);
-        $hora_ini = $timeslot_actual["hora_ini"];
+
+        $hora_ini = $timeslot_actual["hora_fin"];
 
         $hora_fin = date("H:i:00", strtotime ( +$intervalo.'minute' , strtotime ( $hora_ini ) ));
         
@@ -1096,7 +1097,9 @@ class PromocionController extends Controller
             {
                 if ($this->actionValidarHistorial($fecha, $hora_ini, $id_operadora))
                 {
-                    if (strtotime($hora_fin) > strtotime(date("H:i:00")))
+                    $fecha_limite = date_create($fecha." ".$hora_fin)->format('Y-m-d H:i:s');
+
+                    if (strtotime($fecha_limite) > strtotime(date("Y-m-d H:i:s")))
                     {
                         $total_sms_restante = $total_sms - $capacidad_maxima;
 
@@ -1112,7 +1115,16 @@ class PromocionController extends Controller
             }
             else if ($capacidad_maxima === "unlimited")
             {
-                $arreglo[] = array("hora_ini"=>$hora_ini, "hora_fin"=>date("H:i:00", strtotime ( '+30 minute' , strtotime ( $hora_fin ) )), "total"=>$total_sms);
+                $hora_fin_aux = date("H:i:00", strtotime ( '+60 minute' , strtotime ( date("H:i:00") ) ));
+
+                if (strtotime($hora_ini) >= strtotime($hora_fin_aux))
+                {
+                    $hora_fin_aux = date("H:i:00", strtotime ( '+30 minute' , strtotime ( $hora_fin ) ));
+                }
+
+                $arreglo[] = array("hora_ini"=>$hora_ini, "hora_fin"=>$hora_fin_aux, "total"=>$total_sms);
+
+                //$arreglo[] = array("hora_ini"=>$hora_ini, "hora_fin"=>date("H:i:00", strtotime ( '+30 minute' , strtotime ( $hora_fin ) )), "total"=>$total_sms);
                 $total_sms_restante = 0;
             }
             
