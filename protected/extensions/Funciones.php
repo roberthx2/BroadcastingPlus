@@ -288,6 +288,13 @@ class Funciones extends CApplicationComponent
         $array = array(0=>'domingo', 1=>'lunes', 2=>'martes', 3=>'miercoles', 4=>'jueves', 5=>'viernes', 6=>'sabado');
         return $array[$dia];
     }
+
+    public function like_match($pattern, $subject)
+	{
+		$pattern = "%".$pattern."%";
+	    $pattern = str_replace('%', '.*', preg_quote($pattern, '/'));
+	    return (bool) preg_match("/^{$pattern}$/i", $subject);
+	}
 }
 
 ?>

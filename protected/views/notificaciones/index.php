@@ -54,6 +54,32 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
        // 'filter'=> $model_procesamiento,
         'columns'=> array( 
         	array(
+	            'name' => 'id_usuario_creador',
+	            'value'=> function($data)
+	            {
+	            	if (!Yii::app()->user->isAdmin())
+                		return ($data["id_usuario_creador"] == 0) ? "SISTEMA":"EQUIPO TECNICO";
+	            	else
+	            	{
+	            		if ($data["id_usuario_creador"] == 0)
+	            			return 'SISTEMA';
+	            		else
+	            		{
+			            	$cliteria = new CDbCriteria;
+			            	$cliteria->select = "login";
+			            	$cliteria->compare("id_usuario", $data["id_usuario_creador"]);
+			          		$usuario = UsuarioSms::model()->find($cliteria);
+
+			            	return $usuario->login;
+			            }
+		            }
+	            },
+	            'header' => 'De',
+	            'type' => 'raw',
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+        	),
+        	array(
 	            //'name' => "asunto",
 	            'header' => 'Asunto',
 	            'type' => 'raw',
@@ -77,7 +103,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
-
         	array(
 	            'name' => 'fecha',
 	            'header' => 'Fecha',
@@ -85,7 +110,6 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
-
         	array(
 	            'name' => 'hora',
 	            'header' => 'Hora',

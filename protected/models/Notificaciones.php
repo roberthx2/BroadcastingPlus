@@ -134,15 +134,38 @@ class Notificaciones extends CActiveRecord
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
+		$id_usuarios = "-1";
+
+		if ($this->buscar != "")
+		{
+			$sql = "SELECT GROUP_CONCAT(id_usuario) AS id_usuarios FROM usuario WHERE login LIKE '%".$this->buscar."%'";
+			$id_usuarios = Yii::app()->db_sms->createCommand($sql)->queryRow($sql);
+			$id_usuarios = ($id_usuarios["id_usuarios"] == "") ? "-1" : $id_usuarios["id_usuarios"];
+
+			if (Yii::app()->Funciones->like_match($this->buscar, 'SISTEMA'))
+				$id_usuarios .= ",0";
+
+			if (!Yii::app()->user->isAdmin() && Yii::app()->Funciones->like_match($this->buscar, 'EQUIPO TECNICO'))
+			{
+				$criteria = new CDbCriteria;
+                $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
+                $criteria->addInCondition("id_perfil", array(1,2));
+                $usuarios = UsuarioSms::model()->find($criteria);
+                $usuarios = ($usuarios["id_usuario"] == "") ? "null":$usuarios["id_usuario"];
+
+                $id_usuarios .= ",".$usuarios;
+			}
+		}
+
 		$criteria=new CDbCriteria;
 
 		$criteria->condition = "(id_usuario = ".$id_usuario.") AND ";
 		$criteria->condition .= "(fecha BETWEEN '".date('Y-m-d' , strtotime('-1 month', strtotime(date("Y-m-d"))))."' AND '".date("Y-m-d")."') AND (";
-		//$criteria->condition .= "estado = 0 ) AND (";
 		$criteria->condition .= "asunto LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "fecha LIKE '%".$this->buscar."%' OR ";
-		$criteria->condition .= "hora LIKE '%".$this->buscar."%')";
-		//$criteria->order = "fecha DESC";
+		$criteria->condition .= "hora LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.id_usuario_creador IN (".$id_usuarios.") )";
+
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

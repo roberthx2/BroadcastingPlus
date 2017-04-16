@@ -1060,6 +1060,11 @@ class PromocionController extends Controller
                 $hora_fin_reservacion = $value["valor"];
         }
         
+        $fecha_inicio = date_create($fecha." ".$hora_ini)->format('Y-m-d H:i:00');
+
+        if (strtotime($fecha_inicio) < strtotime(date("Y-m-d H:i:00")))
+            $hora_ini = date("H:i:00");
+
         $timeslot_actual = Yii::app()->Procedimientos->getTimeSlot($hora_ini);
 
         $hora_ini = $timeslot_actual["hora_fin"];
