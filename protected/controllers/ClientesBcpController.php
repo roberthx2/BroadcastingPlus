@@ -284,7 +284,7 @@ class ClientesBcpController extends Controller
 							$sms = "Cliente creado correctamente";
 		                    Yii::app()->user->setFlash("success", $sms);
 
-		                	$this->redirect(array('update','id'=>'1'));
+		                	$this->redirect(array('update','id'=>$model->id_cliente));
 
         				} catch (Exception $e)
 		                    {
@@ -467,7 +467,7 @@ class ClientesBcpController extends Controller
     	$criteria->join = "INNER JOIN operadoras_relacion r ON t.id_operadora = r.id_operadora_bcnl";
 		$criteria->compare("t.estado",1);
 		$criteria->group = "r.id_operadora_bcnl, r.alfanumerico";
-		$criteria->order = "id_operadora ASC";
+		$criteria->order = "id_operadora ASC, estado ASC";
 		$model = OperadorasActivas::model()->findAll($criteria);
 
 		$array = array();

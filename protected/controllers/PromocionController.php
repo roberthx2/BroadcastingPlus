@@ -387,11 +387,11 @@ class PromocionController extends Controller
 
                                 if ($alfanumerico == 1) //ALfanumerico
                                 {
-                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF"."_".$j;;
+                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_ALF"."_".$j;
                                 }
                                 else
                                 {
-                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_".$j;;
+                                    $model_aux->nombre = $model->nombre."_".$value["nombre"]."_".$j;
                                 }
 
                                 $model_aux->hora_inicio = $key["hora_ini"];
@@ -779,16 +779,29 @@ class PromocionController extends Controller
     {
         if (Yii::app()->user->isAdmin())
         {
-            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM clientes_bcp cb 
+            /*$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM clientes_bcp cb 
                     INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
-                    WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
+                    WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";*/
+
+            $sql = "SELECT GROUP_CONCAT(DISTINCT t.id_operadora) AS id_operadora FROM (
+                    SELECT c.id, cb.id_operadora FROM clientes_bcp cb 
+                    INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+                    WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1) AS t
+                    INNER JOIN operadora_cliente oc ON t.id = oc.id_cliente AND t.id_operadora = oc.id_op";
         }
         else
         {
-            $sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM usuario_clientes_bcp uc
+            /*$sql = "SELECT GROUP_CONCAT(DISTINCT id_operadora) AS id_operadora FROM usuario_clientes_bcp uc
                     INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
                     INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
-                    WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";
+                    WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1";*/
+
+            $sql = "SELECT GROUP_CONCAT(DISTINCT t.id_operadora) AS id_operadora FROM (
+                    SELECT c.id, cb.id_operadora FROM usuario_clientes_bcp uc
+                    INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+                    INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+                    WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1) AS t
+                    INNER JOIN operadora_cliente oc ON t.id = oc.id_cliente AND t.id_operadora = oc.id_op";
         }
 
         $sql = Yii::app()->db_insignia_alarmas->createCommand($sql);

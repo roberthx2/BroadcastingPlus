@@ -1,5 +1,5 @@
 <?php
-
+ini_set("max_execution_time",0);
 class CrontabController extends Controller
 {
     //public $layout="//layouts/menuApp";
@@ -452,7 +452,29 @@ class CrontabController extends Controller
                     $cadena_numeros[] = $value["telefonos"];
                 }
 
+                print_r("Borrando la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
+
+                $sql = "TRUNCATE tmp_smsxnumero";
+                print_r($sql."<br>");
+
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
                 printf("Limpiando cadena para realizar el insert en insignia_masivo_premium.tmp_smsxnumero<br>");
+
+                foreach ($cadena_numeros as $value)
+                {
+                    //Luego limpio las doble,triples,etc comas
+                    $numeros = trim(preg_replace('/,{2,}/', ",", $value), ",");
+                    //Armo el super insert
+                    $numeros = "('".str_replace(",", "'),('", $numeros)."')";
+
+                    $sql = "INSERT INTO tmp_smsxnumero (numero) VALUES ".$numeros;
+                    print_r($sql."<br>");
+                
+                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                }
+
+                /*printf("Limpiando cadena para realizar el insert en insignia_masivo_premium.tmp_smsxnumero<br>");
                 //Concateno la cadena por coma (,)
                 $cadena_numeros = implode(",", $cadena_numeros);
                 //Luego limpio las doble,triples,etc comas
@@ -462,17 +484,17 @@ class CrontabController extends Controller
 
                 print_r("Borrando la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
-                $sql = "DELETE FROM tmp_smsxnumero";
+                $sql = "TRUNCATE tmp_smsxnumero";
                 print_r($sql."<br>");
-exit;
+
                 Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                 print_r("Insertando registros en la tabla insignia_masivo_premium.tmp_smsxnumero<br>");
 
                 $sql = "INSERT INTO tmp_smsxnumero (numero) VALUES ".$cadena_numeros;
                 //print_r($sql."<br>");
-                exit;
-                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();*/
 
                 print_r("Asignando los prefijos de las operadoras correspondientes<br>");
 
@@ -506,7 +528,7 @@ exit;
                 print_r("No hay registros en la tabla insignia_masivo.smsxnumeros<br>");
             }
 
-
+            print_r("Aplicando commit a la transaction...<br>");
             $transaction->commit();
 
         } catch (Exception $e)
