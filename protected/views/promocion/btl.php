@@ -49,7 +49,7 @@
                         //'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
                     ),
                     'widgetOptions' => array(
-                        'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'class'=>'input_btl'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+                        'htmlOptions' => array('maxlength' => 30, 'autocomplete' => 'off', 'class'=>'input_btl'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
                     ),
                     'prepend' => '<i class="glyphicon glyphicon-lock"></i>'
                 )

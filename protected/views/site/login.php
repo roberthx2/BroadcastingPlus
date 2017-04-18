@@ -70,7 +70,7 @@ $this->pageTitle=Yii::app()->name . ' - Login';
 					array(
 						'buttonType' => 'submit',
 						'context' => 'success',
-						'label' => 'Iniciar Session',
+						'label' => 'Iniciar Sesión',
 					)
 				); ?></div>
 		</div>

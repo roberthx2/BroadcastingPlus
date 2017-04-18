@@ -111,7 +111,7 @@ class ClientesBcp extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->select = "t.id_cliente_sms, GROUP_CONCAT(DISTINCT c.sc SEPARATOR ', ') AS sc";
-		$criteria->join = "INNER JOIN cliente c ON t.id_cliente_sms = c.id_cliente_sms";
+		$criteria->join = "INNER JOIN cliente c ON t.id_cliente_bcp = c.id";
 		$criteria->condition = "(c.sc != '') ";
 		$criteria->group = "t.id_cliente_sms";
 		$criteria->having = "sc LIKE '%".$this->buscar."%' OR t.id_cliente_sms IN (".$id_clientes_sms.")";

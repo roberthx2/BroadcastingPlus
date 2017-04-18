@@ -449,7 +449,7 @@ class ListaController extends Controller
 		$criteria = new CDbCriteria;
 		$criteria->select = "GROUP_CONCAT(numero SEPARATOR ', ')  AS numero";
 		$criteria->compare("id_lista", $id_lista);
-		$lista = LIstaDestinatarios::model()->find($criteria);
+		$lista = ListaDestinatarios::model()->find($criteria);
 
 		return Yii::app()->getRequest()->sendFile(strtoupper($nombre).".txt", $lista->numero);
 	}

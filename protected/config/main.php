@@ -1,6 +1,6 @@
 <?php
 
-if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.14.188.47') || ($_SERVER['SERVER_NAME'] == '10.0.0.102') || ($_SERVER['SERVER_NAME'] == '192.168.2.124' || true)){
+if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.14.188.47') || ($_SERVER['SERVER_NAME'] == '10.0.0.102') || ($_SERVER['SERVER_NAME'] == '192.168.2.124')){
 
 	//Servidores
 	$host_F1 = "localhost";//"200.109.237.18";

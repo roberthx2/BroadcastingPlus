@@ -1,3 +1,4 @@
+<script src="https://code.highcharts.com/highcharts.js"></script>
 <?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
 <div class="panel-group" id="accordion2">
   <div class="panel panel-primary">

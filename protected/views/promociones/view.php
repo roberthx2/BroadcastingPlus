@@ -7,7 +7,7 @@
 <div class="col-md-6">
 <?php 
 	$data = $this->actionReporteTorta($model_promocion->id_promo);
-	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", array("data"=>$data), true); 
+	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
 </div>
 

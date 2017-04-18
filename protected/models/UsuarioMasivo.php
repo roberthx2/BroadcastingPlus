@@ -24,7 +24,7 @@ class UsuarioMasivo extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'Usuario';
+		return 'usuario';
 	}
 
 	/**

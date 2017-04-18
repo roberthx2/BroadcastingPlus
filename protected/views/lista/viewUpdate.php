@@ -72,7 +72,7 @@
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 <?php 
 	$data = $this->actionReporteTorta($model_lista->id_lista);
-	echo $this->renderPartial("/TmpProcesamiento/graficoTorta", array("data"=>$data), true); 
+	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
 </div>
 
@@ -162,7 +162,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Operadora',
                 'value' => function($data)
                 {
-                    $this->widget(
+                    Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'context' => '',

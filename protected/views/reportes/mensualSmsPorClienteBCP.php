@@ -52,7 +52,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            {
 	            	$estado = ($data["total"]-$data["enviados"]) == 0 ? 0 : 1;
 
-	            	$this->widget(
+	            	Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'label' => $data["total"]-$data["enviados"],
@@ -71,7 +71,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            {
 	            	$estado = $data["enviados"] == 0 ? 0 : 2;
 
-	            	$this->widget(
+	            	Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'label' => $data["enviados"],
@@ -88,7 +88,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            //'type' => 'date',
 	            'value' => function($data)
 	            {
-	            	$this->widget(
+	            	Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'label' => $data["total"],

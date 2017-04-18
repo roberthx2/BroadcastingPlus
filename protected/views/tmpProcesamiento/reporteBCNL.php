@@ -13,7 +13,7 @@ $('.search-form form').submit(function(){
 
 ?>
 <div class="search-form">
-    <?php $this->renderPartial('/TmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
+    <?php $this->renderPartial('/tmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
 </div><!-- search-form -->
 
 <?php
@@ -48,7 +48,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Operadora',
                 'value' => function($data)
                 {
-                    $this->widget(
+                    Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'context' => '',
@@ -69,7 +69,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 {
                     //$objeto = estado($data["estado"], $data["descripcion_estado"]);
 
-                    $this->widget(
+                    Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             //'context' => $objeto['clase'],

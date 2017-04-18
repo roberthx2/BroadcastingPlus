@@ -34,8 +34,8 @@
                     <ul class="sub-menu collapse" id="menu_accesos">
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('clientesBcp/admin');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Clientes </a></li>  <?php } ?>
-                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Usuarios </a></li>  <?php } ?>
+                        <?php /*if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Usuarios </a></li>  <?php } */ ?>
                     </ul>
                  <?php } ?>
             </ul>

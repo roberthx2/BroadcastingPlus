@@ -44,7 +44,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Operadora',
                 'value' => function($data)
                 {
-                    $this->widget(
+                    Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'context' => '',
@@ -63,7 +63,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 'header' => 'Estado',
                 'value' => function($data)
                 {
-                    $this->widget(
+                    Controller::widget(
                         'booster.widgets.TbLabel',
                         array(
                             'label' => $data["descripcion_estado"],

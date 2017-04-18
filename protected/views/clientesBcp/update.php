@@ -29,7 +29,7 @@
 ?>
 <fieldset>
  
-	<legend>Crear Cliente BCP</legend>
+	<legend>Editar Cliente BCP</legend>
 	<br>
 	<?php
         $flashMessages = Yii::app()->user->getFlashes();

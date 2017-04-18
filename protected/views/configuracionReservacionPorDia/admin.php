@@ -50,7 +50,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
             	'header' => 'Estado',
             	'value' => function($data)
 	            {
-	                $this->widget(
+	                Controller::widget(
 					    'booster.widgets.TbSwitch',
 					    array(
 					        'name' => $data["id_dia"],

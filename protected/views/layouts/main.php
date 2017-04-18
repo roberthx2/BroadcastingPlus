@@ -1,4 +1,5 @@
 <?php /* @var $this Controller */ ?>
+<?php header('Content-Type: text/html; charset=UTF-8'); ?>
 <!DOCTYPE html>
 <html>
 <head>

@@ -40,7 +40,7 @@ $('.search-form form').submit(function(){
             'label' => 'Crear Cliente BCP',
             'icon' => 'glyphicon glyphicon-user',
             'url' => '#',
-            'url' => Yii::app()->createUrl("clientesBCP/create"),
+            'url' => Yii::app()->createUrl("clientesBcp/create"),
             'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),
         )
     ); 
@@ -80,7 +80,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                     'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                     'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
                 ),
-                array(
+                /*array(
                     'class' => 'CButtonColumn',
                     'header' => 'Acciones',
                     'template' => '{Editar}',
@@ -93,7 +93,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                 'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
                                 ),
                         )
-                )
+                )*/
 	       ),
         )
     );

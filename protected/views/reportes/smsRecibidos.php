@@ -25,7 +25,7 @@ if (Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcp)
         $modelBCP->id_promo=$_GET['Smsin']["id_promo"];
     }
 
-    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('SmsRecibidosBCP', array('model'=>$modelBCP), true), 'active' => $active));
+    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('smsRecibidosBCP', array('model'=>$modelBCP), true), 'active' => $active));
 }
 
 $this->widget(
