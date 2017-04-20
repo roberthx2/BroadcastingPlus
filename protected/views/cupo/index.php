@@ -26,7 +26,7 @@ if (Yii::app()->user->getPermisos()->historico_cupo_bcp)
     if(isset($_GET['UsuarioCupoHistoricoPremium']))
         $modelBCP->buscar = $_GET['UsuarioCupoHistoricoPremium']["buscar"];
 
-    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('/UsuarioCupoHistoricoPremium/admin', array('model'=>$modelBCP), true), 'active' => $active));
+    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('/usuarioCupoHistoricoPremium/admin', array('model'=>$modelBCP), true), 'active' => $active));
 }
 
 $this->widget(

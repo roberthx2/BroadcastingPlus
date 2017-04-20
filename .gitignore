@@ -35,5 +35,5 @@
 ehthumbs.db
 Thumbs.db
 
-assets/
-protected/runtime/
+assets/*
+protected/runtime/*
