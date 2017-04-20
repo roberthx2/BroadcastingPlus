@@ -19,6 +19,10 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+
+	public $buscar;
+	public $descripcion_operacion;
+
 	public function tableName()
 	{
 		return 'usuario_cupo_historico_premium';
@@ -82,7 +86,7 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	/*public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
@@ -100,6 +104,41 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function search()
+	{	
+		$fecha_min = Yii::app()->Procedimientos->getMinDateHistorial();
+		$fecha_max = date("Y-m-d");
+
+		$criteria = new CDbCriteria;
+
+		$criteria->select = "u.login AS id_usuario, (SELECT login FROM insignia_masivo.usuario WHERE id_usuario = t.ejecutado_por) AS ejecutado_por, t.cantidad, t.descripcion, t.fecha, t.hora, t.tipo_operacion, cd.descripcion AS descripcion_operacion";
+		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
+		$criteria->join .= "INNER JOIN usuario_cupo_premium_tipo cd ON t.tipo_operacion = cd.id_tipo ";
+		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);
+
+		if (!Yii::app()->user->isAdmin())
+		{
+			$criteria->compare("t.id_usuario", Yii::app()->user->id);
+		}
+
+		$criteria->condition .= " AND (u.login LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.cantidad LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.descripcion LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "t.hora LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "cd.descripcion LIKE '%".$this->buscar."%')";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'fecha DESC, hora DESC',
+        		'attributes'=>array(
+             		'fecha', 'hora', 'cantidad'
+        		),
+    		),
 		));
 	}
 

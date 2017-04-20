@@ -96,8 +96,9 @@ class ClienteAlarmas extends CActiveRecord
 		$criteria=new CDbCriteria;
 		$criteria->select = "id, sc, onoff";
 		$criteria->compare('id_cliente_sms',$id_cliente_sms);
+		$criteria->compare("id_cliente_sc_numerico", 0);
 		$criteria->addCondition("sc NOT REGEXP '[a-zA-Z]+'"); 
-
+		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));

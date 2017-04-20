@@ -248,6 +248,18 @@ class Funciones extends CApplicationComponent
 		return $color;
 	}
 
+	public function getColorLabelTipoOperacionCupoBCP($id_tipo_operacion)
+	{
+		if($id_tipo_operacion == 1) //Recarga
+			$color = '#5cb85c';
+		elseif($id_tipo_operacion == 2) //Reintegro
+			$color = '#f0ad4e';
+		elseif ($id_tipo_operacion == 3) //Consumido
+			$color = '#d9534f';
+
+		return $color;
+	}
+
 	public function formatearNumero($numero)
 	{
 		$numero_tmp = false;

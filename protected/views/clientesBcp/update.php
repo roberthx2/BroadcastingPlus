@@ -1,3 +1,4 @@
+
 <?php
 	$flashMessages = Yii::app()->user->getFlashes();
 	if ($flashMessages) {

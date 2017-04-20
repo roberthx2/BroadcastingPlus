@@ -254,8 +254,8 @@ class PromocionesPremium extends CActiveRecord
 		$criteria=new CDbCriteria;
 		$criteria->select = "t.id_cliente,t.nombrePromo, t.fecha, total_sms,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
-		$criteria->addInCondition("id_cliente", explode(",", $id_clientes));
 		$criteria->addBetweenCondition("fecha", date($this->ano."-".$this->mes."-01"), Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes));
+		$criteria->addInCondition("id_cliente", explode(",", $id_clientes));
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

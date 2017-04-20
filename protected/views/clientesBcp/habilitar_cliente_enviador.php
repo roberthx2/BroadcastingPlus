@@ -3,14 +3,13 @@
 /* @var $model ConfiguracionReservacionPorDia */
 
 
-Yii::app()->clientScript->registerScript('search', "
-$('.search-form form').submit(function(){
-	$('#habilitar_sc-grid').yiiGridView('update', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
+$this->widget(
+    'booster.widgets.TbBreadcrumbs',
+    array(
+    	'homeLink' => 'Administrar Clientes',
+        'links' => array('Editar Cliente' => Yii::app()->createUrl('/clientesBcp/update', array("id"=>$id_cliente_sms)), 'Estado cliente enviador'),
+    )
+);
 ?>
 
 <br>
@@ -22,10 +21,8 @@ $('.search-form form').submit(function(){
           <span class="glyphicon glyphicon-remove"></span> <?php echo "Ocurrio un error al realizar la actualización" ?>
     </div>
 
-<fieldset>
-
-    <legend>Habilitar Clientes Enviadores</legend>
-
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 hidden-xs"><b style="font-size: 21px;"> Clientes Enviadores </b></div> <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" align="center" style=""><img class="img" src="<?php echo Yii::app()->request->baseUrl; ?>/img/user.png" align="middle" width="28" height="28"> &nbsp;&nbsp;<b> <?php echo ReportesController::actionGetDescripcionClienteBCNL($id_cliente_sms); ?></b></div>
+<br><HR width=100% align="center">
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
@@ -69,7 +66,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     	),
     ));
 ?>
-</fieldset>
+
 <script type="text/javascript">
 	
 	function enviar(id, value)

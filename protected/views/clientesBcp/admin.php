@@ -95,7 +95,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                         'Habilitar'=>array(
                                 'label'=>' ',
                                 'url'=>'Yii::app()->controller->createUrl("/clientesBcp/activateCliente", array("id_cliente_sms"=>$data["id_cliente_sms"]))',
-                                'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Habilitar SC', 'style'=>'color:black;'),
+                                'options'=>array('class'=>'glyphicon glyphicon-off', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Estado cliente enviador', 'style'=>'color:black;'),
                                 ),
                         )
                 )

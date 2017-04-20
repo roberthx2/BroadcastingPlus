@@ -115,7 +115,7 @@ class ClientesBcpController extends Controller
 	            			$transaction->commit();
 		                	$transaction2->commit();
 
-							$sms = "Cliente creado correctamente";
+							$sms = "Cliente configurado correctamente";
 		                    Yii::app()->user->setFlash("success", $sms);
 
 		                	$this->redirect(array('update','id'=>$model->id_cliente));
@@ -229,7 +229,7 @@ class ClientesBcpController extends Controller
 	            			$transaction->commit();
 		                	$transaction2->commit();
 
-							$sms = "Cliente creado correctamente";
+							$sms = "Cliente configurado correctamente";
 		                    Yii::app()->user->setFlash("success", $sms);
 
 		                	$this->redirect(array('update','id'=>$model->id_cliente));
@@ -254,9 +254,9 @@ class ClientesBcpController extends Controller
 
         $sql = "SELECT 
 					(SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
-						WHERE c.id_cliente_sms = :id_cliente_sms AND sc NOT REGEXP '[a-zA-Z]+') AS sc_all,
+						WHERE c.id_cliente_sms = :id_cliente_sms AND c.id_cliente_sc_numerico = 0 AND sc NOT REGEXP '[a-zA-Z]+') AS sc_all,
 					(SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
-						WHERE c.id_cliente_sms = :id_cliente_sms AND sc NOT REGEXP '[a-zA-Z]+' AND c.onoff = 1) AS sc_habilitados";
+						WHERE c.id_cliente_sms = :id_cliente_sms AND c.id_cliente_sc_numerico = 0 AND sc NOT REGEXP '[a-zA-Z]+' AND c.onoff = 1) AS sc_habilitados";
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
         $sql->bindParam(":id_cliente_sms", $id, PDO::PARAM_INT);
@@ -986,7 +986,7 @@ class ClientesBcpController extends Controller
 		if(isset($_GET['ClienteAlarmas']))
 			$model->attributes=$_GET['ClienteAlarmas'];
 
-		$this->render('habilitarSc',array(
+		$this->render('habilitar_cliente_enviador',array(
 			'model'=>$model,
 			'id_cliente_sms'=>$id_cliente_sms
 		));
