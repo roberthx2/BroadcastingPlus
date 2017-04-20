@@ -28,7 +28,7 @@ class ClientesBcpController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'getSc', 'getOperadoras'),
+				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'getSc', 'getOperadoras', 'activateCliente', 'getInfCliente', 'updateEstado'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -103,179 +103,13 @@ class ClientesBcpController extends Controller
 
 		                try
 		                {
-	            			if ($this->actionClienteExiste($model->id_cliente, $model->sc)) //Nuevo (Esto solo aplica para los clientes existentes antes de implementar el Broadcasting Plus)
+	            			if ($this->actionClienteExisteEnAlarmas($model->id_cliente, $model->sc)) //Nuevo (Esto solo aplica para los clientes existentes antes de implementar el Broadcasting Plus)
 	            			{
-	            				$criteria = new CDbCriteria;
-	            				$criteria->select = "id";
-	            				$criteria->compare("id_cliente_sms", $model->id_cliente);
-	            				$criteria->compare("sc", $model->sc);
-	            				$criteria->compare("id_cliente_sc_numerico", 0);
-	            				$model_cliente_alarmas = ClienteAlarmas::model()->find($criteria);
-
-	            				$operadoras_inversa = array();
-
-			                	foreach ($operadoras as $id_operadora => $value)
-								{
-									foreach ($value as $key => $aux)
-									{
-										$operadoras_inversa[$key][] = $id_operadora;	
-									}
-								}
-
-								$criteria = new CDbCriteria;
-								$criteria->select = "Des_cliente, email";
-								$criteria->compare("Id_cliente", $model->id_cliente);
-								$cliente_sms = ClienteSms::model()->find($criteria);
-
-								$descripcion = $this->actionGetDescripcionCliente($cliente_sms->Des_cliente, $model->sc);
-
-								ClienteAlarmas::model()->updateAll(array("onoff"=>"0"),"id_cliente_sc_numerico=:id", array(":id"=>$model_cliente_alarmas->id));
-
-								foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
-								{
-				                	if ($alfanumerico == 0) //Numerico
-				                	{
-				                		$model_cliente_alarmas->descripcion = $descripcion."@";
-				                		$model_cliente_alarmas->contacto_del_cliente = $cliente_sms->email;
-				                		$model_cliente_alarmas->onoff = 1;
-				                		$model_cliente_alarmas->save();
-
-				                		$criteria = new CDbCriteria;
-				                		$criteria->select = "id";
-				                		$criteria->compare("cliente", $model_cliente_alarmas->id);
-				                		$model_evento = Evento::model()->find($criteria);
-
-				                		$model_evento->descripcion = $descripcion;
-				                		$model_evento->save();
-
-				                		OperadoraCliente::model()->deleteAll("id_cliente=:id_cliente", array(":id_cliente"=>$model_cliente_alarmas->id));
-
-					                	foreach ($ids_operadoras as $id_operadora_bcnl)
-					                	{
-					                		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
-
-					                		foreach ($operadoras_bcp as $id_operadora_bcp)
-					                		{
-					                			$this->actionCrearOperadoraCliente($id_operadora_bcp, $model_cliente_alarmas->id, $id_operadora_bcnl);
-					                		}
-
-					                		$this->actionCrearClienteBCP($model_cliente_alarmas->id, $model, $id_operadora_bcnl, $alfanumerico);
-					                	}
-
-					                	$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$model_cliente_alarmas->id." | sc=".$model->sc;
-
-	        							Yii::app()->Procedimientos->setLog($log);
-				                	}
-				                	else //Alfanumerico
-				                	{
-				                		foreach ($ids_operadoras as $id_operadora_bcnl)
-					                	{
-					         				$id_cliente_alarmas_alf = $this->actionGetIdClienteAlf($model_cliente_alarmas->id, $id_operadora_bcnl);
-
-					         				if ($id_cliente_alarmas_alf == "null")
-					         				{
-					         					$id_cliente_alarmas_alf = $this->actionCrearCliente($model, $cliente_sms, $descripcion, $_POST["sc_alf"], $alfanumerico, $id_operadora_bcnl, $model_cliente_alarmas->id);
-					         				}
-					         				else
-					         				{
-					         					$model_cliente_alarmas_alf = ClienteAlarmas::model()->findByPk($id_cliente_alarmas_alf);
-
-					         					$model_cliente_alarmas_alf->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf@";
-					         					$model_cliente_alarmas_alf->sc = strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
-						                		$model_cliente_alarmas_alf->contacto_del_cliente = $cliente_sms->email;
-						                		$model_cliente_alarmas_alf->onoff = 1;
-						                		$model_cliente_alarmas_alf->save();
-
-						                		$criteria = new CDbCriteria;
-						                		$criteria->select = "id";
-						                		$criteria->compare("cliente", $id_cliente_alarmas_alf);
-						                		$model_evento = Evento::model()->find($criteria);
-
-						                		$model_evento->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf";
-						                		$model_evento->save();
-					         				}
-
-					                		OperadoraCliente::model()->deleteAll("id_cliente=".$id_cliente_alarmas_alf."");
-
-					                		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
-
-					                		foreach ($operadoras_bcp as $id_operadora_bcp)
-					                		{
-					                			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas_alf, $id_operadora_bcnl);
-					                		}
-
-					                		$this->actionCrearClienteBCP($id_cliente_alarmas_alf, $model, $id_operadora_bcnl, $alfanumerico);
-
-					                		$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas_alf." | sc=".strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
-					            
-	        								Yii::app()->Procedimientos->setLog($log);
-					                	}
-				                	}				                	
-								}
+	            				$this->actionCrearClienteEnviadorExistenteEnAlarmas($model, $operadoras);
 	            			}
 	            			else
 	            			{
-			                	$operadoras_inversa = array();
-
-			                	foreach ($operadoras as $id_operadora => $value)
-								{
-									foreach ($value as $key => $aux)
-									{
-										$operadoras_inversa[$key][] = $id_operadora;	
-									}
-								}
-
-								$criteria = new CDbCriteria;
-								$criteria->select = "Des_cliente, email";
-								$criteria->compare("Id_cliente", $model->id_cliente);
-								$cliente_sms = ClienteSms::model()->find($criteria);
-
-								$descripcion = $this->actionGetDescripcionCliente($cliente_sms->Des_cliente, $model->sc);
-								$id_cliente_alarmas = 0;
-
-								foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
-								{
-				                	if ($alfanumerico == 0) //Numerico
-				                	{
-				                		$id_cliente_alarmas = $this->actionCrearCliente($model, $cliente_sms, $descripcion, null, $alfanumerico, null, null);
-
-					                	foreach ($ids_operadoras as $id_operadora_bcnl)
-					                	{
-					                		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
-
-					                		foreach ($operadoras_bcp as $id_operadora_bcp)
-					                		{
-					                			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas, $id_operadora_bcnl);
-					                		}
-
-					                		$this->actionCrearClienteBCP($id_cliente_alarmas, $model, $id_operadora_bcnl, $alfanumerico);
-					                	}
-
-					                	$log = "Cliente BCP creado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas." | sc=".$model->sc;
-
-            							Yii::app()->Procedimientos->setLog($log);
-				                	}
-				                	else //Alfanumerico
-				                	{
-				                		foreach ($ids_operadoras as $id_operadora_bcnl)
-					                	{
-					                		$id_cliente_alarmas_alf = $this->actionCrearCliente($model, $cliente_sms, $descripcion, $_POST["sc_alf"], $alfanumerico, $id_operadora_bcnl, $id_cliente_alarmas);
-
-					                		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
-
-					                		foreach ($operadoras_bcp as $id_operadora_bcp)
-					                		{
-					                			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas_alf, $id_operadora_bcnl);
-					                		}
-
-					                		$this->actionCrearClienteBCP($id_cliente_alarmas_alf, $model, $id_operadora_bcnl, $alfanumerico);
-
-					                		$log = "Cliente BCP creado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas_alf." | sc=".strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
-					                	
-            								Yii::app()->Procedimientos->setLog($log);
-					                	}
-				                	}				                	
-								}
+			                	$this->actionCrearClienteEnviadorNuevo($model, $operadoras);
 	            			}
 
 	            			$transaction->commit();
@@ -302,8 +136,6 @@ class ClientesBcpController extends Controller
 				$sms = "Debe seleccionar una operadora";
                 Yii::app()->user->setFlash("danger", $sms);
 			}
-			/*if($model->save())
-				$this->redirect(array('view','id'=>$model->id));*/
 		}
 
 		$criteria = new CDbCriteria;
@@ -331,21 +163,135 @@ class ClientesBcpController extends Controller
 	 */
 	public function actionUpdate($id)
 	{
-		/*$model=$this->loadModel($id);
+		$model = new ClientesBcpForm;
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['ClientesBcp']))
+		if(isset($_POST['ClientesBcpForm']))
 		{
-			$model->attributes=$_POST['ClientesBcp'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
-		}*/
+			$model->attributes=$_POST['ClientesBcpForm'];
 
-		$this->render('update'/*,array(
+			if (isset($_POST["operadora"]))
+			{
+				$bandera = true;
+
+				if (isset($_POST["sc_alf"]))
+				{
+					//Valida si hay 1 operadora Alf seleccionada y si se ingreso su sc
+					if ($this->actionValidarScAlf($_POST["operadora"], $_POST["sc_alf"]))
+					{
+						//Valida que se haya seleccionado por lo menos 1 oper numerica
+						if ($this->actionValidarOperNumeric($_POST["operadora"]))
+						{
+							$bandera = true;
+						}
+						else 
+						{
+							$bandera = false;
+							$sms = "Debe seleccionar al menos una operadora numerica";
+                			Yii::app()->user->setFlash("danger", $sms);
+						}
+					}
+					else
+					{
+						$bandera = false;
+						$sms = "Debe ingresar los sc alfanumericos para las operadoras alf seleccionadas";
+                		Yii::app()->user->setFlash("danger", $sms);
+					}
+				}
+
+				if ($bandera)
+				{
+					if ($model->validate())
+            		{
+            			
+            			$operadoras = $_POST["operadora"];
+
+            			$transaction = Yii::app()->db_insignia_alarmas->beginTransaction();
+        				$transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+		                try
+		                {
+	            			if ($this->actionClienteExisteEnAlarmas($model->id_cliente, $model->sc)) //Nuevo (Esto solo aplica para los clientes existentes antes de implementar el Broadcasting Plus)
+	            			{
+	            				if ($this->actionClienteExisteEnClientesBcp($model->id_cliente, $model->sc))
+	            				{
+	            					$this->actionCrearClienteEnviadorExistenteEnClientesBcp($model, $operadoras);
+	            				}
+	            				else
+	            				{
+	            					$this->actionCrearClienteEnviadorExistenteEnAlarmas($model, $operadoras);
+	            				}
+	            			}
+	            			else
+	            			{
+	            				$this->actionCrearClienteEnviadorNuevo($model, $operadoras);
+	            			}
+
+	            			$transaction->commit();
+		                	$transaction2->commit();
+
+							$sms = "Cliente creado correctamente";
+		                    Yii::app()->user->setFlash("success", $sms);
+
+		                	$this->redirect(array('update','id'=>$model->id_cliente));
+
+        				} catch (Exception $e)
+		                    {
+		                        $sms = "Ocurrio un error al procesar los datos, intente nuevamente.";
+		                        Yii::app()->user->setFlash("danger", $sms);
+		                        $transaction->rollBack();
+		                        $transaction2->rollBack();
+		                        print_r($e);
+		                    } 
+            		}
+				}
+			}
+			else
+			{
+				$sms = "Debe seleccionar una operadora";
+                Yii::app()->user->setFlash("danger", $sms);
+			}
+		}
+
+        $sql = "SELECT 
+					(SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
+						WHERE c.id_cliente_sms = :id_cliente_sms AND sc NOT REGEXP '[a-zA-Z]+') AS sc_all,
+					(SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
+						WHERE c.id_cliente_sms = :id_cliente_sms AND sc NOT REGEXP '[a-zA-Z]+' AND c.onoff = 1) AS sc_habilitados";
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+        $sql->bindParam(":id_cliente_sms", $id, PDO::PARAM_INT);
+        $sc_alarmas = $sql->queryRow();
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "GROUP_CONCAT(DISTINCT t.sc_id) AS sc_id";
+        $criteria->join = "INNER JOIN producto p ON t.id_sc = p.id_sc";
+        $criteria->condition = "p.cliente = ".$id." AND ";
+        $criteria->condition .= "t.sc_id NOT IN(".$sc_alarmas["sc_all"].") AND ";
+        $criteria->condition .= "p.desc_producto NOT LIKE 'CERRADO%' ";
+        $sc_sms = ScId::model()->find($criteria);
+
+        $sc_all = trim($sc_alarmas["sc_habilitados"].",".$sc_sms->sc_id, ",");
+
+        if ($sc_all != "")
+        {
+	        $sc_aux = array_unique(explode(",", $sc_all));
+
+	        foreach ($sc_aux as $value)
+	        {
+	        	$sc[$value] = $value;
+	        }
+
+	        asort($sc);
+	    }
+	    else $sc = array();
+
+        $model->id_cliente = $id;
+
+		$this->render('update',array(
 			'model'=>$model,
-		)*/);
+			'sc'=>$sc,
+			'operadoras'=>$this->actionGetOperadoras()
+		));
 	}
 
 	/**
@@ -422,14 +368,7 @@ class ClientesBcpController extends Controller
         
         if (Yii::app()->request->isAjaxRequest)
         {
-        	 $sql = "SELECT GROUP_CONCAT(DISTINCT(p.id_sc)) AS cadena_sc FROM producto p "
-                    . "INNER JOIN cliente c on p.cliente = c.Id_cliente "
-                    . "WHERE c.id_cliente = ".$_POST["id_cliente"]." "
-                    . "AND p.desc_producto NOT LIKE 'CERRADO%' ";
-            $cadena_sc = Yii::app()->db_sms->createCommand($sql)->queryRow();
-            $cadena_sc = trim(preg_replace('/,{2,}/', ",", $cadena_sc["cadena_sc"]), ",");
-
-            $criteria = new CDbCriteria;
+            /*$criteria = new CDbCriteria;
             $criteria->select = "GROUP_CONCAT(DISTINCT id_sc) AS id_sc";
             $criteria->join = "INNER JOIN cliente c ON t.cliente = c.Id_cliente ";
             $criteria->condition = "c.Id_cliente = ".$id_cliente." AND ";
@@ -440,6 +379,13 @@ class ClientesBcpController extends Controller
             $criteria = new CDbCriteria;
             $criteria->select = "DISTINCT sc_id";
             $criteria->addInCondition("id_sc", explode(",", $sc_id));
+            $model = ScId::model()->findAll($criteria);*/
+
+            $criteria = new CDbCriteria;
+            $criteria->select = "DISTINCT t.sc_id";
+            $criteria->join = "INNER JOIN producto p ON t.id_sc = p.id_sc";
+            $criteria->condition = "p.cliente = ".$id_cliente." AND ";
+            $criteria->condition .= "p.desc_producto NOT LIKE 'CERRADO%' ";
             $model = ScId::model()->findAll($criteria);
 
         	if($model) {
@@ -485,6 +431,7 @@ class ClientesBcpController extends Controller
 							    array(
 							        'name' => "operadora[$value->id_operadora][$value->estado]",
 								    'value' => 0,
+								    'htmlOptions'=> array('class'=> 'operadora'),
 							    )
 							, true);
 
@@ -492,7 +439,7 @@ class ClientesBcpController extends Controller
 
 			if ($value->estado == 1)
 			{
-				$operadoras .= '<td><input type="text" class="form-control" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value->id_operadora.'] style="text-transform:uppercase;"></td>';
+				$operadoras .= '<td><input type="text" class="form-control sc_alf sc_alf_'.$value->id_operadora.'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value->id_operadora.'] style="text-transform:uppercase;"></td>';
 			}
 			else
 				$operadoras .= '<td></td>';
@@ -546,9 +493,19 @@ class ClientesBcpController extends Controller
 		return $bandera;
 	}
 
-	private function actionClienteExiste($id_cliente_sms, $sc)
+	private function actionClienteExisteEnAlarmas($id_cliente_sms, $sc)
 	{
 		$model = ClienteAlarmas::model()->COUNT("id_cliente_sms=:id_cliente_sms AND sc=:sc", array(":id_cliente_sms"=>$id_cliente_sms, ":sc"=>$sc));
+
+		if ($model > 0)
+			return true;
+
+		return false;
+	}
+
+	private function actionClienteExisteEnClientesBcp($id_cliente_sms, $sc)
+	{
+		$model = ClientesBcp::model()->COUNT("id_cliente_sms=:id_cliente_sms AND sc=:sc", array(":id_cliente_sms"=>$id_cliente_sms, ":sc"=>$sc));
 
 		if ($model > 0)
 			return true;
@@ -700,5 +657,367 @@ class ClientesBcpController extends Controller
 			return $model->id;
 
 		return "null";
+	}
+
+	private function actionCrearClienteEnviadorNuevo($model, $operadoras)
+	{
+		$operadoras_inversa = array();
+
+    	foreach ($operadoras as $id_operadora => $value)
+		{
+			foreach ($value as $key => $aux)
+			{
+				$operadoras_inversa[$key][] = $id_operadora;	
+			}
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->select = "Des_cliente, email";
+		$criteria->compare("Id_cliente", $model->id_cliente);
+		$cliente_sms = ClienteSms::model()->find($criteria);
+
+		$descripcion = $this->actionGetDescripcionCliente($cliente_sms->Des_cliente, $model->sc);
+		$id_cliente_alarmas = 0;
+
+		foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
+		{
+        	if ($alfanumerico == 0) //Numerico
+        	{
+        		$id_cliente_alarmas = $this->actionCrearCliente($model, $cliente_sms, $descripcion, null, $alfanumerico, null, null);
+
+            	foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas, $id_operadora_bcnl);
+            		}
+
+            		$this->actionCrearClienteBCP($id_cliente_alarmas, $model, $id_operadora_bcnl, $alfanumerico);
+            	}
+
+            	$log = "Cliente BCP creado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas." | sc=".$model->sc;
+
+				Yii::app()->Procedimientos->setLog($log);
+        	}
+        	else //Alfanumerico
+        	{
+        		foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+            		$id_cliente_alarmas_alf = $this->actionCrearCliente($model, $cliente_sms, $descripcion, $_POST["sc_alf"], $alfanumerico, $id_operadora_bcnl, $id_cliente_alarmas);
+
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas_alf, $id_operadora_bcnl);
+            		}
+
+            		$this->actionCrearClienteBCP($id_cliente_alarmas_alf, $model, $id_operadora_bcnl, $alfanumerico);
+
+            		$log = "Cliente BCP creado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas_alf." | sc=".strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
+            	
+					Yii::app()->Procedimientos->setLog($log);
+            	}
+        	}				                	
+		}
+	}
+
+	private function actionCrearClienteEnviadorExistenteEnAlarmas($model, $operadoras)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "id";
+		$criteria->compare("id_cliente_sms", $model->id_cliente);
+		$criteria->compare("sc", $model->sc);
+		$criteria->compare("id_cliente_sc_numerico", 0);
+		$model_cliente_alarmas = ClienteAlarmas::model()->find($criteria);
+
+		$operadoras_inversa = array();
+
+    	foreach ($operadoras as $id_operadora => $value)
+		{
+			foreach ($value as $key => $aux)
+			{
+				$operadoras_inversa[$key][] = $id_operadora;	
+			}
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->select = "Des_cliente, email";
+		$criteria->compare("Id_cliente", $model->id_cliente);
+		$cliente_sms = ClienteSms::model()->find($criteria);
+
+		$descripcion = $this->actionGetDescripcionCliente($cliente_sms->Des_cliente, $model->sc);
+
+		ClienteAlarmas::model()->updateAll(array("onoff"=>"0"),"id_cliente_sc_numerico=:id", array(":id"=>$model_cliente_alarmas->id));
+
+		foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
+		{
+        	if ($alfanumerico == 0) //Numerico
+        	{
+        		$model_cliente_alarmas->descripcion = $descripcion."@";
+        		$model_cliente_alarmas->contacto_del_cliente = $cliente_sms->email;
+        		$model_cliente_alarmas->onoff = 1;
+        		$model_cliente_alarmas->save();
+
+        		$criteria = new CDbCriteria;
+        		$criteria->select = "id";
+        		$criteria->compare("cliente", $model_cliente_alarmas->id);
+        		$model_evento = Evento::model()->find($criteria);
+
+        		$model_evento->descripcion = $descripcion;
+        		$model_evento->save();
+
+        		OperadoraCliente::model()->deleteAll("id_cliente=:id_cliente", array(":id_cliente"=>$model_cliente_alarmas->id));
+
+            	foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $model_cliente_alarmas->id, $id_operadora_bcnl);
+            		}
+
+            		$this->actionCrearClienteBCP($model_cliente_alarmas->id, $model, $id_operadora_bcnl, $alfanumerico);
+            	}
+
+            	$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$model_cliente_alarmas->id." | sc=".$model->sc;
+
+				Yii::app()->Procedimientos->setLog($log);
+        	}
+        	else //Alfanumerico
+        	{
+        		foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+     				$id_cliente_alarmas_alf = $this->actionGetIdClienteAlf($model_cliente_alarmas->id, $id_operadora_bcnl);
+
+     				if ($id_cliente_alarmas_alf == "null")
+     				{
+     					$id_cliente_alarmas_alf = $this->actionCrearCliente($model, $cliente_sms, $descripcion, $_POST["sc_alf"], $alfanumerico, $id_operadora_bcnl, $model_cliente_alarmas->id);
+     				}
+     				else
+     				{
+     					$model_cliente_alarmas_alf = ClienteAlarmas::model()->findByPk($id_cliente_alarmas_alf);
+
+     					$model_cliente_alarmas_alf->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf@";
+     					$model_cliente_alarmas_alf->sc = strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
+                		$model_cliente_alarmas_alf->contacto_del_cliente = $cliente_sms->email;
+                		$model_cliente_alarmas_alf->onoff = 1;
+                		$model_cliente_alarmas_alf->save();
+
+                		$criteria = new CDbCriteria;
+                		$criteria->select = "id";
+                		$criteria->compare("cliente", $id_cliente_alarmas_alf);
+                		$model_evento = Evento::model()->find($criteria);
+
+                		$model_evento->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf";
+                		$model_evento->save();
+     				}
+
+            		OperadoraCliente::model()->deleteAll("id_cliente=".$id_cliente_alarmas_alf."");
+
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas_alf, $id_operadora_bcnl);
+            		}
+
+            		$this->actionCrearClienteBCP($id_cliente_alarmas_alf, $model, $id_operadora_bcnl, $alfanumerico);
+
+            		$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas_alf." | sc=".strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
+        
+					Yii::app()->Procedimientos->setLog($log);
+            	}
+        	}				                	
+		}
+	}
+
+	private function actionCrearClienteEnviadorExistenteEnClientesBcp($model, $operadoras)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "id";
+		$criteria->compare("id_cliente_sms", $model->id_cliente);
+		$criteria->compare("sc", $model->sc);
+		$criteria->compare("id_cliente_sc_numerico", 0);
+		$model_cliente_alarmas = ClienteAlarmas::model()->find($criteria);
+
+		$operadoras_inversa = array();
+
+    	foreach ($operadoras as $id_operadora => $value)
+		{
+			foreach ($value as $key => $aux)
+			{
+				$operadoras_inversa[$key][] = $id_operadora;	
+			}
+		}
+
+		$criteria = new CDbCriteria;
+		$criteria->select = "Des_cliente, email";
+		$criteria->compare("Id_cliente", $model->id_cliente);
+		$cliente_sms = ClienteSms::model()->find($criteria);
+
+		$descripcion = $this->actionGetDescripcionCliente($cliente_sms->Des_cliente, $model->sc);
+
+		ClienteAlarmas::model()->updateAll(array("onoff"=>"0"),"id_cliente_sc_numerico=:id", array(":id"=>$model_cliente_alarmas->id));
+
+		foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
+		{
+			if ($alfanumerico == 0) //Numerico
+        	{
+        		$model_cliente_alarmas->descripcion = $descripcion."@";
+        		$model_cliente_alarmas->contacto_del_cliente = $cliente_sms->email;
+        		$model_cliente_alarmas->onoff = 1;
+        		$model_cliente_alarmas->save();
+
+        		$criteria = new CDbCriteria;
+        		$criteria->select = "id";
+        		$criteria->compare("cliente", $model_cliente_alarmas->id);
+        		$model_evento = Evento::model()->find($criteria);
+
+        		$model_evento->descripcion = $descripcion;
+        		$model_evento->save();
+
+        		OperadoraCliente::model()->deleteAll("id_cliente=:id_cliente", array(":id_cliente"=>$model_cliente_alarmas->id));
+
+        		foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $model_cliente_alarmas->id, $id_operadora_bcnl);
+            		}
+
+            		$count = ClientesBcp::model()->COUNT("id_cliente_sms=:id_cliente_sms AND sc=:sc AND id_operadora=:id_operadora AND alfanumerico=:alfanumerico", array(":id_cliente_sms"=>$model->id_cliente, ":sc"=>$model->sc, ":id_operadora"=>$id_operadora_bcnl, ":alfanumerico"=>$alfanumerico));
+
+            		if ($count == 0)
+            			$this->actionCrearClienteBCP($model_cliente_alarmas->id, $model, $id_operadora_bcnl, $alfanumerico);
+            	}
+
+            	$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$model_cliente_alarmas->id." | sc=".$model->sc;
+
+				Yii::app()->Procedimientos->setLog($log);
+        	}
+        	else //Alfanumerico
+        	{
+        		foreach ($ids_operadoras as $id_operadora_bcnl)
+            	{
+     				$id_cliente_alarmas_alf = $this->actionGetIdClienteAlf($model_cliente_alarmas->id, $id_operadora_bcnl);
+
+     				if ($id_cliente_alarmas_alf == "null")
+     				{
+     					$id_cliente_alarmas_alf = $this->actionCrearCliente($model, $cliente_sms, $descripcion, $_POST["sc_alf"], $alfanumerico, $id_operadora_bcnl, $model_cliente_alarmas->id);
+     				}
+     				else
+     				{
+     					$model_cliente_alarmas_alf = ClienteAlarmas::model()->findByPk($id_cliente_alarmas_alf);
+
+     					$model_cliente_alarmas_alf->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf@";
+     					$model_cliente_alarmas_alf->sc = strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
+                		$model_cliente_alarmas_alf->contacto_del_cliente = $cliente_sms->email;
+                		$model_cliente_alarmas_alf->onoff = 1;
+                		$model_cliente_alarmas_alf->save();
+
+                		$criteria = new CDbCriteria;
+                		$criteria->select = "id";
+                		$criteria->compare("cliente", $id_cliente_alarmas_alf);
+                		$model_evento = Evento::model()->find($criteria);
+
+                		$model_evento->descripcion = $descripcion."_".$this->actionGetAbrevOper($id_operadora_bcnl)."_Alf";
+                		$model_evento->save();
+     				}
+
+            		OperadoraCliente::model()->deleteAll("id_cliente=".$id_cliente_alarmas_alf."");
+
+            		$operadoras_bcp = $this->actionGetOperBCP($id_operadora_bcnl, $alfanumerico);
+
+            		foreach ($operadoras_bcp as $id_operadora_bcp)
+            		{
+            			$this->actionCrearOperadoraCliente($id_operadora_bcp, $id_cliente_alarmas_alf, $id_operadora_bcnl);
+            		}
+
+            		$count = ClientesBcp::model()->COUNT("id_cliente_sms=:id_cliente_sms AND sc=:sc AND id_operadora=:id_operadora AND alfanumerico=:alfanumerico", array(":id_cliente_sms"=>$model->id_cliente, ":sc"=>$model->sc, ":id_operadora"=>$id_operadora_bcnl, ":alfanumerico"=>$alfanumerico));
+
+            		if ($count == 0)
+            			$this->actionCrearClienteBCP($id_cliente_alarmas_alf, $model, $id_operadora_bcnl, $alfanumerico);
+
+            		$log = "Cliente BCP enlazado correctamente: id_sms=".$model->id_cliente." | id_cliente_bcp=".$id_cliente_alarmas_alf." | sc=".strtoupper($_POST["sc_alf"][$id_operadora_bcnl]);
+        
+					Yii::app()->Procedimientos->setLog($log);
+            	}
+        	}
+		}	
+	}
+
+	public function actionGetInfCliente()
+	{
+		$id_cliente_sms = Yii::app()->request->getParam('id_cliente_sms');
+		$sc = Yii::app()->request->getParam('sc');
+        
+        if (Yii::app()->request->isAjaxRequest)
+        {
+			$operadoras = Yii::app()->Procedimientos->getScOperadorasBCP($id_cliente_sms, $sc);
+
+			if($operadoras) {
+	            echo CJSON::encode(array(
+		                        'error' => 'false',
+		                        'status' => 'Operadoras obtenidas correctamente',
+		                        'data' => $operadoras,
+		                   )                                
+	                 );
+	            Yii::app()->end();
+	        } else {
+	            echo CJSON::encode(array(
+	                'error' => 'true',
+	                'status' => 'El SC no posee operadoras asociadas'
+	            ));
+	            Yii::app()->end();
+	        }
+	    }
+	}
+
+	public function actionActivateCliente($id_cliente_sms)
+	{
+		$model=new ClienteAlarmas('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['ClienteAlarmas']))
+			$model->attributes=$_GET['ClienteAlarmas'];
+
+		$this->render('habilitarSc',array(
+			'model'=>$model,
+			'id_cliente_sms'=>$id_cliente_sms
+		));
+	}
+
+	public function actionUpdateEstado()
+	{
+		$id = Yii::app()->request->getParam('id');
+		$valor = Yii::app()->request->getParam('valor');
+
+        if (Yii::app()->request->isAjaxRequest)
+        {
+        	$model=ClienteAlarmasController::loadModel($id);
+        	$model->onoff = ($valor == 'true') ? 1 : 0;
+        	
+        	if ($model->save())
+        	{
+        		ClienteAlarmas::model()->updateAll(array("onoff"=>"0"),"id_cliente_sc_numerico=:id", array(":id"=>$model->id));
+        		
+	            echo CJSON::encode(array(
+	                'error' => 'false',
+	            ));
+	            Yii::app()->end();
+	        }
+	        else
+	        {
+	        	echo CJSON::encode(array(
+                'error' => 'true',
+	            ));
+	            Yii::app()->end();
+	        }
+        }
 	}
 }

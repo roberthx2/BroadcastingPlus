@@ -27,9 +27,9 @@
 	    )
 	);
 ?>
-<fieldset>
- 
-	<legend>Editar Cliente BCP</legend>
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 hidden-xs"><b style="font-size: 21px;"> Editar Cliente BCP </b></div> <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" align="center" style=""><img class="img" src="<?php echo Yii::app()->request->baseUrl; ?>/img/user.png" align="middle" width="28" height="28"> &nbsp;&nbsp;<b> <?php echo ReportesController::actionGetDescripcionClienteBCNL($model->id_cliente); ?></b></div>
+<br><HR width=100% align="center">
+
 	<br>
 	<?php
         $flashMessages = Yii::app()->user->getFlashes();
@@ -45,53 +45,9 @@
     ?>
 	<br>
     <div class="container-fluid alert alert-danger" id="div_error" style="display:none;">
-        <span class="glyphicon glyphicon-ban-circle"></span> El cliente seleccionado no posee Short Code asociados
+        <span class="glyphicon glyphicon-ban-circle"></span> El SC no posee operadoras asociadas.
 	</div>
-
-	<div id="div_id_cliente" class="col-xs-12 col-sm-12 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
-		<?php echo $form->dropDownListGroup(
-			$model,
-			'id_cliente',
-			array(
-				'wrapperHtmlOptions' => array(
-					//'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-					//'style'=>'display: none;',
-				),
-				'widgetOptions' => array(
-					'data' => CHtml::listData($clientes, 'Id_cliente', 'Des_cliente'),
-					//'value' => 'null',
-					'htmlOptions' => array('prompt' => 'Seleccionar...',
-					'ajax' => array(
-                        'type'=>'POST', //request type
-                        'dataType' => 'json',
-                        'url'=>Yii::app()->createUrl('/clientesBcp/getSc'), //url to call.
-                        'data' => array('id_cliente' => 'js:$("#ClientesBcpForm_id_cliente").val()'),
-                        'beforeSend' => 'function(){
-                        	$("#div_error").hide();
-                        }',
-                        'success' => 'function(response){
-                                if (response.error == "false")
-                                {
-                                    $("#'.CHTML::activeId($model,'sc').'").empty();
-                                    var sc = response.data;
-                                    $.each(sc, function(i, value) {
-                                        $("#'.CHTML::activeId($model,'sc').'").append($("<option>").text(value.sc_id).attr("value",value.sc_id));
-                                    });
-                                }
-                                else
-                                {
-                                    $("#'.CHTML::activeId($model,'sc').'").empty();
-                                    $("#div_error").show();
-                                    console.log(response.status);
-                                }
-                            }'
-                		),
-					),
-				),
-				'prepend' => '<i class="glyphicon glyphicon-user"></i>',
-			)
-		); ?>
-	</div>
+	<?php echo $form->hiddenField($model, 'id_cliente'); ?>
 
 	<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 			<?php echo $form->dropDownListGroup(
@@ -103,9 +59,34 @@
 						//'style'=>'display: none;',
 					),
 					'widgetOptions' => array(
-						'htmlOptions' => array('prompt' => 'Seleccionar sc...','multiple' => false),
+						'data' => $sc,
+						'htmlOptions' => array(/*'prompt' => 'Seleccionar sc...',*/'multiple' => false, 
+							'ajax' => array(
+		                        'type'=>'POST', //request type
+		                        'dataType' => 'json',
+		                        'url'=>Yii::app()->createUrl('/clientesBcp/getInfCliente'), //url to call.
+		                        'data' => array('id_cliente_sms' => 'js:$("#ClientesBcpForm_id_cliente").val()', 'sc' => 'js:$("#ClientesBcpForm_sc").val()'),
+		                        'beforeSend' => 'function(){
+		                        	reiniciarOperadoras();
+		                        	$("#div_error").hide();
+		                        }',
+		                        'success' => 'function(response){
+		                                if (response.error == "false")
+		                                {
+		                                    var data = response.data;
+		                                    activarOperadoras(data);
+		                                }
+		                                else
+		                                {
+		                                    $("#div_error").show();
+		                                    console.log(response.status);
+		                                }
+		                            }'
+		                		),	
+						),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-tags"></i>',
+					'hint' => 'Haz clic <a href="'.Yii::app()->createUrl("/clientesBcp/activateCliente", array("id_cliente_sms"=>$model->id_cliente)).'">aqui</a> para habilitar los SC que no aparecen en esta lista',
 				)
 			); ?>
 	</div>
@@ -119,24 +100,47 @@
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="center">	
 		<br><br>
 	<?php
-		echo CHtml::submitButton('Crear Cliente', array('id' => 'bontonCrear', 'class'=>'btn btn-success'));
+		echo CHtml::submitButton('Guardar Cambios', array('id' => 'bontonCrear', 'class'=>'btn btn-success'));
 		$this->endWidget();
 	    unset($form);
 	?>
 	</div>
-</fieldset>
 
 <script type="text/javascript">
 
+	function reiniciarOperadoras()
+	{
+		$(".operadora").each(function () 
+		{ 
+			if( $(this).is(":checked") ) 
+				$(this).click(); 
+		});
+
+		$(".sc_alf").val("");
+	} 
+
+	function activarOperadoras(data)
+	{
+        $.each(data, function(i, value)
+        {
+            $("#operadora_"+ value.id_operadora + "_" + value.alfanumerico).click();
+
+            if (value.alfanumerico == 1)
+            {
+            	$(".sc_alf_" + value.id_operadora).val(value.sc);
+            }
+        });
+	}
+
 	$(document).ready(function() 
     {
-    	if ($("#ClientesBcpForm_id_cliente").val() != "")
+    	if ($("#ClientesBcpForm_sc").val() != "")
 		{
 			$.ajax({
-	            url: "<?php echo Yii::app()->createUrl('/clientesBcp/getSc'); ?>",
+	            url: "<?php echo Yii::app()->createUrl('/clientesBcp/getInfCliente'); ?>",
 	            type: "POST",
 	            dataType: 'json',    
-	            data:{id_cliente:$("#ClientesBcpForm_id_cliente").val()},
+	            data:{id_cliente_sms:$("#ClientesBcpForm_id_cliente").val(), sc:$("#ClientesBcpForm_sc").val()},
 	            
 	            beforeSend: function(){
                     $("#div_error").hide();
@@ -144,28 +148,19 @@
 	            success: function(response)
 	            {
 	            	if (response.error == "false")
-	                {
-	                	var sc_id = "<?php echo $model->sc; ?>";
-
-	                	$("#ClientesBcpForm_sc").empty();
-
-	                	var sc = response.data;
-                        $.each(sc, function(i, value) {
-                            $("#ClientesBcpForm_sc").append($("<option>").text(value.sc_id).attr("value",value.sc_id));
-                        });
-
-                        $("#ClientesBcpForm_sc option[value='" + sc_id + "']").prop("selected", true);
-	                }
-	                else
-	                {
-	                	$("#ClientesBcpForm_sc").empty();
+                    {
+                        var data = response.data;
+                        activarOperadoras(data);
+                    }
+                    else
+                    {
                         $("#div_error").show();
-	                    console.log(response.status);
-	                }
+                        //console.log(response.status);
+                    }
 	            },
 	            error: function()
 	            {
-	                alert("Ocurrio un error al cargar los clientes")
+	                alert("Ocurrio un error al cargar la información del cliente");
 	            }
 	        });
 		}

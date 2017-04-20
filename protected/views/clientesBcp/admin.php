@@ -80,20 +80,25 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                     'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                     'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
                 ),
-                /*array(
+                array(
                     'class' => 'CButtonColumn',
                     'header' => 'Acciones',
-                    'template' => '{Editar}',
+                    'template' => '{Editar}&#09;{Habilitar}',
                     'headerHtmlOptions' => array('class'=>'tableHover'),
                     'htmlOptions' => array('style' => 'text-align: center;'),
                     'buttons' => array(
                         'Editar'=>array(
                                 'label'=>' ',
-                                'url'=>'Yii::app()->createUrl("clientesBcp/update", array("id"=>$data["id_cliente_sms"]))',
+                                'url'=>'Yii::app()->controller->createUrl("/clientesBcp/update", array("id"=>$data["id_cliente_sms"]))',
                                 'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
                                 ),
+                        'Habilitar'=>array(
+                                'label'=>' ',
+                                'url'=>'Yii::app()->controller->createUrl("/clientesBcp/activateCliente", array("id_cliente_sms"=>$data["id_cliente_sms"]))',
+                                'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Habilitar SC', 'style'=>'color:black;'),
+                                ),
                         )
-                )*/
+                )
 	       ),
         )
     );

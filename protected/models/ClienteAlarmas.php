@@ -89,22 +89,14 @@ class ClienteAlarmas extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	public function search($id_cliente_sms)
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('descripcion',$this->descripcion,true);
-		$criteria->compare('sc',$this->sc,true);
-		$criteria->compare('cuota',$this->cuota,true);
-		$criteria->compare('burst',$this->burst,true);
-		$criteria->compare('onoff',$this->onoff);
-		$criteria->compare('segundos',$this->segundos);
-		$criteria->compare('id_cliente_sms',$this->id_cliente_sms);
-		$criteria->compare('contacto_del_cliente',$this->contacto_del_cliente,true);
-		$criteria->compare('id_cliente_sc_numerico',$this->id_cliente_sc_numerico);
+		$criteria->select = "id, sc, onoff";
+		$criteria->compare('id_cliente_sms',$id_cliente_sms);
+		$criteria->addCondition("sc NOT REGEXP '[a-zA-Z]+'"); 
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
