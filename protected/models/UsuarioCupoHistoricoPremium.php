@@ -114,7 +114,7 @@ class UsuarioCupoHistoricoPremium extends CActiveRecord
 
 		$criteria = new CDbCriteria;
 
-		$criteria->select = "u.login AS id_usuario, (SELECT login FROM insignia_masivo.usuario WHERE id_usuario = t.ejecutado_por) AS ejecutado_por, t.cantidad, t.descripcion, t.fecha, t.hora, t.tipo_operacion, cd.descripcion AS descripcion_operacion";
+		$criteria->select = "u.login AS id_usuario, CASE ejecutado_por WHEN 0 THEN 'SISTEMA' ELSE (SELECT login FROM insignia_masivo.usuario WHERE id_usuario = t.ejecutado_por) END AS ejecutado_por, t.cantidad, t.descripcion, t.fecha, t.hora, t.tipo_operacion, cd.descripcion AS descripcion_operacion";
 		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
 		$criteria->join .= "INNER JOIN usuario_cupo_premium_tipo cd ON t.tipo_operacion = cd.id_tipo ";
 		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);

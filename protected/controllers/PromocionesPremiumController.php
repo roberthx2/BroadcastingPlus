@@ -155,7 +155,7 @@ class PromocionesPremiumController extends Controller
             $model_promocion->estado = 2;
             $model_promocion->save();
 
-            $sql = "UPDATE outgoing_premium SET status = 2 WHERE id_promo = :id_promo";
+            $sql = "UPDATE outgoing_premium_diario SET status = 2 WHERE id_promo = :id_promo";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql);
             $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_STR);
             $sql->execute();
@@ -183,7 +183,7 @@ class PromocionesPremiumController extends Controller
 			$model->save();
 
 			//Todo lo que sea distinto de enviado
-			$sql = "UPDATE outgoing_premium SET status = 4 WHERE id_promo = ".$id_promo." AND status <> 1"; 
+			$sql = "UPDATE outgoing_premium_diario SET status = 4 WHERE id_promo = ".$id_promo." AND status <> 1"; 
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
 			$log = "PROMOCION CANCELADA BCP | id_promo: ".$id_promo." | id_cliente_bcp: ".$model->id_cliente;

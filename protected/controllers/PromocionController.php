@@ -272,7 +272,7 @@ class PromocionController extends Controller
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero(Yii::app()->user->modelSMS()->id_cliente))
                         {
                             //Update en estado 5 todos los numeros que no tienen trafico suficiente
-                            //Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
+                            Yii::app()->Filtros->filtrarSmsXNumero($id_proceso, 2, $operadorasPermitidasBCP);
 
                             //Update en estado 9 todos los numeros que han sido cargados del limite permitido en el dia
                             Yii::app()->Filtros->filtrarPorCargaDiaria($id_proceso, $model->sc_bcp, $model->fecha, $operadorasPermitidasBCP);
@@ -901,7 +901,7 @@ class PromocionController extends Controller
             $sql = "UPDATE promociones_premium SET estado = 2 WHERE id_promo IN(".$id_promo.")";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
-            $sql = "UPDATE outgoing_premium SET status = 2 WHERE id_promo IN(".$id_promo.")";
+            $sql = "UPDATE outgoing_premium_diario SET status = 2 WHERE id_promo IN(".$id_promo.")";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
             $log = "PROMOCION(ES) BCP CONFIRMADA(S) | id_promo: (".$id_promo.")";
