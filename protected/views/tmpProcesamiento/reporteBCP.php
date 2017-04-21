@@ -13,7 +13,7 @@ $('.search-form form').submit(function(){
 
 ?>
 <div class="search-form">
-    <?php $this->renderPartial('/TmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
+    <?php $this->renderPartial('/tmpProcesamiento/busqueda',array('model'=>$model_procesamiento, 'id_proceso'=>$id_proceso)); ?>
 </div><!-- search-form -->
 
 <?php

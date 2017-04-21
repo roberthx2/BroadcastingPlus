@@ -1,16 +1,6 @@
 <?php
 /* @var $this ConfiguracionOperadoraReservacionController */
 /* @var $model ConfiguracionOperadoraReservacion */
-
-
-Yii::app()->clientScript->registerScript('search', "
-$('.search-form form').submit(function(){
-	$('#configuracion-operadora-reservacion-grid').yiiGridView('update', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
 ?>
 
 <br>
@@ -38,7 +28,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'columns'=> array( 
         	array(
               	'name' => 'descripcion',
-              	'header' => 'Descripcion',
+              	'header' => 'Descripción',
               	'type' => 'raw',
               	'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
               	'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
@@ -55,18 +45,18 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                   	'mode'=>'inline',
                   	'title' => '',
                   	'success' => 'js: function(response, newValue) {
-				       if(!response.success) return response.msg;
-				    }',
-				   	'options' => array(
-				    	'ajaxOptions' => array('dataType' => 'json')
-				   	), 
+        				       if(!response.success) return response.msg;
+        				    }',
+        				   	'options' => array(
+        				    	'ajaxOptions' => array('dataType' => 'json')
+        				   	), 
 				   	
               	)
         	),
         	array(
         		'class' => 'booster.widgets.TbEditableColumn',
 	            'name' => 'porcentaje_permitido',
-	            'header' => '% Permitido.',
+	            'header' => '% Permitido',
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'editable' => array(

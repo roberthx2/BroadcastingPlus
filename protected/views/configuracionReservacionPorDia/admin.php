@@ -1,16 +1,6 @@
 <?php
 /* @var $this ConfiguracionReservacionPorDiaController */
 /* @var $model ConfiguracionReservacionPorDia */
-
-
-Yii::app()->clientScript->registerScript('search', "
-$('.search-form form').submit(function(){
-	$('#configuracion-reservacion-por-dia-grid').yiiGridView('update', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
 ?>
 
 <br>
@@ -41,7 +31,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'columns'=> array( 
         	array(
               	'name' => 'descripcion',
-              	'header' => 'Descripcion',
+              	'header' => 'Descripción',
               	'type' => 'raw',
               	'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
               	'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),

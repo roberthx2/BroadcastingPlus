@@ -1,16 +1,6 @@
 <?php
 /* @var $this ConfiguracionSmsPorDiaController */
 /* @var $model ConfiguracionSmsPorDia */
-
-
-Yii::app()->clientScript->registerScript('search', "
-$('.search-form form').submit(function(){
-	$('#configuracion-sms-por-dia-grid').yiiGridView('update', {
-		data: $(this).serialize()
-	});
-	return false;
-});
-");
 ?>
 
 <br>
