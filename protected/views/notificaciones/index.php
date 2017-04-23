@@ -89,7 +89,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 	            	if ($data["estado"] == 0)
 	            	{
-	            		$nuevo=$this->widget('booster.widgets.TbBadge', array(
+	            		$nuevo=Controller::widget('booster.widgets.TbBadge', array(
 					        'context' => 'success',
 					        // 'default', 'success', 'info', 'warning', 'danger'
 					        'label' => 'Nuevo',

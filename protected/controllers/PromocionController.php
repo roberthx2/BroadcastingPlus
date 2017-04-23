@@ -190,7 +190,7 @@ class PromocionController extends Controller
                             {
                                 $sql = "INSERT INTO insignia_masivo.outgoing (id_promo, number, status, frecuency, date_loaded, time_loaded, loaded_by, date_program, time_program, content, id_cliente) SELECT :id_promo, CONCAT('0',numero), :estado, :puerto, :fecha_cargada, :hora_cargada, :id_usuario, :fecha_envio, :hora_envio, :mensaje, :id_cliente FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 LIMIT :limite_inferio , :limite_superior";
                             
-                                $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                                $sql = Yii::app()->db->createCommand($sql);
                                 $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
                                 $sql->bindParam(":estado", $estado, PDO::PARAM_INT);
                                 $sql->bindParam(":puerto", $value, PDO::PARAM_INT);
