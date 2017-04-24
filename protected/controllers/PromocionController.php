@@ -103,7 +103,7 @@ class PromocionController extends Controller
                         Yii::app()->Filtros->filtrarDuplicados($id_proceso);
 
                         //Update en estado 4 todos los numeros exentos
-                        Yii::app()->Filtros->filtrarExentos($id_proceso);
+                        Yii::app()->Filtros->filtrarExentos($id_proceso, 1, null);
 
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero($model->id_cliente))
                         {
@@ -188,7 +188,7 @@ class PromocionController extends Controller
 
                             foreach ($model->puertos as $value)
                             {
-                                $sql = "INSERT INTO insignia_masivo.outgoing (id_promo, number, status, frecuency, date_loaded, time_loaded, loaded_by, date_program, time_program, content, id_cliente) SELECT :id_promo, CONCAT('0',numero), :estado, :puerto, :fecha_cargada, :hora_cargada, :id_usuario, :fecha_envio, :hora_envio, :mensaje, :id_cliente FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 LIMIT :limite_inferio , :limite_superior";
+                                /*$sql = "INSERT INTO outgoing (id_promo, number, status, frecuency, date_loaded, time_loaded, loaded_by, date_program, time_program, content, id_cliente) SELECT :id_promo, CONCAT('0',numero), :estado, :puerto, :fecha_cargada, :hora_cargada, :id_usuario, :fecha_envio, :hora_envio, :mensaje, :id_cliente FROM insignia_masivo_premium.tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1 LIMIT :limite_inferio , :limite_superior";
                             
                                 $sql = Yii::app()->db->createCommand($sql);
                                 $sql->bindParam(":id_promo", $id_promo, PDO::PARAM_INT);
@@ -204,7 +204,24 @@ class PromocionController extends Controller
                                 $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
                                 $sql->bindParam(":limite_inferio", $limite_inferio, PDO::PARAM_INT);
                                 $sql->bindParam(":limite_superior", $sms_x_modem, PDO::PARAM_INT);
-                                $sql->execute();
+                                $sql->execute();*/
+
+                                $sql_1 = "SELECT CONCAT('0',numero) AS numero FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1 LIMIT ".$limite_inferio." , ".$sms_x_modem;
+                                $sql_1 = Yii::app()->db_masivo_premium->createCommand($sql_1)->queryAll();
+
+                                $array = array();
+
+                                foreach ($sql_1 as $num)
+                                {
+                                    $array[] = "(".$id_promo.", '".$num["numero"]."', ".$estado.", ".$value.", '".date("Y-m-d")."', '".date("H:i:s")."', ".$id_usuario.", '".$model->fecha."', '".$model->hora_inicio."', '".$model->mensaje."', ".$model->id_cliente.")";
+                                }
+
+                                if (COUNT($array) > 0)
+                                {
+                                    $sql = "INSERT INTO outgoing (id_promo, number, status, frecuency, date_loaded, time_loaded, loaded_by, date_program, time_program, content, id_cliente) VALUES ".implode(",", $array);
+
+                                    $sql = Yii::app()->db->createCommand($sql)->execute();
+                                }
 
                                 $limite_inferio = $limite_inferio + $sms_x_modem;
                             }
@@ -299,11 +316,20 @@ class PromocionController extends Controller
                         $_SESSION["operadoras_bcp"] = $operadoras_bcp;
 
                         if ($objeto_timeslot["timeslot"] && $objeto_timeslot["mostrarMensaje"])
-                           $this->redirect(array("mensajeTimeSlot", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
-                        else $this->redirect(array("generarPromocionBCP", "id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
+                        {
+                            $url = Yii::app()->createUrl("promocion/mensajeTimeSlot", array("id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
+                        }
+                        else
+                        {
+                            $url = Yii::app()->createUrl("promocion/generarPromocionBCP", array("id_proceso"=>$id_proceso, "timeslot"=>$objeto_timeslot["timeslot"]));
+                        }
                     }
                     else //BCNL/CPEI
-                        $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+                    {
+                        $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+                    }
+
+                    $this->redirect($url);
 
                 } catch (Exception $e)
                     {
@@ -336,8 +362,11 @@ class PromocionController extends Controller
         $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas, 'operadoras_bcp'=>$operadoras_bcp));
     }
 
-    public function actionGenerarPromocionBCP($id_proceso, $timeslot)
+    public function actionGenerarPromocionBCP()
     {
+        $id_proceso = Yii::app()->request->getParam('id_proceso');
+        $timeslot = Yii::app()->request->getParam('timeslot');
+
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
         try
@@ -445,13 +474,15 @@ class PromocionController extends Controller
             unset($_SESSION["operadoras_bcp"]);
             unset($_SESSION["timeslot"]);
 
-            $this->redirect(array("reporteCreate", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+            $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+
+            $this->redirect($url);
 
         } catch (Exception $e)
             {
                 $error = "Ocurrio un error al crear la promocion, intente nuevamente.";
                 Yii::app()->user->setFlash("danger", $error);
-                print_r($e);
+                //print_r($e);
                 $transaction->rollBack();
                 //$this->redirect(array("create"));
             }
@@ -1001,8 +1032,13 @@ class PromocionController extends Controller
         }
     }
 
-    public function actionReporteCreate($id_proceso, $nombre, $url_confirmar, $tipo)
+    public function actionReporteCreate()
     {
+        $id_proceso = Yii::app()->request->getParam('id_proceso');
+        $nombre = Yii::app()->request->getParam('nombre');
+        $url_confirmar = Yii::app()->request->getParam('url_confirmar');
+        $tipo = Yii::app()->request->getParam('tipo');
+
         $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar, 'tipo'=>$tipo));
     }
 
@@ -1247,8 +1283,11 @@ class PromocionController extends Controller
         }
     }*/
 
-    public function actionMensajeTimeSlot($id_proceso, $timeslot)
+    public function actionMensajeTimeSlot()
     {
+        $id_proceso = Yii::app()->request->getParam('id_proceso');
+        $timeslot = Yii::app()->request->getParam('timeslot');
+
         $this->render("timeSlot", array("id_proceso"=>$id_proceso, "timeslot"=>$timeslot));
     }
 

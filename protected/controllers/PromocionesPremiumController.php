@@ -169,7 +169,7 @@ class PromocionesPremiumController extends Controller
                 $transaction->rollBack();
             }
 
-        $this->redirect("home/index");
+        $this->redirect(Yii::app()->createUrl("home/index"));
     }
 
 	public function actionCancelarPromo($id_promo)
@@ -198,8 +198,8 @@ class PromocionesPremiumController extends Controller
 				Yii::app()->user->setFlash("danger", $error);
         		$transaction->rollBack();
     		}
-
-    	$this->redirect("home/index");
+    	
+    	$this->redirect(Yii::app()->createUrl("home/index"));
 	}
 
 	//Obtener el estado de la promocion
