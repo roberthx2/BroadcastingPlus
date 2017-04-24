@@ -231,7 +231,7 @@ class PromocionController extends Controller
                         //BTL
                         if (isset($model->sc) && $model->sc != "")
                         {
-                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos);
+                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos, 2, $operadorasPermitidasBCP);
 
                             //En case de existir numeros obtenidos desde BTL los updateo como validos para que no se aplique ningun filtro
                             if ($btl_destinatarios != "")
@@ -267,7 +267,7 @@ class PromocionController extends Controller
                         Yii::app()->Filtros->filtrarOperadoraPermitida($id_proceso, $operadorasPermitidasBCP);
 
                         //Update en estado 4 todos los numeros exentos
-                        Yii::app()->Filtros->filtrarExentos($id_proceso);
+                        Yii::app()->Filtros->filtrarExentos($id_proceso, 2, $operadorasPermitidasBCP);
 
                         if (Yii::app()->Procedimientos->clienteIsHipicoLotero(Yii::app()->user->modelSMS()->id_cliente))
                         {

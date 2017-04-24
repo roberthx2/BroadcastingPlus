@@ -94,14 +94,47 @@ class Filtros extends CApplicationComponent
     	$sql->execute();	
 	}
 
-	public function filtrarExentos($id_proceso)
+	public function filtrarExentos($id_proceso, $tipo, $operadorasPermitidas)
 	{
 		//FALTA EL FILTRO DE EXENTOS DE F1
 
-		$this->fltrarExentosF2($id_proceso);
+		$this->fltrarExentosF2($id_proceso, $tipo, $operadorasPermitidas);
 	}
 
-	private function fltrarExentosF2($id_proceso)
+	private function fltrarExentosF2($id_proceso, $tipo, $operadorasPermitidas)
+	{
+		//TIPO = 1 BCNL / CPEI
+		//TIPO = 2 BCP
+
+		if ($tipo == 1)
+		{
+			//Exentos cortos
+			$sql = "SELECT GROUP_CONCAT(CONCAT('^', numero) SEPARATOR '|') AS regexp_ex FROM tmp_exentos WHERE tipo = 2";
+        	$regexp_exentos = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+        	$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND ( numero REGEXP ('".$regexp_exentos['regexp_ex']."') OR numero IN (SELECT numero FROM tmp_exentos WHERE tipo = 1) )";
+		}
+		else if ($tipo == 2)
+		{
+			//Exentos cortos
+			$sql = "SELECT GROUP_CONCAT(CONCAT('^', numero) SEPARATOR '|') AS regexp_ex FROM tmp_exentos WHERE id_operadora IN (".$operadorasPermitidas.") AND tipo = 2";
+        	$regexp_exentos = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+        	$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero_btl IS NULL AND ( numero REGEXP ('".$regexp_exentos['regexp_ex']."') OR numero IN (SELECT numero FROM tmp_exentos WHERE id_operadora IN (".$operadorasPermitidas.") AND tipo = 1) )";
+		}
+		
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+    	$id = $sql->queryRow();
+
+    	if ($id["ids"] != "")
+		{
+			$sql = "UPDATE tmp_procesamiento SET estado = 4 WHERE id IN(".$id["ids"].")";
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		}
+	}
+
+	/*private function fltrarExentosF2($id_proceso)
 	{
 		$sql = "SELECT GROUP_CONCAT(CONCAT('^', SUBSTRING(e.numero, 2)) SEPARATOR '|') AS regexp_ex FROM exentos e WHERE LENGTH(numero) < 11";
         $regexp_exentos = Yii::app()->db->createCommand($sql)->queryRow();
@@ -116,7 +149,7 @@ class Filtros extends CApplicationComponent
 			$sql = "UPDATE tmp_procesamiento SET estado = 4 WHERE id IN(".$id["ids"].")";
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 		}
-	}
+	}*/
 
 	public function filtrarSmsXNumero($id_proceso, $tipo, $operadorasPermitidas)
 	{

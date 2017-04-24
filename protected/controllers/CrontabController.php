@@ -789,6 +789,105 @@ class CrontabController extends Controller
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
+
+    //Se ejecuta todos los dias a media noche para llenar la tabla servida de exentos
+    public function actionServirTablaTmpExentos()
+    {
+        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+
+        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+            print_r("Obteniendo números de la tabla insignia_masivo.exentos\n");
+
+            $sql = "SELECT DISTINCT numero FROm exentos";
+            $sql = Yii::app()->db->createCommand($sql)->queryAll();
+
+            if ($sql)
+            {
+                print_r("Borrando la tabla insignia_masivo_premium.tmp_exentos\n");
+
+                $sql2 = "TRUNCATE tmp_exentos";
+                print_r($sql2."\n");
+
+                Yii::app()->db_masivo_premium->createCommand($sql2)->execute();
+
+                print_r("Insertando registros en la tabla tmp_exentos\n");
+
+                $i = 0;
+
+                foreach ($sql as $value)
+                {
+                    $cadena_numeros[] = "('".substr($value["numero"], 1)."')";
+                    $i++;
+
+                    if ($i == 5000)
+                    {
+                        $sql_insert = "INSERT INTO tmp_exentos (numero) VALUES ".implode(",", $cadena_numeros);
+                        Yii::app()->db_masivo_premium->createCommand($sql_insert)->execute();
+                        $cadena_numeros = array();
+                    }
+                }
+
+                if (COUNT($cadena_numeros) > 0)
+                {
+                    $sql = "INSERT INTO tmp_exentos (numero) VALUES ".implode(",", $cadena_numeros);
+                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                }
+
+                print_r("Asignando los prefijos de las operadoras correspondientes\n");
+
+                $sql = "SELECT id_operadora_bcnl, CONCAT('^',GROUP_CONCAT(DISTINCT prefijo SEPARATOR '|^')) AS prefijo, GROUP_CONCAT(DISTINCT prefijo SEPARATOR ' | ') AS prefijo_print, descripcion FROM operadoras_relacion GROUP BY id_operadora_bcnl";
+                print_r($sql."\n");
+                $operadoras = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+                foreach ($operadoras as $value)
+                {
+                    print_r("Asignado prefijo para la operadora ".$value["descripcion"]." (".$value["prefijo_print"].")\n");
+
+                    $sql = "UPDATE tmp_exentos SET id_operadora = ".$value["id_operadora_bcnl"]." WHERE numero REGEXP '".$value["prefijo"]."'";
+                    print_r($sql."\n");
+                    Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                }
+
+                print_r("Eliminando de la tabla insignia_masivo_premium.tmp_exentos todos los números que no posean una operadora valida\n");
+
+                $sql = "DELETE FROM tmp_exentos WHERE id_operadora = 0";
+                print_r($sql."\n");
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                print_r("Actualizando la columna tipo=2 a los numeros exentos cortos...\n");
+                
+                $sql = "UPDATE tmp_exentos SET tipo = 2 WHERE LENGTH(numero) < 10";
+                print_r($sql."\n");
+                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                $sql = "SELECT COUNT(id) AS total FROM tmp_exentos";
+                print_r($sql."\n");
+                $total = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+                print_r("Cantidad de registros insertados en la tabla insignia_masivo_premium.tmp_exentos: ".$total["total"]."\n");
+            }
+            else
+            {
+                print_r("No hay registros en la tabla insignia_masivo.exentos\n");
+            }
+
+            print_r("Aplicando commit a la transaction...\n");
+            $transaction->commit();
+
+        } catch (Exception $e)
+                {
+                    print_r("Ocurrio un error al procesar los datos\n");
+                    print_r($e);
+                    $transaction->rollBack();
+                }
+
+        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+
+        print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
+    }
 }
 
 ?>

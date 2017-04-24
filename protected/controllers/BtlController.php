@@ -201,7 +201,7 @@ class BtlController extends Controller
         }
     }
 
-    public function actionGetNumeros($sc, $operadoras, $all_operadoras, $fecha_inicio, $fecha_fin, $productos)
+    public function actionGetNumeros($sc, $operadoras, $all_operadoras, $fecha_inicio, $fecha_fin, $productos, $tipo, $operadorasPermitidasBCP)
     {
         $numeros_btl = "";
 
@@ -251,7 +251,7 @@ class BtlController extends Controller
                 //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
                 Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
                 //Update en estado 4 todos los numeros exentos
-                Yii::app()->Filtros->filtrarExentos($id_proceso);
+                Yii::app()->Filtros->filtrarExentos($id_proceso, $tipo, $operadorasPermitidasBCP);
                 //Update en estado 10 todos los numeros que sobrepasen el porcentaje permitido
                 Yii::app()->Filtros->filtrarPorcentaje($id_proceso, $porcentaje["porcentaje_lista"]);
                 //Updatea a estado = 1 todos los numeros validos 
