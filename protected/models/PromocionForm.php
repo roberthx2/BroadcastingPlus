@@ -286,19 +286,25 @@ Class PromocionForm extends CFormModel
 		{
 	    	if (Yii::app()->Procedimientos->clienteIsHipicoLotero($this->id_cliente))
 	    	{
-		        preg_match_all('/\d{6,}/', $this->$attribute, $mensaje_partes);
-		        $mensaje_partes = array_unique($mensaje_partes[0]);
-		        $posicion = array_search($this->sc_bcp, $mensaje_partes);
-		       
-		        if ($posicion ==! 'false')
-		        {
-		            unset($mensaje_partes[$posicion]);
-		        }
+	    		$sql = "SELECT add_number_in_sms FROM usuario_acciones_permitidas WHERE id_usuario = ".Yii::app()->user->id;
+	            $validar = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
-		        if (count($mensaje_partes) > 0)
-		        {
-		            $this->addError($attribute, "El mensaje no puede incluir números telefónicos o cadenas de números diferentes a su Short Code");
-		        }
+	            if ($validar["add_number_in_sms"] == 0 || !isset($validar["add_number_in_sms"])) //Debe realizar la validacion o el registro para el usuario no existe por lo debe validar por defecto
+	            {
+			        preg_match_all('/\d{3,}/', $this->$attribute, $mensaje_partes);
+			        $mensaje_partes = array_unique($mensaje_partes[0]);
+			        $posicion = array_search($this->sc_bcp, $mensaje_partes);
+			       
+			        if ($posicion ==! 'false')
+			        {
+			            unset($mensaje_partes[$posicion]);
+			        }
+
+			        if (count($mensaje_partes) > 0)
+			        {
+			            $this->addError($attribute, "El mensaje no puede incluir números telefónicos o cadenas de números diferentes a su Short Code");
+			        }
+			    }
 	    	}
 	    }
     }

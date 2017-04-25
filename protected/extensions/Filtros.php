@@ -316,6 +316,19 @@ class Filtros extends CApplicationComponent
 			}
 		}
 	}
+
+	public function filtrarOperadoraHabilitada($id_proceso)
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(id_operadora) AS id_operadora";
+		$criteria->compare("estado", 1);
+
+		$model = OperadorasActivas::model()->find($criteria);
+		$ids_operadoras = ($model->id_operadora == "") ? "0" : $model->id_operadora;
+
+		$sql = "UPDATE tmp_procesamiento SET estado = 11 WHERE id_proceso = ".$id_proceso." AND id_operadora NOT IN (".$ids_operadoras.")";
+		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+	}
 }
 
 ?>

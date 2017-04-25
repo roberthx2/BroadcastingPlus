@@ -188,6 +188,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 ); ?>
  
     <div class="modal-header" style="background-color:#d2322d">
+    	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		<h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Eliminar Número(s)</h4>
     </div>
  	

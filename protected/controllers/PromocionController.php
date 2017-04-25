@@ -61,7 +61,7 @@ class PromocionController extends Controller
                     $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
 
                     $cupo = LoginCupo::model()->find("id_usuario = ".Yii::app()->user->id);
-                    $url_confirmar = null;
+                    $_SESSION["url_confirmar"] = null;
 
                     //BCNL / CPEI
                     if ($model->tipo == 1 || $model->tipo == 2)
@@ -230,7 +230,11 @@ class PromocionController extends Controller
 
                             if ($model->tipo == 1) //BCNL
                             {
-                                $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCNL", array("id_promo"=>$id_promo));
+                                $_SESSION["url_confirmar"] = Yii::app()->createUrl("promocion/confirmarBCNL", array("id_promo"=>$id_promo));
+                            }
+                            else if ($model->tipo == 2)
+                            {
+                                $_SESSION["url_confirmar"] = "CPEI";
                             }
 
                             $log = "PROMOCION ".$prefijo." CREADA | id_promo: ".$id_promo." | id_cliente: ".$model->id_cliente." | Destinatarios: ".$total;
@@ -276,6 +280,9 @@ class PromocionController extends Controller
 
                         //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
                         Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
+
+                        //Updatea en estado 11 todos los numeros con id_operadora inhabilitado
+                        Yii::app()->Filtros->filtrarOperadoraHabilitada($id_proceso);
 
                         //Updatea en estado 3 todos los números duplicados
                         Yii::app()->Filtros->filtrarDuplicados($id_proceso);
@@ -326,7 +333,7 @@ class PromocionController extends Controller
                     }
                     else //BCNL/CPEI
                     {
-                        $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+                        $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, 'tipo'=>$model->tipo));
                     }
 
                     $this->redirect($url);
@@ -373,7 +380,7 @@ class PromocionController extends Controller
         {
             //Cantidad de destinatarios validos
             $total_sms = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
-            $url_confirmar = null;
+            $_SESSION["url_confirmar"] = null;
             $ids_promo = "";
             $model = clone $_SESSION["model"];
             $model_aux = new PromocionForm;
@@ -465,7 +472,7 @@ class PromocionController extends Controller
                 }
 
                 $id_promo = trim($ids_promo, ",");
-                $url_confirmar = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
+                $_SESSION["url_confirmar"] = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
             }
 
             $transaction->commit();
@@ -474,7 +481,7 @@ class PromocionController extends Controller
             unset($_SESSION["operadoras_bcp"]);
             unset($_SESSION["timeslot"]);
 
-            $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, "url_confirmar" => $url_confirmar, 'tipo'=>$model->tipo));
+            $url = Yii::app()->createUrl("promocion/reporteCreate", array("id_proceso"=>$id_proceso, "nombre"=>$model->nombre, 'tipo'=>$model->tipo));
 
             $this->redirect($url);
 
@@ -1036,7 +1043,8 @@ class PromocionController extends Controller
     {
         $id_proceso = Yii::app()->request->getParam('id_proceso');
         $nombre = Yii::app()->request->getParam('nombre');
-        $url_confirmar = Yii::app()->request->getParam('url_confirmar');
+        $url_confirmar = $_SESSION["url_confirmar"];
+        unset($_SESSION["url_confirmar"]);
         $tipo = Yii::app()->request->getParam('tipo');
 
         $this->render("reporteCreate", array('id_proceso'=>$id_proceso, 'nombre'=>$nombre, 'url_confirmar'=>$url_confirmar, 'tipo'=>$tipo));

@@ -139,7 +139,7 @@ class PromocionesController extends Controller
                 $transaction2->rollBack();
             }
 
-        $this->redirect("home/index");
+        $this->redirect(Yii::app()->createUrl("home/index"));
     }
 
 	public function actionCancelarPromo($id_promo)
@@ -172,7 +172,7 @@ class PromocionesController extends Controller
         		$transaction2->rollBack();
     		}
 
-    	$this->redirect("home/index");
+    	$this->redirect(Yii::app()->createUrl("home/index"));
 	}
 
 	/**

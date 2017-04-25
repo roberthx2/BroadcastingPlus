@@ -214,11 +214,21 @@ class CrontabController extends Controller
 
             if ($puertos_inhabilitar["ids"] != "" || $puertos_warning["ids"] != "")
             {
+                print_r("Buscando usuarios administrativos\n");
+
+                $criteria = new CDbCriteria;
+                $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
+                $criteria->addInCondition("id_perfil", array(1,2));
+                $usuarios_adm = UsuarioSms::model()->find($criteria);
+                $usuarios_adm = ($usuarios_adm["id_usuario"] == "") ? "null" : $usuarios_adm["id_usuario"];
+
+                print_r("Usuarios administrativos que no seran procesados: ".$usuarios_adm."\n");
+
                 print_r("Buscando usuarios con acceso al sistema\n");
 
                 $sql = "SELECT u.id_usuario FROM usuario u 
                     INNER JOIN insignia_masivo_premium.permisos p ON u.id_usuario = p.id_usuario 
-                    WHERE p.acceso_sistema = 1 AND p.broadcasting = 1";
+                    WHERE p.acceso_sistema = 1 AND p.broadcasting = 1 AND p.id_usuario NOT IN (".$usuarios_adm.")";
                 print_r($sql."\n");
 
                 $resultado = Yii::app()->db->createCommand($sql)->queryAll();
@@ -260,21 +270,13 @@ class CrontabController extends Controller
                         }
                     }
 
-                    $criteria = new CDbCriteria;
-                    $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
-                    $criteria->addInCondition("id_perfil", array(1,2));
-                    $usuarios_adm = UsuarioSms::model()->find($criteria);
-                    $usuarios_adm = ($usuarios_adm["id_usuario"] == "") ? "null":$usuarios_adm["id_usuario"];
-
-                    print_r("Usuarios administrativos que no seran procesados: ".$usuarios_adm."\n");
-
                     //Si existen puertos por inhabilitar
                     if ($puertos_inhabilitar["ids"] != "")
                     {
                         print_r("Puertos que serán inhabilitados por desuso: ".$puertos_inhabilitar["ids"]."\n");
 
                         $sql = "SELECT id_usuario, GROUP_CONCAT(id_puerto) AS puertos, tipo FROM tmp_usuario_puerto 
-                                WHERE id_puerto IN(".$puertos_inhabilitar["ids"].") AND id_usuario NOT IN (".$usuarios_adm.") 
+                                WHERE id_puerto IN(".$puertos_inhabilitar["ids"].")  
                                 GROUP BY id_usuario, tipo";
                         print_r($sql."\n");
                         $resultado = Yii::app()->db->createCommand($sql)->queryAll();
@@ -339,7 +341,7 @@ class CrontabController extends Controller
                         print_r("Buscando los puertos que están próximos a inhabilitación de cada usuario\n");
 
                         $sql = "SELECT id_usuario, GROUP_CONCAT(id_puerto) AS puertos FROM tmp_usuario_puerto 
-                                WHERE id_puerto NOT IN(".$puertos_inhabilitar["ids"].") AND id_usuario NOT IN (".$usuarios_adm.") 
+                                WHERE id_puerto NOT IN(".$puertos_inhabilitar["ids"].")  
                                 AND id_puerto IN(".$puertos_warning["ids"].")
                                 AND tipo = 1 
                                 GROUP BY id_usuario";
