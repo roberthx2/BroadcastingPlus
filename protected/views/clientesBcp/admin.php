@@ -76,6 +76,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 array(
                     'name' => 'sc',
                     'header' => 'Short Codes',
+                    'value' => function($data)
+                    {
+                        return str_replace(",", ", ", Yii::app()->Funciones->limpiarNumerosTexarea($data["sc"]));
+                    },
                     'type' => 'raw',
                     'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                     'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),

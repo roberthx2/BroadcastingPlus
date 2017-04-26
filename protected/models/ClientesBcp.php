@@ -111,7 +111,8 @@ class ClientesBcp extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		//$criteria->select = "t.id_cliente_sms, GROUP_CONCAT(DISTINCT c.sc SEPARATOR ', ') AS sc";
-		$criteria->select = "t.id_cliente_sms, REPLACE(TRIM(BOTH ',' FROM REGEXP_REPLACE(GROUP_CONCAT(DISTINCT CASE c.onoff WHEN 0 THEN '' ELSE c.sc END), ',{2,}', ',')), ',', ', ') AS sc";
+		//$criteria->select = "t.id_cliente_sms, REPLACE(TRIM(BOTH ',' FROM REGEXP_REPLACE(GROUP_CONCAT(DISTINCT CASE c.onoff WHEN 0 THEN '' ELSE c.sc END), ',{2,}', ',')), ',', ', ') AS sc";
+		$criteria->select = "t.id_cliente_sms, GROUP_CONCAT(DISTINCT CASE c.onoff WHEN 0 THEN '' ELSE c.sc END) AS sc";
 		$criteria->join = "INNER JOIN cliente c ON t.id_cliente_bcp = c.id";
 		$criteria->condition = "(c.sc != '') ";
 		$criteria->group = "t.id_cliente_sms";
