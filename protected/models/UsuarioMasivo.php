@@ -22,6 +22,10 @@ class UsuarioMasivo extends CActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
+
+	public $buscar;
+	public $acceso_sistema;
+
 	public function tableName()
 	{
 		return 'usuario';
@@ -114,6 +118,28 @@ class UsuarioMasivo extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function searchAccesoBcplus()
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->select = "t.id_usuario, login, IFNULL(p.acceso_sistema, 0) AS acceso_sistema";
+		$criteria->join = "LEFT JOIN insignia_masivo_premium.permisos p ON t.id_usuario = p.id_usuario";
+		$criteria->condition = "login LIKE '%".$this->buscar."%'";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'login ASC',
+        		'attributes'=>array(
+             		'login'
+        		),
+    		),
+    		'pagination'=>array(
+        		'pageSize'=>1000000,
+    		),
 		));
 	}
 

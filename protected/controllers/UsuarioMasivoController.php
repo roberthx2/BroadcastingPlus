@@ -6,7 +6,7 @@ class UsuarioMasivoController extends Controller
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
 	 * using two-column layout. See 'protected/views/layouts/column2.php'.
 	 */
-	public $layout='//layouts/column2';
+	public $layout='//layouts/menuAdministracion';
 
 	/**
 	 * @return array action filters
@@ -27,17 +27,9 @@ class UsuarioMasivoController extends Controller
 	public function accessRules()
 	{
 		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
-				'users'=>array('*'),
-			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'accesoBcplus', 'updateAccesoBcplus'),
 				'users'=>array('@'),
-			),
-			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('admin','delete'),
-				'users'=>array('admin'),
 			),
 			array('deny',  // deny all users
 				'users'=>array('*'),
@@ -169,5 +161,46 @@ class UsuarioMasivoController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionAccesoBcplus()
+	{
+		$model=new UsuarioMasivo('searchAccesoBcplus');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_GET['UsuarioMasivo']))
+			$model->buscar=$_GET['UsuarioMasivo']['buscar'];
+
+		$this->render('accesoBcplus',array(
+			'model'=>$model,
+		));
+	}
+
+	public function actionUpdateAccesoBcplus()
+	{
+		$id = Yii::app()->request->getParam('id');
+		$valor = Yii::app()->request->getParam('valor');
+
+        if (Yii::app()->request->isAjaxRequest)
+        {
+        	$valor = ($valor == 'true') ? 1 : 0;
+
+        	$sql = "INSERT INTO permisos (id_usuario, acceso_sistema) VALUES (".$id.", ".$valor.") ON DUPLICATE KEY UPDATE acceso_sistema = ".$valor;
+        	$bandera = Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+        	if ($bandera)
+        	{
+	            echo CJSON::encode(array(
+	                'error' => 'false',
+	            ));
+	            Yii::app()->end();
+	        }
+	        else
+	        {
+	        	echo CJSON::encode(array(
+                'error' => 'true',
+	            ));
+	            Yii::app()->end();
+	        }
+        }
 	}
 }
