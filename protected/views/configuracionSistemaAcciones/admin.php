@@ -42,6 +42,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         	array(
               'name' => 'nombre',
               'header' => 'Nombre',
+              'sortable' => false,
               'type' => 'raw',
               'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
               'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),

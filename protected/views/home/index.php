@@ -47,3 +47,21 @@ $this->widget(
 );
 ?>
 </div>
+
+<!-- Esto aplica solo si viene desde el broadcasting viejo-->
+<script type="text/javascript">
+
+function quitarFrame() 
+{
+    if (self.parent.frames.length != 0)
+        self.parent.location='../../../../broadcasting/testVersion/Broadcasting/secure.php';
+}
+
+$(document).ready(function() 
+{
+    var aux = '<?php echo (isset($_SESSION["redireccionar"]) == true) ? $_SESSION["redireccionar"] : 1; ?>';
+
+    if(aux == 0)
+        quitarFrame();
+});
+</script>

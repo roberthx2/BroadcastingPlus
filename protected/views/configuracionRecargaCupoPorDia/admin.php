@@ -1,6 +1,6 @@
 <?php
-/* @var $this ConfiguracionOperadoraReservacionController */
-/* @var $model ConfiguracionOperadoraReservacion */
+/* @var $this ConfiguracionRecargaCupoPorDiaController */
+/* @var $model ConfiguracionRecargaCupoPorDia */
 ?>
 
 <br>
@@ -14,11 +14,11 @@
 
 <fieldset>
 
-    <legend>Configurar reservación por operadoras</legend>
-    
+    <legend>Configurar Recarga Cupo BCP por día </legend>
+
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'configuracion-operadora-reservacion-grid',
+        'id'=>'configuracion-recarga-cupo-por-dia-grid',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model->search(),
@@ -28,7 +28,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'columns'=> array( 
         	array(
               	'name' => 'descripcion',
-              	'header' => 'Descripción',
+              	'header' => 'Descripcion',
                 'sortable' => false,
               	'type' => 'raw',
               	'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
@@ -36,37 +36,17 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
           	),
           	array(
         		'class' => 'booster.widgets.TbEditableColumn',
-	            'name' => 'sms_x_seg',
-	            'header' => 'SMS por seg.',
+	            'name' => 'valor',
+	            'header' => 'Valor',
               'sortable' => false,
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'editable' => array(
                   	'url'        => $this->createUrl('lista/editableSaver'),
-                  	'params' => array("model"=>"ConfiguracionOperadoraReservacion"),
+                  	'params' => array("model"=>"ConfiguracionRecargaCupoPorDia"),
                   	'mode'=>'inline',
                   	'title' => '',
-                  	'success' => 'js: function(response, newValue) {
-        				       if(!response.success) return response.msg;
-        				    }',
-        				   	'options' => array(
-        				    	'ajaxOptions' => array('dataType' => 'json')
-        				   	), 
-				   	
-              	)
-        	),
-        	array(
-        		'class' => 'booster.widgets.TbEditableColumn',
-	            'name' => 'porcentaje_permitido',
-	            'header' => '% Permitido',
-              'sortable' => false,
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-	            'editable' => array(
-                  	'url'        => $this->createUrl('lista/editableSaver'),
-                  	'params' => array("model"=>"ConfiguracionOperadoraReservacion"),
-                  	'mode'=>'inline',
-                  	'title' => '',
+                    //'pk'=>'id_dia',
                   	'success' => 'js: function(response, newValue) {
 				       if(!response.success) return response.msg;
 				    }',

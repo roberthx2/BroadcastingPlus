@@ -25,6 +25,8 @@
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionReservacionPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservación por dias </a></li>  <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionOperadoraReservacion/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Reservación por operadora </a></li>  <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionRecargaCupoPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Recarga de cupo por dia </a></li>  <?php } ?>
                     </ul>
                  <?php } ?>
                  <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>

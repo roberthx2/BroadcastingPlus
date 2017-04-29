@@ -32,12 +32,14 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         	array(
               	'name' => 'descripcion',
               	'header' => 'Descripción',
+              	'sortable' => false,
               	'type' => 'raw',
               	'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
               	'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
           	),
           	array(
             	'header' => 'Estado',
+            	'sortable' => false,
             	'value' => function($data)
 	            {
 	                Controller::widget(

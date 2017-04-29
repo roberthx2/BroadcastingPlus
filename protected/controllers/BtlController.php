@@ -89,7 +89,7 @@ class BtlController extends Controller
         $criteria->compare("id_usuario", Yii::app()->user->id);
         $criteria->compare("access_lista", "1");
 
-        $sc_CFE = ControlFE::model()->find($criteria);
+        $sc_CFE = ControlFe::model()->find($criteria);
 
         $sc = array_intersect(explode(",", $sc_CFE->sc_cadena), explode(",", Yii::app()->user->getCadenaSc()));
 
