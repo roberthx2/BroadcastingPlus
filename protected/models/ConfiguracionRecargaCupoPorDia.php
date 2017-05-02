@@ -86,12 +86,6 @@ class ConfiguracionRecargaCupoPorDia extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'id_dia DESC',
-        		'attributes'=>array(
-             		'id_dia', 'descripcion', 'valor'
-        		),
-    		),
 		));
 	}
 
