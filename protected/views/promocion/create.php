@@ -1,4 +1,14 @@
 
+<link rel="stylesheet" href="./css/ripples.min.css"/>
+
+<link rel="stylesheet" href="./css/bootstrap-material-datetimepicker.css" />
+<link href='https://fonts.googleapis.com/css?family=Roboto:400,500' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="./js/ripples.min.js"></script>
+<script src="./js/material.min.js"></script>
+<script type="text/javascript" src="./js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="./js/bootstrap-material-datetimepicker.js"></script>
+
 <?php if(Yii::app()->user->hasFlash('danger')):?>
 	<br>
     <div class="container-fluid">
@@ -230,8 +240,8 @@
 	</div> <!--Cierre de la columna #1-->
 
 	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-		<div id="div_fecha" style="display:none;">
-			<?php echo $form->datePickerGroup(
+		<!--<div id="div_fecha" style="display:none;">
+			<?php /*echo $form->datePickerGroup(
 				$model,
 				'fecha',
 				array(
@@ -250,6 +260,22 @@
 						'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
 					),
 					//'hint' => 'Click inside! This is a super cool date field.',
+					'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
+				)
+			); */?>
+		</div>-->
+
+		<div id="div_fecha" style="display:none;">
+			<?php echo $form->textFieldGroup(
+				$model,
+				'fecha',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12 form-control floating-label',
+					),
+					'widgetOptions' => array(
+						'htmlOptions' => array(), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
 					'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
 				)
 			); ?>
@@ -272,8 +298,8 @@
 			); ?>
 		</div>
 		
-		<div id="div_hora_inicio" style="display:none;">
-			<?php echo $form->timePickerGroup(
+		<!--<div id="div_hora_inicio" style="display:none;">
+			<?php /*echo $form->timePickerGroup(
 				$model,
 				'hora_inicio',
 				array(
@@ -292,11 +318,27 @@
 					),
 					//'hint' => 'Nice bootstrap time picker',
 				)
+			);*/ ?>
+		</div>-->
+
+		<div id="div_hora_inicio" style="display:none;">
+			<?php echo $form->textFieldGroup(
+				$model,
+				'hora_inicio',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12 form-control floating-label',
+					),
+					'widgetOptions' => array(
+						'htmlOptions' => array(), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'prepend' => '<i class="glyphicon glyphicon-time"></i>'
+				)
 			); ?>
 		</div>
 
-		<div id="div_hora_fin" style="display:none;">
-			<?php echo $form->timePickerGroup(
+		<!--<div id="div_hora_fin" style="display:none;">
+			<?php /*echo $form->timePickerGroup(
 				$model,
 				'hora_fin',
 				array(
@@ -313,6 +355,22 @@
 						'htmlOptions' => array('readonly'=>false, 'style'=>'background-color: white;'),
 					),
 					//'hint' => 'Nice bootstrap time picker',
+				)
+			); */?>
+		</div>-->
+
+		<div id="div_hora_fin" style="display:none;">
+			<?php echo $form->textFieldGroup(
+				$model,
+				'hora_fin',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12 form-control floating-label',
+					),
+					'widgetOptions' => array(
+						'htmlOptions' => array(), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'prepend' => '<i class="glyphicon glyphicon-time"></i>'
 				)
 			); ?>
 		</div>
@@ -459,6 +517,39 @@
         hideShowFormPromocion($("#PromocionForm_tipo").val());
         contarCaracterPromocion();
 		//processKeydown(-1);
+		$('#PromocionForm_fecha').bootstrapMaterialDatePicker
+		({
+			lang : 'es',
+			time: false,
+			clearButton: true,
+			format: 'YYYY-MM-DD',
+			clearButton: false,
+			switchOnClick: true,
+			year: false,
+			currentDate: "<?php echo date('Y-m-d'); ?>",
+			minDate: "<?php echo date('Y-m-d'); ?>",
+			maxDate: "<?php echo date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))); ?>",
+
+		});
+
+		$('#PromocionForm_hora_inicio').bootstrapMaterialDatePicker
+		({
+			date: false,
+			shortTime: false,
+			format: 'HH:mm',
+			shortTime: true
+		});
+
+		$('#PromocionForm_hora_fin').bootstrapMaterialDatePicker
+		({
+			date: false,
+			shortTime: false,
+			format: 'HH:mm',
+			shortTime: true
+		});
+
+		$('#PromocionForm_hora_inicio').bootstrapMaterialDatePicker('setDate', "<?php echo $interval_minute['hora_ini']; ?>");
+		$('#PromocionForm_hora_fin').bootstrapMaterialDatePicker('setDate', "<?php echo $interval_minute['hora_fin']; ?>");
 
 		if ($("#PromocionForm_tipo").val() != "")
 		{

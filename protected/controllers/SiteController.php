@@ -136,4 +136,38 @@ class SiteController extends Controller
 		//$this->redirect(Yii::app()->homeUrl);
 		$this->redirect(Yii::app()->createUrl('site/login'));
 	}
+
+	public function actionAutoLogin()
+	{
+		$model=new LoginForm;
+		$error = false;
+
+		session_start();
+
+		$model->username = $_SESSION["bcplus_user"];
+		$model->password = $_SESSION["bcplus_pass"];
+
+		// validate user input and redirect to the previous page if valid
+		if($model->validate() && $model->login())
+		{
+			if(isset(Yii::app()->user->getPermisos()->acceso_sistema) && (isset(Yii::app()->user->getPermisos()->broadcasting) || isset(Yii::app()->user->getPermisos()->broadcasting_premium) || isset(Yii::app()->user->getPermisos()->broadcasting_cpei)))
+			{
+				if(Yii::app()->user->getPermisos()->acceso_sistema == 1 && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei))
+				{
+					$log = "Login exitoso del usuario: ".Yii::app()->user->name;
+					Yii::app()->Procedimientos->setLog($log);
+					$this->redirect(Yii::app()->createUrl('home/index'));
+				}
+			}
+			
+			$log = "Login fallido del usuario: ".Yii::app()->user->name." debido a que no posee acceso al sistema";
+			Yii::app()->Procedimientos->setLog($log);
+
+			Yii::app()->user->logout();
+			$error = true;
+		}
+
+		// display the login form
+		$this->render('login',array('model'=>$model, 'error'=>$error));
+	}
 }
