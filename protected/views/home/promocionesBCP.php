@@ -9,12 +9,20 @@ $('.BCP form').submit(function(){
     return false;
 });
 
+$('.BCP_pager form').change(function(){
+    $.fn.yiiGridView.update('detallesBCPToday',{data:{pageSize:$('#pageSize').val()}});
+});
+
 ");
 
 ?>
 <div class="BCP">
     <?php $this->renderPartial('/promocion/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
+
+<div class="BCP_pager">
+    <?php $this->renderPartial('/busqueda/pager'); ?>
+</div>
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (

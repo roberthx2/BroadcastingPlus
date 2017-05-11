@@ -193,6 +193,10 @@ class PromocionesPremium extends CActiveRecord
              		'id_promo', 'fecha', 'nombrePromo', 'u.login', 'hora', 'd_o.hora_limite'
         		),
     		),
+    		'pagination' => array(
+				'pageSize' => (isset($_SESSION["pageSize"]) == true) ? $_SESSION["pageSize"] : Yii::app()->params['defaultPageSize']
+				//Yii::app()->user->getState( 'pageSize', Yii::app()->params[ 'defaultPageSize' ] ),
+			),
 		));
 	}
 
