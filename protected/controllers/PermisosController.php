@@ -1,6 +1,6 @@
 <?php
 
-class UsuarioSmsController extends Controller
+class PermisosController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -28,7 +28,7 @@ class UsuarioSmsController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('index','view', 'admin','delete', 'create','update','getLogin'),
+				'actions'=>array('index','view','create','update','admin','delete'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -54,14 +54,14 @@ class UsuarioSmsController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new UsuarioSms;
+		$model=new Permisos;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['UsuarioSms']))
+		if(isset($_POST['Permisos']))
 		{
-			$model->attributes=$_POST['UsuarioSms'];
+			$model->attributes=$_POST['Permisos'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id_usuario));
 		}
@@ -78,14 +78,20 @@ class UsuarioSmsController extends Controller
 	 */
 	public function actionUpdate($id)
 	{
-		$model=$this->loadModel($id);
+		//$model=$this->loadModel($id);
+		$model=Permisos::model()->findByPk($id);
 
+		if ($model===null)
+		{
+			$model = new Permisos;
+			$model->id_usuario = $id;
+		}
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['UsuarioSms']))
+		if(isset($_POST['Permisos']))
 		{
-			$model->attributes=$_POST['UsuarioSms'];
+			$model->attributes=$_POST['Permisos'];
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id_usuario));
 		}
@@ -114,7 +120,7 @@ class UsuarioSmsController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('UsuarioSms');
+		$dataProvider=new CActiveDataProvider('Permisos');
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
@@ -125,10 +131,10 @@ class UsuarioSmsController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new UsuarioSms('search');
+		$model=new Permisos('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['UsuarioSms']))
-			$model->buscar=$_GET['UsuarioSms']["buscar"];
+		if(isset($_GET['Permisos']))
+			$model->attributes=$_GET['Permisos'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -139,12 +145,12 @@ class UsuarioSmsController extends Controller
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
-	 * @return UsuarioSms the loaded model
+	 * @return Permisos the loaded model
 	 * @throws CHttpException
 	 */
 	public function loadModel($id)
 	{
-		$model=UsuarioSms::model()->findByPk($id);
+		$model=Permisos::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -152,20 +158,14 @@ class UsuarioSmsController extends Controller
 
 	/**
 	 * Performs the AJAX validation.
-	 * @param UsuarioSms $model the model to be validated
+	 * @param Permisos $model the model to be validated
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='usuario-sms-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='permisos-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
-	}
-
-	public function actionGetLogin($id_usuario)
-	{
-		$model=UsuarioSms::model()->findByPk($id_usuario);
-		return $model->login;
 	}
 }

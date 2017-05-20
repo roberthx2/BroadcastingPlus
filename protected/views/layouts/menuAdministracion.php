@@ -37,6 +37,8 @@
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('clientesBcp/admin');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Clientes </a></li>  <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioSms/admin');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Usuarios </a></li>  <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioMasivo/accesoBcplus');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Acceso de Usuarios </a></li>  <?php }  ?>
                     </ul>
                  <?php } ?>

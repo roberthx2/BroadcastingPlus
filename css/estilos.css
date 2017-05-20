@@ -153,3 +153,18 @@
         height: 350px;
     }
 }
+
+.panel-black {
+  border-color: black;
+}
+.panel-black > .panel-heading {
+  color: white;
+  background-color: black;
+  border-color: black;
+}
+.panel-black > .panel-heading + .panel-collapse .panel-body {
+  border-top-color: black;
+}
+.panel-black > .panel-footer + .panel-collapse .panel-body {
+  border-bottom-color: black;
+}

@@ -27,6 +27,7 @@
  */
 class UsuarioSms extends CActiveRecord
 {
+	public $buscar;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -110,7 +111,7 @@ class UsuarioSms extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	/*public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
@@ -139,6 +140,24 @@ class UsuarioSms extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+
+		$criteria->select = "id_usuario, login";
+		$criteria->condition = "login LIKE '%".$this->buscar."%'";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'login ASC',
+        		'attributes'=>array(
+             		'login'
+        		),
+    		),
 		));
 	}
 
