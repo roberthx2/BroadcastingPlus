@@ -44,7 +44,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
           	array(
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
-	            'template' => '{permisos}',
+	            'template' => '{permisos}&#09;{sc}',
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
@@ -53,6 +53,12 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'url'=>'Yii::app()->createUrl("permisos/update", array("id"=>$data["id_usuario"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-lock', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Permisos', 'style'=>'color:black;'),
 	            			),
+                'sc'=>array(
+                    'label'=>' ',
+                    'visible'=>'PermisosController::actionPermiso($data["id_usuario"], "crear_promo_bcp")',
+                    'url'=>'Yii::app()->createUrl("permisos/update", array("id"=>$data["id_usuario"]))',
+                    'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
+                    ),
 	            ),
 	        ),
     	),

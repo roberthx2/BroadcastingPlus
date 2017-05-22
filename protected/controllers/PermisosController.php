@@ -28,7 +28,7 @@ class PermisosController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('index','view','create','update','admin','delete'),
+				'actions'=>array('index','view','create','update','admin','delete','permiso'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -89,11 +89,32 @@ class PermisosController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Permisos']))
+		if(isset($_POST["bandera"])) //Ingresa si el formulario fue enviado.
 		{
-			$model->attributes=$_POST['Permisos'];
+			unset($_POST["bandera"]);
+			unset($_POST["yt0"]);
+
+			$id_usuario = $model->id_usuario;
+			$model->unsetAttributes(); 
+			$model->id_usuario = $id_usuario;
+
+			foreach($_POST as $nombre_campo => $valor)
+			{
+			   	$model->$nombre_campo=$valor;
+
+			   	if ($nombre_campo == 'crear_promo_bcnl')
+			   		$model->broadcasting = 1;
+			   	if ($nombre_campo == 'crear_promo_bcp')
+			   		$model->broadcasting_premium = 1;
+			}
+
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_usuario));
+			{
+				Yii::app()->user->setFlash("success", "Permisos actualizados correctamente.");
+				$this->redirect(array('update','id'=>$model->id_usuario));
+			}
+			else
+				Yii::app()->user->setFlash("danger", "Ocurrió un error al actualizar los permisos.");
 		}
 
 		$this->render('update',array(
@@ -167,5 +188,11 @@ class PermisosController extends Controller
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
+	}
+
+	public function actionPermiso($id_usuario, $permiso)
+	{
+		$model=Permisos::model()->COUNT("id_usuario=:id_usuario AND ".$permiso."=1", array(":id_usuario"=>$id_usuario));
+		return ($model == 0) ? false : true;	
 	}
 }

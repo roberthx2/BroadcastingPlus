@@ -28,7 +28,7 @@ class UsuarioSmsController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('index','view', 'admin','delete', 'create','update','getLogin'),
+				'actions'=>array('index','view', 'admin','delete', 'create','update','getLogin','isAdmin'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -167,5 +167,11 @@ class UsuarioSmsController extends Controller
 	{
 		$model=UsuarioSms::model()->findByPk($id_usuario);
 		return $model->login;
+	}
+
+	public function actionIsAdmin($id_usuario)
+	{
+		$model=UsuarioSms::model()->COUNT("id_usuario=:id_usuario AND id_perfil IN (1,2)", array(":id_usuario"=>$id_usuario));
+		return ($model == 0) ? false : true; 
 	}
 }

@@ -54,9 +54,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 						    'value' => $data["onoff"],
 					        'events' => array(
 					            'switchChange' => 'js:function(event, state){
-									enviar($(this).attr("name"), state);
+									       enviar($(this).attr("name"), state);
 					            }'
-					        )
+					        ),
+                  'options' => array(
+                    'onColor'=>'success', 
+                    'offColor'=>'danger',
+                  )
 					    )
 					);
 	            },

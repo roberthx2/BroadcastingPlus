@@ -432,6 +432,10 @@ class ClientesBcpController extends Controller
 							        'name' => "operadora[$value->id_operadora][$value->estado]",
 								    'value' => 0,
 								    'htmlOptions'=> array('class'=> 'operadora'),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
 							    )
 							, true);
 

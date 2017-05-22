@@ -26,8 +26,6 @@
  * @property string $agregar_exentos
  * @property string $administrar_exentos
  * @property string $modulo_reportes
- * @property string $reporte_sms_programados_bcnl
- * @property string $reporte_sms_programados_bcp
  * @property string $reporte_mensual_sms_bcnl
  * @property string $reporte_mensual_sms_bcp
  * @property string $reporte_mensual_sms_por_cliente_bcnl
@@ -35,9 +33,17 @@
  * @property string $reporte_mensual_sms_por_codigo_bcp
  * @property string $reporte_sms_recibidos_bcnl
  * @property string $reporte_sms_recibidos_bcp
- * @property string $reporte_vigilancia_bcnl
- * @property string $reporte_vigilancia_bcp
+ * @property string $modulo_btl
+ * @property string $modulo_herramientas
+ * @property string $administrar_prefijo
  * @property string $modulo_administracion
+ * @property string $configurar_sistema
+ * @property string $configurar_sms_por_dia
+ * @property string $configurar_reservacion_por_dia
+ * @property string $configurar_reservacion_por_operadora
+ * @property string $configurar_recarga_cupo_bcp_por_dia
+ * @property string $administrar_clientes
+ * @property string $administrar_usuarios
  */
 class Permisos extends CActiveRecord
 {
@@ -59,10 +65,10 @@ class Permisos extends CActiveRecord
 		return array(
 			array('id_usuario', 'required'),
 			array('id_usuario, acceso_sistema', 'length', 'max'=>10),
-			array('broadcasting, broadcasting_premium, broadcasting_cpei, modulo_promocion, crear_promo_bcnl, crear_promo_bcp, detalles_promo_bcnl, detalles_promo_bcp, modulo_listas, crear_listas, administrar_listas, modulo_cupo, recargar_cupo_bcnl, recargar_cupo_bcp, historico_cupo_bcnl, historico_cupo_bcp, modulo_exentos, agregar_exentos, administrar_exentos, modulo_reportes, reporte_sms_programados_bcnl, reporte_sms_programados_bcp, reporte_mensual_sms_bcnl, reporte_mensual_sms_bcp, reporte_mensual_sms_por_cliente_bcnl, reporte_mensual_sms_por_cliente_bcp, reporte_mensual_sms_por_codigo_bcp, reporte_sms_recibidos_bcnl, reporte_sms_recibidos_bcp, reporte_vigilancia_bcnl, reporte_vigilancia_bcp, modulo_administracion', 'length', 'max'=>1),
+			array('broadcasting, broadcasting_premium, broadcasting_cpei, modulo_promocion, crear_promo_bcnl, crear_promo_bcp, detalles_promo_bcnl, detalles_promo_bcp, modulo_listas, crear_listas, administrar_listas, modulo_cupo, recargar_cupo_bcnl, recargar_cupo_bcp, historico_cupo_bcnl, historico_cupo_bcp, modulo_exentos, agregar_exentos, administrar_exentos, modulo_reportes, reporte_mensual_sms_bcnl, reporte_mensual_sms_bcp, reporte_mensual_sms_por_cliente_bcnl, reporte_mensual_sms_por_cliente_bcp, reporte_mensual_sms_por_codigo_bcp, reporte_sms_recibidos_bcnl, reporte_sms_recibidos_bcp, modulo_btl, modulo_herramientas, administrar_prefijo, modulo_administracion, configurar_sistema, configurar_sms_por_dia, configurar_reservacion_por_dia, configurar_reservacion_por_operadora, configurar_recarga_cupo_bcp_por_dia, administrar_clientes, administrar_usuarios', 'length', 'max'=>1),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_usuario, acceso_sistema, broadcasting, broadcasting_premium, broadcasting_cpei, modulo_promocion, crear_promo_bcnl, crear_promo_bcp, detalles_promo_bcnl, detalles_promo_bcp, modulo_listas, crear_listas, administrar_listas, modulo_cupo, recargar_cupo_bcnl, recargar_cupo_bcp, historico_cupo_bcnl, historico_cupo_bcp, modulo_exentos, agregar_exentos, administrar_exentos, modulo_reportes, reporte_sms_programados_bcnl, reporte_sms_programados_bcp, reporte_mensual_sms_bcnl, reporte_mensual_sms_bcp, reporte_mensual_sms_por_cliente_bcnl, reporte_mensual_sms_por_cliente_bcp, reporte_mensual_sms_por_codigo_bcp, reporte_sms_recibidos_bcnl, reporte_sms_recibidos_bcp, reporte_vigilancia_bcnl, reporte_vigilancia_bcp, modulo_administracion', 'safe', 'on'=>'search'),
+			array('id_usuario, acceso_sistema, broadcasting, broadcasting_premium, broadcasting_cpei, modulo_promocion, crear_promo_bcnl, crear_promo_bcp, detalles_promo_bcnl, detalles_promo_bcp, modulo_listas, crear_listas, administrar_listas, modulo_cupo, recargar_cupo_bcnl, recargar_cupo_bcp, historico_cupo_bcnl, historico_cupo_bcp, modulo_exentos, agregar_exentos, administrar_exentos, modulo_reportes, reporte_mensual_sms_bcnl, reporte_mensual_sms_bcp, reporte_mensual_sms_por_cliente_bcnl, reporte_mensual_sms_por_cliente_bcp, reporte_mensual_sms_por_codigo_bcp, reporte_sms_recibidos_bcnl, reporte_sms_recibidos_bcp, modulo_btl, modulo_herramientas, administrar_prefijo, modulo_administracion, configurar_sistema, configurar_sms_por_dia, configurar_reservacion_por_dia, configurar_reservacion_por_operadora, configurar_recarga_cupo_bcp_por_dia, administrar_clientes, administrar_usuarios', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -105,8 +111,6 @@ class Permisos extends CActiveRecord
 			'agregar_exentos' => 'Agregar Exentos',
 			'administrar_exentos' => 'Administrar Exentos',
 			'modulo_reportes' => 'Modulo Reportes',
-			'reporte_sms_programados_bcnl' => 'Reporte Sms Programados Bcnl',
-			'reporte_sms_programados_bcp' => 'Reporte Sms Programados Bcp',
 			'reporte_mensual_sms_bcnl' => 'Reporte Mensual Sms Bcnl',
 			'reporte_mensual_sms_bcp' => 'Reporte Mensual Sms Bcp',
 			'reporte_mensual_sms_por_cliente_bcnl' => 'Reporte Mensual Sms Por Cliente Bcnl',
@@ -114,9 +118,17 @@ class Permisos extends CActiveRecord
 			'reporte_mensual_sms_por_codigo_bcp' => 'Reporte Mensual Sms Por Codigo Bcp',
 			'reporte_sms_recibidos_bcnl' => 'Reporte Sms Recibidos Bcnl',
 			'reporte_sms_recibidos_bcp' => 'Reporte Sms Recibidos Bcp',
-			'reporte_vigilancia_bcnl' => 'Reporte Vigilancia Bcnl',
-			'reporte_vigilancia_bcp' => 'Reporte Vigilancia Bcp',
+			'modulo_btl' => 'Modulo Btl',
+			'modulo_herramientas' => 'Modulo Herramientas',
+			'administrar_prefijo' => 'Administrar Prefijo',
 			'modulo_administracion' => 'Modulo Administracion',
+			'configurar_sistema' => 'Configurar Sistema',
+			'configurar_sms_por_dia' => 'Configurar Sms Por Dia',
+			'configurar_reservacion_por_dia' => 'Configurar Reservacion Por Dia',
+			'configurar_reservacion_por_operadora' => 'Configurar Reservacion Por Operadora',
+			'configurar_recarga_cupo_bcp_por_dia' => 'Configurar Recarga Cupo Bcp Por Dia',
+			'administrar_clientes' => 'Administrar Clientes',
+			'administrar_usuarios' => 'Administrar Usuarios',
 		);
 	}
 
@@ -160,8 +172,6 @@ class Permisos extends CActiveRecord
 		$criteria->compare('agregar_exentos',$this->agregar_exentos,true);
 		$criteria->compare('administrar_exentos',$this->administrar_exentos,true);
 		$criteria->compare('modulo_reportes',$this->modulo_reportes,true);
-		$criteria->compare('reporte_sms_programados_bcnl',$this->reporte_sms_programados_bcnl,true);
-		$criteria->compare('reporte_sms_programados_bcp',$this->reporte_sms_programados_bcp,true);
 		$criteria->compare('reporte_mensual_sms_bcnl',$this->reporte_mensual_sms_bcnl,true);
 		$criteria->compare('reporte_mensual_sms_bcp',$this->reporte_mensual_sms_bcp,true);
 		$criteria->compare('reporte_mensual_sms_por_cliente_bcnl',$this->reporte_mensual_sms_por_cliente_bcnl,true);
@@ -169,9 +179,17 @@ class Permisos extends CActiveRecord
 		$criteria->compare('reporte_mensual_sms_por_codigo_bcp',$this->reporte_mensual_sms_por_codigo_bcp,true);
 		$criteria->compare('reporte_sms_recibidos_bcnl',$this->reporte_sms_recibidos_bcnl,true);
 		$criteria->compare('reporte_sms_recibidos_bcp',$this->reporte_sms_recibidos_bcp,true);
-		$criteria->compare('reporte_vigilancia_bcnl',$this->reporte_vigilancia_bcnl,true);
-		$criteria->compare('reporte_vigilancia_bcp',$this->reporte_vigilancia_bcp,true);
+		$criteria->compare('modulo_btl',$this->modulo_btl,true);
+		$criteria->compare('modulo_herramientas',$this->modulo_herramientas,true);
+		$criteria->compare('administrar_prefijo',$this->administrar_prefijo,true);
 		$criteria->compare('modulo_administracion',$this->modulo_administracion,true);
+		$criteria->compare('configurar_sistema',$this->configurar_sistema,true);
+		$criteria->compare('configurar_sms_por_dia',$this->configurar_sms_por_dia,true);
+		$criteria->compare('configurar_reservacion_por_dia',$this->configurar_reservacion_por_dia,true);
+		$criteria->compare('configurar_reservacion_por_operadora',$this->configurar_reservacion_por_operadora,true);
+		$criteria->compare('configurar_recarga_cupo_bcp_por_dia',$this->configurar_recarga_cupo_bcp_por_dia,true);
+		$criteria->compare('administrar_clientes',$this->administrar_clientes,true);
+		$criteria->compare('administrar_usuarios',$this->administrar_usuarios,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

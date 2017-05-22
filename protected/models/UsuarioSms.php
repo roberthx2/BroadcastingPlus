@@ -150,6 +150,9 @@ class UsuarioSms extends CActiveRecord
 		$criteria->select = "id_usuario, login";
 		$criteria->condition = "login LIKE '%".$this->buscar."%'";
 
+		if (Yii::app()->user->id != 1)//Godadmin
+			$criteria->condition .= " AND id_usuario != ".Yii::app()->user->id;
+
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
