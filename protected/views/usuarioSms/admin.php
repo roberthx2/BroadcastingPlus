@@ -55,8 +55,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			),
                 'sc'=>array(
                     'label'=>' ',
-                    'visible'=>'PermisosController::actionPermiso($data["id_usuario"], "crear_promo_bcp")',
-                    'url'=>'Yii::app()->createUrl("permisos/update", array("id"=>$data["id_usuario"]))',
+                    'visible'=>'PermisosController::actionPermiso($data["id_usuario"], "crear_promo_bcp") && !UsuarioSmsController::actionIsAdmin($data["id_usuario"])',
+                    'url'=>'Yii::app()->createUrl("usuarioMasivo/asignarSc", array("id"=>$data["id_usuario"]))',
                     'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
                     ),
 	            ),
