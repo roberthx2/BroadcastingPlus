@@ -229,7 +229,11 @@ class UsuarioMasivoController extends Controller
 		$cadena_sc = ($sc_id->sc_id == "") ? "null" : $sc_id->sc_id;
 
 		$sql = "SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
-						WHERE c.id_cliente_sms = ".$usuario->id_cliente." AND c.id_cliente_sc_numerico = 0 AND sc IN (".$cadena_sc.") AND sc NOT REGEXP '[a-zA-Z]+' AND c.onoff = 1";
+						WHERE c.id_cliente_sms = ".$usuario->id_cliente." 
+							AND c.id_cliente_sc_numerico = 0 
+							AND sc IN (".$cadena_sc.") 
+							AND sc NOT REGEXP '[a-zA-Z]+' 
+							AND c.onoff = 1";
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
@@ -251,7 +255,7 @@ class UsuarioMasivoController extends Controller
 		$this->render('asignarSc', array( 
 			'model'=>$model,
 			'sc'=>$sc,
-			'operadoras'=>ClientesBcpController::actionGetOperadoras(),
+			'operadoras'=>ClientesBcpController::actionGetOperadorasCliente(),
 		));
 	}
 

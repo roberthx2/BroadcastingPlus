@@ -28,7 +28,7 @@ class ClientesBcpController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'getSc', 'getOperadoras', 'activateCliente', 'getInfCliente', 'updateEstado'),
+				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'getSc', 'getOperadoras', 'activateCliente', 'getInfCliente', 'updateEstado', 'getOperadorasCliente'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -453,6 +453,59 @@ class ClientesBcpController extends Controller
 
 		$operadoras .= "</table>";
 
+		return $operadoras;
+	}
+
+	public function actionGetOperadorasCliente($id_cliente_sms, $sc)
+	{
+		$model = OperadorasActivas::model()->findAll();
+
+		foreach ($model as $value)
+		{
+			$oper_act[$value["id_operadora"]] = array("estado"=>$value["estado"], "descripcion"=>$value["descripcion"]);
+		}
+
+		$model = Yii::app()->Procedimientos->getScOperadorasBCP($id_cliente_sms, $sc);
+
+		$array = array();
+
+		$operadoras = "<table>";
+
+		foreach ($model as $key => $value)
+		{
+			if ($oper_act[$value["id_operadora"]]["estado"] == 1)
+			{
+				$descripcion = ($value["alfanumerico"] == 0) ? $oper_act[$value["id_operadora"]]["descripcion"]:$oper_act[$value["id_operadora"]]["descripcion"]." ALF";
+
+				$operadoras .= "<tr><td style='padding: 3px 10px 3px 10px; color: ".Yii::app()->Funciones->getColorOperadoraBCNL($value["id_operadora"]).";'><strong>".$descripcion."</strong></td><td style='padding: 3px 10px 3px 10px'>";
+
+				$operadoras .= $this->widget(
+								    'booster.widgets.TbSwitch',
+								    array(
+								        'name' => "operadora[". $value['id_operadora'] ."][". $value['alfanumerico']. "]",
+									    'value' => 0,
+									    'htmlOptions'=> array('class'=> 'operadora'),
+									    'options' => array(
+									    	'onColor'=>'success', 
+											'offColor'=>'danger',
+									    )
+								    )
+								, true);
+
+				$operadoras .= "</td>";
+
+				if ($value["alfanumerico"] == 1)
+				{
+					$operadoras .= '<td><input type="text" class="form-control sc_alf sc_alf_'.$value["id_operadora"].'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value["id_operadora"].'] style="text-transform:uppercase;"></td>';
+				}
+				else
+					$operadoras .= '<td></td>';
+
+				$operadoras .= "</tr>";
+			}
+		}
+
+		$operadoras .= "</table>";
 		return $operadoras;
 	}
 
