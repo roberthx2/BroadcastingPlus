@@ -49,6 +49,7 @@
         <span class="glyphicon glyphicon-ban-circle"></span> El SC no posee operadoras asociadas.
 	</div>
 	<?php echo $form->hiddenField($model, 'id_usuario'); ?>
+	<?php echo $form->hiddenField($model, 'id_cliente_sms'); ?>
 
 	<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 			<?php echo $form->dropDownListGroup(
@@ -56,30 +57,35 @@
 				'sc',
 				array(
 					'wrapperHtmlOptions' => array(
-						//'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-						//'style'=>'display: none;',
 					),
 					'widgetOptions' => array(
 						'data' => $sc,
-						'htmlOptions' => array(/*'prompt' => 'Seleccionar sc...',*/'multiple' => false, 
+						'htmlOptions' => array('multiple' => false, 
 							'ajax' => array(
 		                        'type'=>'POST', //request type
 		                        'dataType' => 'json',
 		                        'url'=>Yii::app()->createUrl('/usuarioMasivo/getInfUsuario'), //url to call.
 		                        'data' => array('id_usuario' => 'js:$("#UsuarioMasivoScForm_id_usuario").val()', 'sc' => 'js:$("#UsuarioMasivoScForm_sc").val()'),
 		                        'beforeSend' => 'function(){
-		                        	reiniciarOperadoras();
+		                        	$("#div_operadoras").hide();
 		                        	$("#div_error").hide();
 		                        }',
 		                        'success' => 'function(response){
 		                                if (response.error == "false")
 		                                {
-		                                    var data = response.data;
-		                                    activarOperadoras(data);
+		                                    var oper_usuario = response.operadoras_usuario;
+		                                    var oper_cliente = response.operadoras_cliente;
+
+		                                    $("#div_operadoras").html("<center>"+oper_cliente+"</center>");
+		                                    $(".operadora").bootstrapSwitch("onColor", "success");
+		                                    $(".operadora").bootstrapSwitch("offColor", "danger");
+		                                    $("#div_operadoras").show();
+		                                    activarOperadoras(oper_usuario);
 		                                }
 		                                else
 		                                {
 		                                    $("#div_error").show();
+		                                    $("#div_operadoras").hide();
 		                                    console.log(response.status);
 		                                }
 		                            }'
@@ -92,9 +98,20 @@
 			); ?>
 	</div>
 
-	<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+	<div id="div_operadoras" class="col-xs-12 col-sm-12 col-md-8 col-lg-8" style="display: none;">
 		<?php 
-			echo "<center>".$operadoras."</center>";
+			echo $this->widget(
+				    'booster.widgets.TbSwitch',
+				    array(
+				        'name' => "null",
+					    'value' => 0,
+					    'htmlOptions'=> array('class'=> 'operadora'),
+					    'options' => array(
+					    	'onColor'=>'success', 
+							'offColor'=>'danger',
+					    )
+				    )
+				, true);
 		?>
 	</div>
 
@@ -108,17 +125,6 @@
 	</div>
 
 <script type="text/javascript">
-
-	function reiniciarOperadoras()
-	{
-		$(".operadora").each(function () 
-		{ 
-			if( $(this).is(":checked") ) 
-				$(this).click(); 
-		});
-
-		$(".sc_alf").val("");
-	} 
 
 	function activarOperadoras(data)
 	{
@@ -135,8 +141,6 @@
 
 	$(document).ready(function() 
     {
-    	$(".sc_alf").attr("readonly", true);
-
     	if ($("#UsuarioMasivoScForm_sc").val() != "")
 		{
 			$.ajax({
@@ -146,18 +150,26 @@
 	            data:{id_usuario:$("#UsuarioMasivoScForm_id_usuario").val(), sc:$("#UsuarioMasivoScForm_sc").val()},
 	            
 	            beforeSend: function(){
-                    $("#div_error").hide();
+                    $("#div_operadoras").hide();
+		            $("#div_error").hide();
                 },
 	            success: function(response)
 	            {
 	            	if (response.error == "false")
                     {
-                        var data = response.data;
-                        activarOperadoras(data);
+                        var oper_usuario = response.operadoras_usuario;
+                        var oper_cliente = response.operadoras_cliente;
+
+                        $("#div_operadoras").html("<center>"+oper_cliente+"</center>");
+                        $(".operadora").bootstrapSwitch("onColor", "success");
+                        $(".operadora").bootstrapSwitch("offColor", "danger");
+                        $("#div_operadoras").show();
+                        activarOperadoras(oper_usuario);
                     }
                     else
                     {
                         $("#div_error").show();
+		                $("#div_operadoras").hide();
                         //console.log(response.status);
                     }
 	            },

@@ -2,7 +2,7 @@
 
 class UsuarioMasivoScForm extends CFormModel
 {
-	public $id_cliente;
+	public $id_cliente_sms;
 	public $id_usuario;
 	public $sc;
 	//public $operadoras;
@@ -13,7 +13,7 @@ class UsuarioMasivoScForm extends CFormModel
 	public function rules()
 	{
 		return array(
-			array('id_cliente, sc', 'required'),
+			array('id_cliente_sms, id_usuario, sc', 'required'),
 			//array('id_cliente_bcp, id_cliente_sms, sc, id_operadora, alfanumerico', 'numerical', 'integerOnly'=>true),
 		);
 	}

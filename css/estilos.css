@@ -154,17 +154,17 @@
     }
 }
 
-.panel-black {
-  border-color: black;
+.panel-grey {
+  border-color: dimgrey;
 }
-.panel-black > .panel-heading {
+.panel-grey > .panel-heading {
   color: white;
-  background-color: black;
-  border-color: black;
+  background-color: dimgrey;
+  border-color: dimgrey;
 }
-.panel-black > .panel-heading + .panel-collapse .panel-body {
-  border-top-color: black;
+.panel-grey > .panel-heading + .panel-collapse .panel-body {
+  border-top-color: dimgrey;
 }
-.panel-black > .panel-footer + .panel-collapse .panel-body {
-  border-bottom-color: black;
+.panel-grey > .panel-footer + .panel-collapse .panel-body {
+  border-bottom-color: dimgrey;
 }

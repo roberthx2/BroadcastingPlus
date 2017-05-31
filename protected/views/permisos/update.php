@@ -52,7 +52,7 @@
 <br><HR width=100% align="center">
 
 <div class="panel-group col-md-4" id="modulo">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-list-alt"></span> Modulos
@@ -74,7 +74,7 @@
 <!--Promoción -->
 
 <div class="accion panel-group col-md-7" id="act_promocion" style="display:block;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones
@@ -209,7 +209,7 @@
 <!--Listas -->
 
 <div class="accion panel-group col-md-7" id="act_listas" style="display:none;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones
@@ -283,7 +283,7 @@
 <!--Cupo -->
 
 <div class="accion panel-group col-md-7" id="act_cupo" style="display:none;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones
@@ -337,7 +337,7 @@
 <!--Herramientas -->
 
 <div class="accion panel-group col-md-7" id="act_herramientas" style="display:none;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones
@@ -391,7 +391,7 @@
 <!--BTL -->
 
 <div class="accion panel-group col-md-7" id="act_btl" style="display:none;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones
@@ -421,7 +421,7 @@
 <!--Administración -->
 
 <div class="accion panel-group col-md-7" id="act_administracion" style="display:none;">
-  	<div class="panel panel-black">
+  	<div class="panel panel-grey">
     	<div class="panel-heading">
       		<h4 class="panel-title">
           		<span class="glyphicon glyphicon-eye-open"></span> Acciones

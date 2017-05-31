@@ -110,6 +110,10 @@ class PermisosController extends Controller
 
 			if($model->save())
 			{
+				$log = "Permisos del usuario: ".UsuarioSmsController::actionGetLogin($model->id_usuario)." actualizados por el Administrador: ".UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+
+				Yii::app()->Procedimientos->setLog($log);
+
 				Yii::app()->user->setFlash("success", "Permisos actualizados correctamente.");
 				$this->redirect(array('update','id'=>$model->id_usuario));
 			}

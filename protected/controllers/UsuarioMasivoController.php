@@ -210,7 +210,70 @@ class UsuarioMasivoController extends Controller
 
 		if(isset($_POST['UsuarioMasivoScForm']))
 		{
+			$model->attributes=$_POST['UsuarioMasivoScForm'];
 
+			$criteria = new CDbCriteria;
+			$criteria->select = "GROUP_CONCAT(id) AS id";
+			$criteria->compare("id_cliente_sms", $model->id_cliente_sms);
+			$criteria->compare("sc", $model->sc);
+			$clientes_bcp = ClientesBcp::model()->find($criteria);
+
+			$transaction = Yii::app()->db_insignia_alarmas->beginTransaction();
+			$transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+			try
+		    {
+				UsuarioClientesBcp::model()->deleteAll("id_cliente_bcp IN (".$clientes_bcp->id.")");
+
+				if (isset($_POST["operadora"]))
+				{
+					$operadoras = $_POST["operadora"];
+
+					$operadoras_inversa = array();
+
+			    	foreach ($operadoras as $id_operadora => $value)
+					{
+						foreach ($value as $key => $aux)
+						{
+							$operadoras_inversa[$key][] = $id_operadora;	
+						}
+					}
+
+					foreach ($operadoras_inversa as $alfanumerico => $ids_operadoras)
+					{
+						$criteria = new CDbCriteria;
+						$criteria->select = "GROUP_CONCAT(CONCAT('(', ".$model->id_usuario.", ',', id, ')'))  AS id";
+						$criteria->compare("id_cliente_sms", $model->id_cliente_sms);
+						$criteria->compare("sc", $model->sc);
+						$criteria->addInCondition("id_operadora", $ids_operadoras);
+						$criteria->compare("alfanumerico", $alfanumerico);
+						$insert = ClientesBcp::model()->find($criteria);
+
+						$sql = "INSERT INTO usuario_clientes_bcp (id_usuario, id_cliente_bcp) VALUES ".$insert->id;
+						Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
+					}
+				}
+
+				$log = "Usuario BCP: ".UsuarioSmsController::actionGetLogin($model->id_usuario)." configurado por el Administrador: ".UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+
+				Yii::app()->Procedimientos->setLog($log);
+
+				$transaction->commit();
+				$transaction2->commit();
+
+				$sms = "Usuario configurado correctamente";
+                Yii::app()->user->setFlash("success", $sms);
+
+            	$this->redirect(array('asignarSc','id'=>$model->id_usuario));
+
+			} catch (Exception $e)
+                {
+                    $sms = "Ocurrio un error al procesar los datos, intente nuevamente.";
+                    Yii::app()->user->setFlash("danger", $sms);
+                    $transaction->rollBack();
+                    $transaction2->rollBack();
+                    //print_r($e);
+                }
 		}
 
 		$criteria = new CDbCriteria;
@@ -251,11 +314,11 @@ class UsuarioMasivoController extends Controller
 	    else $sc = array();
 
 		$model->id_usuario = $id;
+		$model->id_cliente_sms = $usuario->id_cliente;
 
 		$this->render('asignarSc', array( 
 			'model'=>$model,
 			'sc'=>$sc,
-			'operadoras'=>ClientesBcpController::actionGetOperadorasCliente(),
 		));
 	}
 
@@ -271,13 +334,27 @@ class UsuarioMasivoController extends Controller
 			$criteria->compare("id_usuario", $id_usuario);
 			$usuario = UsuarioSms::model()->find($criteria);
 
-			$operadoras = Yii::app()->Procedimientos->getScOperadorasBCP($usuario->id_cliente, $sc);
+			$operadoras_cliente = ClientesBcpController::actionGetOperadorasCliente($usuario->id_cliente, $sc);
 
-			if($operadoras) {
+			$sql = "SELECT t.* FROM (
+					SELECT c.id, c.sc, cb.id_operadora, alfanumerico FROM usuario_clientes_bcp uc
+					INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+					INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+					WHERE uc.id_usuario = :id_usuario AND cb.id_cliente_sms = ".$usuario->id_cliente." AND cb.sc = :sc AND c.onoff = 1) AS t
+					INNER JOIN operadora_cliente oc ON t.id = oc.id_cliente AND t.id_operadora = oc.id_op
+					GROUP BY oc.id_op, alfanumerico";
+
+			$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+			$sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
+	        $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
+	        $operadoras_usuario = $sql->queryAll();
+
+			if($operadoras_cliente) {
 	            echo CJSON::encode(array(
 		                        'error' => 'false',
 		                        'status' => 'Operadoras obtenidas correctamente',
-		                        'data' => $operadoras,
+		                        'operadoras_usuario' => $operadoras_usuario,
+		                        'operadoras_cliente' => $operadoras_cliente,
 		                   )                                
 	                 );
 	            Yii::app()->end();

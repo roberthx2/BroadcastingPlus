@@ -221,10 +221,19 @@ class Procedimientos extends CApplicationComponent
 		}
 		else
 		{
+			$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea(Yii::app()->user->getCadenaSc());
+			$cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
+
+			$criteria = new CDbCriteria;
+			$criteria->select = "GROUP_CONCAT(DISTINCT sc_id) AS sc_id";
+			$criteria->addInCondition("id_sc", explode(",", $cadena_sc));
+			$sc_id = ScId::model()->find($criteria);
+			$cadena_sc = ($sc_id->sc_id == "") ? "null" : $sc_id->sc_id;
+
 			$sql = "SELECT DISTINCT c.sc FROM usuario_clientes_bcp uc
 				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
 				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
-				WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.onoff = 1";
+				WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.sc IN (".$cadena_sc.") AND c.onoff = 1";
 		}
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
@@ -321,7 +330,8 @@ class Procedimientos extends CApplicationComponent
 		$model->fecha = date("Y-m-d");
 		$model->hora = date("H:i:s");
 		$model->descripcion = $descripcion;
-		$model->controller_action = Yii::app()->request->queryString;
+		$model->controller_action = "r=".Yii::app()->controller->id."/".Yii::app()->controller->action->id;
+		//Yii::app()->request->queryString; //No funciona para url encriptadas
 		$model->save();
 	}
 

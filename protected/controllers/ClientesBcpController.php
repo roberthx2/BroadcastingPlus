@@ -226,6 +226,11 @@ class ClientesBcpController extends Controller
 	            				$this->actionCrearClienteEnviadorNuevo($model, $operadoras);
 	            			}
 
+
+	            			$log = "Cliente BCP: ".ReportesController::actionGetDescripcionClienteBCNL($model->id_cliente)." configurado por el Administrador: ".UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+
+							Yii::app()->Procedimientos->setLog($log);
+
 	            			$transaction->commit();
 		                	$transaction2->commit();
 
@@ -240,7 +245,7 @@ class ClientesBcpController extends Controller
 		                        Yii::app()->user->setFlash("danger", $sms);
 		                        $transaction->rollBack();
 		                        $transaction2->rollBack();
-		                        print_r($e);
+		                        //print_r($e);
 		                    } 
             		}
 				}
@@ -368,19 +373,6 @@ class ClientesBcpController extends Controller
         
         if (Yii::app()->request->isAjaxRequest)
         {
-            /*$criteria = new CDbCriteria;
-            $criteria->select = "GROUP_CONCAT(DISTINCT id_sc) AS id_sc";
-            $criteria->join = "INNER JOIN cliente c ON t.cliente = c.Id_cliente ";
-            $criteria->condition = "c.Id_cliente = ".$id_cliente." AND ";
-            $criteria->condition .= "t.desc_producto NOT LIKE 'CERRADO%' ";
-            $model = Producto::model()->find($criteria);
-            $sc_id = ($model->id_sc == "") ? "null":$model->id_sc;
-
-            $criteria = new CDbCriteria;
-            $criteria->select = "DISTINCT sc_id";
-            $criteria->addInCondition("id_sc", explode(",", $sc_id));
-            $model = ScId::model()->findAll($criteria);*/
-
             $criteria = new CDbCriteria;
             $criteria->select = "DISTINCT t.sc_id";
             $criteria->join = "INNER JOIN producto p ON t.id_sc = p.id_sc";
@@ -496,7 +488,7 @@ class ClientesBcpController extends Controller
 
 				if ($value["alfanumerico"] == 1)
 				{
-					$operadoras .= '<td><input type="text" class="form-control sc_alf sc_alf_'.$value["id_operadora"].'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value["id_operadora"].'] style="text-transform:uppercase;"></td>';
+					$operadoras .= '<td><input type="text" readonly class="form-control sc_alf sc_alf_'.$value["id_operadora"].'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value["id_operadora"].'] style="text-transform:uppercase;"></td>';
 				}
 				else
 					$operadoras .= '<td></td>';
@@ -1062,6 +1054,9 @@ class ClientesBcpController extends Controller
         	if ($model->save())
         	{
         		ClienteAlarmas::model()->updateAll(array("onoff"=>"0"),"id_cliente_sc_numerico=:id", array(":id"=>$model->id));
+
+        		/*$log = "Cliente BCP: ".ReportesController::actionGetDescripcionClienteBCNL($model->id_cliente_sms)." ".(($valor=='true') ? 'Habilitado' : 'Inhabilitado')." por el Administrador: ".UsuarioSmsController::actionGetLogin(Yii::app()->user->id)."";
+				Yii::app()->Procedimientos->setLog($log);*/
         		
 	            echo CJSON::encode(array(
 	                'error' => 'false',
