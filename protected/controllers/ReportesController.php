@@ -54,7 +54,18 @@ class ReportesController extends Controller
 
     public function actionMensualSmsPorCodigo()
     {
-        $this->render("mensualSmsPorCodigo");
+        $modelBCP = new Reportes('reporte_mensual', 'resumen_bcp_diario');
+        $modelBCP->unsetAttributes();
+        
+        if(isset($_GET['Reportes']))
+        {
+            $modelBCP->mes=$_GET['Reportes']["mes"];
+            $modelBCP->ano=$_GET['Reportes']["anio"];
+        }
+
+        //$this->render("mensualSmsPorCodigo");
+
+        $this->render('mensualSmsPorCodigoBCP', array('model'=>$modelBCP));
     }
 
     public function actionSmsRecibidos()

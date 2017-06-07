@@ -5,14 +5,6 @@
 $contenido = array();
 $active = true;
 
-/*if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_cliente_bcnl)
-{        
-    $contenido = array(
-            		array('label' => 'BCNL', 'content' => $this->renderPartial('mensualSmsBCNL', false, true), 'active' => $active),
-            	);
-    $active = false;
-}*/
-
 if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_codigo_bcp)
 {
     $modelBCP = new PromocionesPremium('searchMensualSmsPorCodigo');

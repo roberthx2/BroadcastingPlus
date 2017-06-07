@@ -1,3 +1,5 @@
+<fieldset> 
+    <legend>Reporte de SMS por Código</legend>
 <br>
 <?php
 Yii::app()->clientScript->registerScript('searchMensualSmsPorCodigoBCP', "
@@ -6,7 +8,7 @@ $('.BCP form').submit(function(){
     $('#mensualSmsPorCodigoBCP').yiiGridView('update', {
         data: $(this).serialize()
     });
-    updateInfo();
+    //updateInfo();
     return false;
 });
 
@@ -14,11 +16,11 @@ $('.BCP form').submit(function(){
 
 ?>
 <div class="BCP col-xs-12 col-sm-5 col-md-5 col-lg-5">
-    <?php $this->renderPartial('busquedaMensualSmsPorPeriodo',array('model'=>$model)); ?>
+    <?php $this->renderPartial('busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <?php $this->renderPartial('mensualSmsDetallePeriodo',array('model'=>$model)); ?>
+    <?php //$this->renderPartial('mensualSmsDetallePeriodo',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
 <?php
@@ -33,14 +35,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
 
         'columns'=> array( 
-        	//'id_cliente',
-        	array(
+        	'fecha',
+        	/*array(
 	            'name' => 'sc',
 	            'header' => 'sc',
-	            /*'value' => function($data)
-	            {
-	            	return $this->actionGetDescripcionClienteBCP($data["sc"]);
-	            },*/
 	            'type' => 'raw',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
@@ -96,10 +94,11 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            },
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
+        	),*/
         ),
     ));
 ?>
+</fieldset>
 
 <script type="text/javascript">
 
@@ -136,8 +135,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 
 	$(document).ready(function()
 	{
-		updateInfo();
-        $('[data-tooltip="tooltip"]').tooltip();
+		//updateInfo();
+        //$('[data-tooltip="tooltip"]').tooltip();
 	});
 
 </script>
