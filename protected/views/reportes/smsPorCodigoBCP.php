@@ -24,18 +24,25 @@ $('.BCP form').submit(function(){
 </div><!-- search-form -->
 
 <?php
+    $model_oper=OpereradorasActivas::model()->findAll();
+?>
+
+<?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model->searchMensualSmsPorCodigo(),
+        'dataProvider' => $model->searchSmsPorCodigo(),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
 
         'columns'=> array( 
-        	'fecha',
+        	'sc',
+            'MOVISTAR',
+            'MOVILNET',
+            'DIGITEL',
         	/*array(
 	            'name' => 'sc',
 	            'header' => 'sc',

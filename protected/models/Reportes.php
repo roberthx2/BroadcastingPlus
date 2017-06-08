@@ -19,6 +19,7 @@ class Reportes extends CActiveRecord
 	public $fecha;
 	public $fecha_ini;
 	public $fecha_fin;
+	public $tipo_busqueda; //1. Mes / 2.Periodo / 3. Dia
 
 	private $tableName = 'resumen_bcp_mensual'; // <=default value
     private static $_models=array();
@@ -128,7 +129,7 @@ class Reportes extends CActiveRecord
 		return Yii::app()->db_masivo_premium;
 	}
 
-	public function searchMensualSmsPorCodigo()
+	public function searchSmsPorCodigo()
 	{
 		/*if ($this->mes == "")
 			$this->mes = date("m");
@@ -137,20 +138,25 @@ class Reportes extends CActiveRecord
 			$this->anio = date("Y");*/
 
 		$criteria=new CDbCriteria;
-		//$criteria->select = "fecha";
-//print_r($this::model()->getAttributes());
-//exit;
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			/*'sort'=>array(
-				'defaultOrder'=>'id_promo DESC',
+		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
+		$cond_oper = OperadorasActivas::model()->find($criteria);
+
+		$sql = "SELECT id_mensual AS id, sc, $cond_oper->descripcion FROM (
+					SELECT id_mensual, r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
+						WHERE year = 2017 AND month = 4 GROUP BY r.sc, r.operadora) AS t 
+				GROUP BY sc";
+
+		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.id_mensual',
+			'sort'=>array(
+				'defaultOrder'=>'sc DESC',
         		'attributes'=>array(
-             		'nombrePromo', 'fecha', 'total_sms'
+             		'sc',
         		),
-    		),*/
+    		),
 		));
-		//print_r($model->getData());
-		//exit;
 	}
 
 	/**

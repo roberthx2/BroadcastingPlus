@@ -54,18 +54,30 @@ class ReportesController extends Controller
 
     public function actionMensualSmsPorCodigo()
     {
-        $modelBCP = new Reportes('reporte_mensual', 'resumen_bcp_diario');
-        $modelBCP->unsetAttributes();
+        $model = new Reportes('reporte_mensual', 'resumen_bcp_diario');
+        $model->unsetAttributes();
         
         if(isset($_GET['Reportes']))
         {
-            $modelBCP->mes=$_GET['Reportes']["mes"];
-            $modelBCP->ano=$_GET['Reportes']["anio"];
+            if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+            {
+                $model->month=$_GET['Reportes']["month"];
+                $model->year=$_GET['Reportes']["year"];
+            }
+            else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+            {
+                $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+            }
+            else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+            {
+                $model->fecha=$_GET['Reportes']["fecha"];
+            }
         }
 
         //$this->render("mensualSmsPorCodigo");
 
-        $this->render('mensualSmsPorCodigoBCP', array('model'=>$modelBCP));
+        $this->render('smsPorCodigoBCP', array('model'=>$model));
     }
 
     public function actionSmsRecibidos()

@@ -10,7 +10,20 @@
 	)
 );
 ?>
+<?php echo $form->hiddenField($model, 'tipo_busqueda', array('value'=>1)); ?>
 <br>
+
+<?php 
+	$anio_min = date("Y", strtotime(Yii::app()->Procedimientos->getMinDateHistorial()));
+	$anios = array();
+
+	do
+	{
+		$anios[$anio_min] = $anio_min;
+		$anio_min++;
+	} while ($anio_min <= date("Y"));
+?>
+
 <div class="form-group">
 	<?php echo $form->dropDownListGroup(
 		$model,
@@ -20,12 +33,8 @@
 				//'class' => 'col-sm-5',
 			),
 			'widgetOptions' => array(
-				'data' => array(
-					//date('Y',strtotime('-2 year', strtotime(date('Y'))))=>date('Y',strtotime('-2 year', strtotime(date('Y')))), 
-					date('Y',strtotime('-1 year', strtotime(date('Y'))))=>date('Y',strtotime('-1 year', strtotime(date('Y')))),
-					date('Y')=>date('Y'),
-					),
-				'htmlOptions' => array('options'=>array(date("Y")=>array('selected'=>true))),	
+				'data' => $anios,
+				'htmlOptions' => array('onchange'=>'js:getMonth()', 'options'=>array(date("Y")=>array('selected'=>true))),	
 			),
 			'prepend' => '<i class="glyphicon glyphicon-calendar"></i>',
 		)
@@ -39,7 +48,6 @@
 				//'class' => 'col-sm-5',
 			),
 			'widgetOptions' => array(
-				'data' => array("01"=>"Enero", "02"=>"Febrero", "03"=>"Marzo", "04"=>"Abril", "05"=>"Mayo", "06"=>"Junio", "07"=>"Julio", "08"=>"Agosto", "09"=>"Septiembre", "10"=>"Octubre", "11"=>"Noviembre", "12"=>"Diciembre"),
 				'htmlOptions' => array('options'=>array(date("m")=>array('selected'=>true))),
 			),
 			'prepend' => '<i class="glyphicon glyphicon-calendar"></i>',
@@ -58,3 +66,51 @@
     ); ?>
 </div><!-- /.col-lg-6 -->
 <?php $this->endWidget(); ?>
+
+<script type="text/javascript">
+
+	function getMonthArray(ini, fin)
+	{
+		var meses = {01:"Enero", 02:"Febrero", 03:"Marzo", 04:"Abril", 05:"Mayo", 06:"Junio", 07:"Julio", 08:"Agosto", 09:"Septiembre", 10:"Octubre", 11:"Noviembre", 12:"Diciembre"};
+
+		$("#Reportes_month").empty();
+
+		for (var i=parseInt(ini); i<=parseInt(fin); i++)
+		{
+			$("#Reportes_month").append($("<option>").text(meses[i]).attr("value",i));
+		} 
+	}
+	
+	function getMonth()
+	{
+		var anio_min = '<?php echo date("Y", strtotime(Yii::app()->Procedimientos->getMinDateHistorial())); ?>';
+		var anio_select = $("#Reportes_year").val();
+		var anio_actual = '<?php echo date("Y"); ?>';
+		var mes_min = '<?php echo date("m", strtotime(Yii::app()->Procedimientos->getMinDateHistorial())); ?>';
+		var mes_actual = '<?php echo date("m"); ?>';
+
+		if (anio_select == anio_actual)
+		{
+			if (anio_min < anio_actual)
+				getMonthArray(1, mes_actual);
+			else
+				getMonthArray(mes_min, mes_actual);
+		}
+		else
+		{
+			if (anio_min < anio_select)
+				getMonthArray(1, 12);
+			else
+				getMonthArray(mes_min, 12);
+		}
+
+	}
+
+	$(document).ready(function() 
+    {
+    	getMonth();
+    	$("#Reportes_month option[value='" + parseInt('<?php echo date("m"); ?>') + "']").prop("selected", true);
+    });
+
+</script>
+

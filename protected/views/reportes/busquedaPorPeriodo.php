@@ -10,6 +10,7 @@
 	)
 );
 ?>
+<?php echo $form->hiddenField($model, 'tipo_busqueda', array('value'=>2)); ?>
 <br>
 <div class="form-group">
 	<?php echo $form->datePickerGroup(
