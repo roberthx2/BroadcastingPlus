@@ -24,7 +24,25 @@ $('.BCP form').submit(function(){
 </div><!-- search-form -->
 
 <?php
-    $model_oper=OpereradorasActivas::model()->findAll();
+    $model_oper=OperadorasActivas::model()->findAll();
+    $data_arr[] = array(
+                'name' => 'sc',
+                'header' => 'sc',
+                'type' => 'raw',
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            );
+
+    foreach ($model_oper as $value)
+    {
+        $data_arr[] = array(
+                'name' => $value["descripcion"],
+                'header' => $value["descripcion"],
+                'type' => 'number',
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            );
+    }
 ?>
 
 <?php
@@ -38,71 +56,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
 
-        'columns'=> array( 
-        	'sc',
-            'MOVISTAR',
-            'MOVILNET',
-            'DIGITEL',
-        	/*array(
-	            'name' => 'sc',
-	            'header' => 'sc',
-	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
-        	array(
-        		'name' => 'no_enviados',
-	            'header' => 'No enviados',
-	            'value' => function($data)
-	            {
-	            	$estado = ($data["total"]-$data["enviados"]) == 0 ? 0 : 1;
-
-	            	Controller::widget(
-                        'booster.widgets.TbLabel',
-                        array(
-                            'label' => $data["total"]-$data["enviados"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoReportes($estado).';'),    
-                        )
-                    );
-	            },
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
-        	array(
-        		'name'=>'enviados',
-	            'header' => 'Enviados',
-	            'value' => function($data)
-	            {
-	            	$estado = $data["enviados"] == 0 ? 0 : 2;
-
-	            	Controller::widget(
-                        'booster.widgets.TbLabel',
-                        array(
-                            'label' => $data["enviados"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoReportes($estado).';'),    
-                        )
-                    );
-	            },
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),
-        	array(
-        		'name' => 'total',
-	            'header' => 'Total',
-	            'value' => function($data)
-	            {
-	            	Controller::widget(
-                        'booster.widgets.TbLabel',
-                        array(
-                            'label' => $data["total"],
-                            'htmlOptions'=>array('style'=>'background-color: '.Yii::app()->Funciones->getColorLabelEstadoReportes(3).';'),    
-                        )
-                    );
-	            },
-	            'htmlOptions' => array('style' => 'text-align: center;'),
-	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-        	),*/
-        ),
+        'columns'=> $data_arr,
     ));
 ?>
 </fieldset>
