@@ -78,7 +78,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         	array(
 	            'name' => 'total',
 	            'header' => 'Total Destinatarios',
-	            'type' => 'raw',
+	            'type' => 'number',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover'),
         	),

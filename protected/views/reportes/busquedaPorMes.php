@@ -48,7 +48,7 @@
 				//'class' => 'col-sm-5',
 			),
 			'widgetOptions' => array(
-				'htmlOptions' => array('options'=>array(date("m")=>array('selected'=>true))),
+				//'htmlOptions' => array('options'=>array(date("m")=>array('selected'=>true))),
 			),
 			'prepend' => '<i class="glyphicon glyphicon-calendar"></i>',
 		)

@@ -129,33 +129,78 @@ class Reportes extends CActiveRecord
 		return Yii::app()->db_masivo_premium;
 	}
 
-	public function searchSmsPorCodigo()
+	public function searchSmsPorCodigo(/*$tipo_busqueda, $objeto*/)
 	{
-		/*if ($this->mes == "")
-			$this->mes = date("m");
 
-		if ($this->anio == "")
-			$this->anio = date("Y");*/
+		/*$this->tipo_busqueda = $_SESSION['tipo_busqueda'];
+		$this->year = $_SESSION['year'];
+		$this->month = $_SESSION['month'];*/
+		//$this->tipo_busqueda = $tipo_busqueda;
 
+		if ($this->tipo_busqueda == 1) //Mes
+		{
+			/*$this->year = $objeto['year'];
+			$this->month = $objeto['month'];*/
+			$condicion = "year = ".$this->year." AND month = ".$this->month;
+			//$condicion = "year = ".$objeto["year"]." AND month = ".$objeto["month"];
+		}
+		else if ($this->tipo_busqueda == 2) //Periodo
+		{
+			//$condicion = "fecha BETWEEN '".$this->fecha_ini."' AND '".$this->fecha_fin."'";
+			$condicion = "fecha BETWEEN '".$objeto["fecha_ini"]."' AND '".$objeto["fecha_fin"]."'";
+		}
+		else if ($this->tipo_busqueda == 3) //Dia
+		{
+			//$condicion = "fecha = '".$this->fecha."'";
+			$condicion = "fecha = '".$objeto["fecha"]."'";
+		}
+		else
+		{
+			$condicion = "false";
+		}
+		//$condicion = "year = 2017 AND month = 4";
+		//print_r("tipo--->>>".$tipo_busqueda);
+		//print_r($objeto);
+//print_r("tipo->".$this->year."<br>");
+print_r("tipo->".$this->tipo_busqueda."<br>");
+print_r("year->".$this->year."<br>");
+print_r("month->".$this->month."<br>");
 		$criteria=new CDbCriteria;
 		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
 		$cond_oper = OperadorasActivas::model()->find($criteria);
 
-		$sql = "SELECT id_mensual AS id, sc, $cond_oper->descripcion FROM (
-					SELECT id_mensual, r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
-						WHERE year = 2017 AND month = 4 GROUP BY r.sc, r.operadora) AS t 
+		$sql = "SELECT sc AS id, sc, $cond_oper->descripcion FROM (
+					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM ".$this->scenario." r 
+						WHERE ".$condicion." GROUP BY r.sc, r.operadora) AS t 
 				GROUP BY sc";
+//print_r($sql);
 
-		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+		//$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 
-		return new CArrayDataProvider($criteria, array(
-			'id'=>'t.id_mensual',
+		/*return new CArrayDataProvider($criteria, array(
+			'id'=>'t.sc',
 			'sort'=>array(
 				'defaultOrder'=>'sc DESC',
         		'attributes'=>array(
              		'sc',
         		),
     		),
+		));*/
+
+		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
+		//$sql='SELECT * FROM tbl_user';
+		return new CSqlDataProvider($sql, array(
+			'db'=>Yii::app()->db_masivo_premium,
+		    'totalItemCount'=>$count,
+		    'sort'=>array(
+				'defaultOrder'=>'sc DESC',
+        		'attributes'=>array(
+             		'sc',
+        		),
+    		),
+		    'pagination'=>array(
+		        'pageSize'=>10,
+		    ),
 		));
 	}
 

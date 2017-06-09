@@ -28,7 +28,7 @@ class ReportesController extends Controller
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
                 'actions' => array('index', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'mensualSmsPorCodigo', 'smsRecibidos'),
-                'users' => array('@'),
+                'users' => array('*'),
             ),
 
             array('deny', // deny all users
@@ -54,30 +54,43 @@ class ReportesController extends Controller
 
     public function actionMensualSmsPorCodigo()
     {
-        $model = new Reportes('reporte_mensual', 'resumen_bcp_diario');
+        $model = new Reportes('resumen_bcp_mensual', 'resumen_bcp_mensual');
         $model->unsetAttributes();
+        /*$tipo_busqueda = null;
+        $objeto = array();*/
         
         if(isset($_GET['Reportes']))
         {
+            $model->tipo_busqueda=$_GET['Reportes']["tipo_busqueda"];
+
+
             if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
             {
                 $model->month=$_GET['Reportes']["month"];
                 $model->year=$_GET['Reportes']["year"];
+                $model->scenario = 'resumen_bcp_mensual';
+                /*$objeto["year"]=$_GET['Reportes']["year"];
+                $objeto["month"]=$_GET['Reportes']["month"];*/
             }
             else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
             {
-                $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
-                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+                /*$model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];*/
+                $model->scenario = 'resumen_bcp_diario';
+                $objeto["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                $objeto["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
             }
             else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
             {
-                $model->fecha=$_GET['Reportes']["fecha"];
+                //$model->fecha=$_GET['Reportes']["fecha"];
+                $model->scenario = 'resumen_bcp_diario';
+                $objeto["fecha"]=$_GET['Reportes']["fecha"];
             }
+
+            //$tipo_busqueda=$model->tipo_busqueda;
         }
-
-        //$this->render("mensualSmsPorCodigo");
-
-        $this->render('smsPorCodigoBCP', array('model'=>$model));
+        
+        $this->render('smsPorCodigoBCP', array('model'=>$model, /*'tipo_busqueda'=>$tipo_busqueda, "objeto"=>$objeto*/));
     }
 
     public function actionSmsRecibidos()

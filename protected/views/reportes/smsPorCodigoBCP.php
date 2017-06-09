@@ -37,7 +37,7 @@ $('.BCP form').submit(function(){
     {
         $data_arr[] = array(
                 'name' => $value["descripcion"],
-                'header' => $value["descripcion"],
+                'header' => ucfirst(strtolower($value["descripcion"])),
                 'type' => 'number',
                 'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
@@ -46,11 +46,13 @@ $('.BCP form').submit(function(){
 ?>
 
 <?php
+//print_r($model);
+//$cadena = '$year,$month';
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model->searchSmsPorCodigo(),
+        'dataProvider' => $model->searchSmsPorCodigo(/*$tipo_busqueda,$cadena*/),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',

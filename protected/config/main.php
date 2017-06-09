@@ -110,6 +110,7 @@ return array(
 		'format' => array(
         	'timeFormat' => 'h:i a',
         	'dateFormat' => 'Y-m-d',
+        	'numberFormat' => array('decimals'=>0, 'decimalSeparator'=>',', 'thousandSeparator'=>'.'),
     	),
 
 		/*'authManager'=>array(
