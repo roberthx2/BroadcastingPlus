@@ -52,45 +52,74 @@ class ReportesController extends Controller
         $this->render("mensualSmsPorCliente");
     }
 
-    public function actionMensualSmsPorCodigo()
+    /*public function actionMensualSmsPorCodigo()
     {
         $model = new Reportes('resumen_bcp_mensual', 'resumen_bcp_mensual');
         $model->unsetAttributes();
-        /*$tipo_busqueda = null;
-        $objeto = array();*/
-        
+
         if(isset($_GET['Reportes']))
         {
-            $model->tipo_busqueda=$_GET['Reportes']["tipo_busqueda"];
-
-
             if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
             {
-                $model->month=$_GET['Reportes']["month"];
-                $model->year=$_GET['Reportes']["year"];
-                $model->scenario = 'resumen_bcp_mensual';
-                /*$objeto["year"]=$_GET['Reportes']["year"];
-                $objeto["month"]=$_GET['Reportes']["month"];*/
+                $model = new Reportes('resumen_bcp_mensual', 'resumen_bcp_mensual');
+                $model->unsetAttributes();
+                //$model->scenario = 'resumen_bcp_mensual';
+                $_SESSION["year"]=$_GET['Reportes']["year"];
+                $_SESSION["month"]=$_GET['Reportes']["month"];
             }
             else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
             {
-                /*$model->fecha_ini=$_GET['Reportes']["fecha_ini"];
-                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];*/
-                $model->scenario = 'resumen_bcp_diario';
-                $objeto["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
-                $objeto["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
+                $model = new Reportes('resumen_bcp_diario', 'resumen_bcp_diario');
+                $model->unsetAttributes();
+                //$model->scenario = 'resumen_bcp_diario';
+                $_SESSION["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                $_SESSION["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
             }
             else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
             {
-                //$model->fecha=$_GET['Reportes']["fecha"];
-                $model->scenario = 'resumen_bcp_diario';
-                $objeto["fecha"]=$_GET['Reportes']["fecha"];
+                $model = new Reportes('resumen_bcp_diario', 'resumen_bcp_diario');
+                $model->unsetAttributes();
+                //$model->scenario = 'resumen_bcp_diario';
+                $_SESSION["fecha"]=$_GET['Reportes']["fecha"];
             }
 
-            //$tipo_busqueda=$model->tipo_busqueda;
+            $_SESSION["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"];
         }
         
-        $this->render('smsPorCodigoBCP', array('model'=>$model, /*'tipo_busqueda'=>$tipo_busqueda, "objeto"=>$objeto*/));
+        $this->render('smsPorCodigoBCP', array('model'=>$model));
+    }*/
+
+    public function actionMensualSmsPorCodigo()
+    {
+        $model = new Reportes();
+        $model->table = "resumen_bcp_mensual";
+        $model->unsetAttributes();
+        $tipo_busqueda=null;
+
+        if(isset($_GET['Reportes']))
+        {
+            if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+            {
+                $model->table = 'resumen_bcp_mensual';
+                $model->year=$_GET['Reportes']["year"];
+                $model->month=$_GET['Reportes']["month"];
+            }
+            else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+            {
+                $model->table = 'resumen_bcp_diario';
+                $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+            }
+            else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+            {
+                $model->table = 'resumen_bcp_diario';
+                $model->fecha=$_GET['Reportes']["fecha"];
+            }
+
+            $model->tipo_busqueda=$_GET['Reportes']["tipo_busqueda"]; 
+        }
+
+        $this->render('smsPorCodigoBCP', array('model'=>$model));
     }
 
     public function actionSmsRecibidos()

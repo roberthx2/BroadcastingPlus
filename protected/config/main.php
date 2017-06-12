@@ -144,7 +144,7 @@ return array(
 			),
 		),*/
 
-		'urlManager'=>array(
+		/*'urlManager'=>array(
 			'urlFormat'=>'path',
 			
 			'showScriptName'=>false,
@@ -155,7 +155,7 @@ return array(
 			  				),       
 	  			
 			),
-		),
+		),*/
 		
 
 		// database settings are configured in database.php

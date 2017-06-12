@@ -33,6 +33,8 @@ $('.BCP form').submit(function(){
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             );
 
+    $total=array();
+
     foreach ($model_oper as $value)
     {
         $data_arr[] = array(
@@ -42,17 +44,30 @@ $('.BCP form').submit(function(){
                 'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             );
+        $total[]= $value["descripcion"];
     }
+//    print_r($total);
+
+    $data_arr[] = array(
+//                'name' => 'total',
+                'header' => 'Total',
+                'type' => 'number',
+                'value' => function($data, $total)
+                {
+                    print_r($total);
+                },
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            );
 ?>
 
 <?php
-//print_r($model);
-//$cadena = '$year,$month';
+
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model->searchSmsPorCodigo(/*$tipo_busqueda,$cadena*/),
+        'dataProvider' => $model->searchSmsPorCodigo(),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
