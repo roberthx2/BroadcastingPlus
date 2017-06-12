@@ -93,7 +93,7 @@ class ReportesController extends Controller
     {
         $model = new Reportes();
         $model->table = "resumen_bcp_mensual";
-        $model->unsetAttributes();
+        //$model->unsetAttributes();
         $tipo_busqueda=null;
 
         if(isset($_GET['Reportes']))
@@ -119,7 +119,54 @@ class ReportesController extends Controller
             $model->tipo_busqueda=$_GET['Reportes']["tipo_busqueda"]; 
         }
 
-        $this->render('smsPorCodigoBCP', array('model'=>$model));
+        /////GRID VIEW
+
+        /*$data_arr[] = array(
+                'name' => 'sc',
+                'header' => 'sc',
+                'type' => 'raw',
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            );
+
+        $grid = $this->actionCreateColumnasOper();
+
+        $columnas = array_merge($data_arr, $grid);*/
+
+        ////////////////////////
+
+        $this->render('smsPorCodigoBCP', array('model'=>$model, /*'columnas'=>$columnas*/));
+    }
+
+    public function actionCreateColumnasOper()
+    {
+        $model_oper=OperadorasActivas::model()->findAll();
+        $data_arr=array();
+
+        foreach ($model_oper as $value)
+        {
+            $data_arr[] = array(
+                    'name' => $value["descripcion"],
+                    'header' => ucfirst(strtolower($value["descripcion"])),
+                    'type' => 'number',
+                    'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                    'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+                );
+
+            $total[] = "\$data['".$value["descripcion"]."']";
+        }
+
+        $total = implode(" + ", $total);
+
+        $data_arr[] = array(
+                'header' => 'Total',
+                'type' => 'number',
+                'value' =>$total,
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            );
+
+        return $data_arr;
     }
 
     public function actionSmsRecibidos()

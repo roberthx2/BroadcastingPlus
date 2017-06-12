@@ -176,10 +176,10 @@ class Reportes extends CActiveRecord
 
 	public function searchSmsPorCodigo()
 	{
-		if (!$this->tipo_busqueda == 1) //Mes
+		if ($this->tipo_busqueda == 1) //Mes
 		{
-//			$condicion = "year = ".$this->year." AND month = ".$this->month;
-			$condicion = "year = 2017 AND month = 5";
+			$condicion = "year = ".$this->year." AND month = ".$this->month;
+			//$condicion = "year = 2017 AND month = 5";
 		}
 		else if ($this->tipo_busqueda == 2) //Periodo
 		{
@@ -228,6 +228,8 @@ class Reportes extends CActiveRecord
     		),
 		    'pagination'=>array(
 		        'pageSize'=>10,
+		        //'route'=>Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array("asddd"=>"asas")),
+		        //'params'=>array("asd"=>"sss"),
 		    ),
 		));
 	}

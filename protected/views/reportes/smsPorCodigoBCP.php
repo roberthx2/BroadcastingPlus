@@ -24,8 +24,8 @@ $('.BCP form').submit(function(){
 </div><!-- search-form -->
 
 <?php
-    $model_oper=OperadorasActivas::model()->findAll();
-    $data_arr[] = array(
+
+$data_arr[] = array(
                 'name' => 'sc',
                 'header' => 'sc',
                 'type' => 'raw',
@@ -33,32 +33,10 @@ $('.BCP form').submit(function(){
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             );
 
-    $total=array();
+$grid = $this->actionCreateColumnasOper(/*$model*/);
 
-    foreach ($model_oper as $value)
-    {
-        $data_arr[] = array(
-                'name' => $value["descripcion"],
-                'header' => ucfirst(strtolower($value["descripcion"])),
-                'type' => 'number',
-                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-            );
-        $total[]= $value["descripcion"];
-    }
-//    print_r($total);
+$columnas = array_merge($data_arr, $grid);
 
-    $data_arr[] = array(
-//                'name' => 'total',
-                'header' => 'Total',
-                'type' => 'number',
-                'value' => function($data, $total)
-                {
-                    print_r($total);
-                },
-                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-            );
 ?>
 
 <?php
@@ -72,8 +50,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         //'template'=>"{items}\n{pager}",
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
-
-        'columns'=> $data_arr,
+        /*'pagination' => array(
+            'pageSize' => 3,
+            'params' => array('my_new_param' => 'myvalue'),
+        ),*/
+        //'extraParams'=>array("a"=>"asd"),
+         'ajaxUrl' => Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) ),
+        'columns'=> $columnas,
     ));
 ?>
 </fieldset>
