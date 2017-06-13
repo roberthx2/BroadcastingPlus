@@ -176,38 +176,58 @@ class Reportes extends CActiveRecord
 
 	public function searchSmsPorCodigo()
 	{
+		/*$this->tipo_busqueda = (isset($_SESSION["objeto"]["tipo_busqueda"]) == true) ? $_SESSION["objeto"]["tipo_busqueda"] : null;
+		$this->table = (isset($_SESSION["objeto"]["table"]) == true) ? $_SESSION["objeto"]["table"] : "resumen_bcp_mensual";
+
 		if ($this->tipo_busqueda == 1) //Mes
 		{
-			$condicion = "year = ".$this->year." AND month = ".$this->month;
+			$condicion = "year = ".$_SESSION["objeto"]["year"]." AND month = ".$_SESSION["objeto"]["month"];
 			//$condicion = "year = 2017 AND month = 5";
 		}
 		else if ($this->tipo_busqueda == 2) //Periodo
 		{
-			$condicion = "fecha BETWEEN '".$this->fecha_ini."' AND '".$this->fecha_fin."'";
+			$condicion = "fecha BETWEEN '".$_SESSION["objeto"]["fecha_ini"]."' AND '".$_SESSION["objeto"]["fecha_fin"]."'";
 		}
 		else if ($this->tipo_busqueda == 3) //Dia
 		{
-			$condicion = "fecha = '".$this->fecha."'";
+			$condicion = "fecha = '".$_SESSION["objeto"]["fecha"]."'";
 		}
 		else
-		{
+		{*/
 			$condicion = "false";
-		}
+		//}
+
+		/*print_r($_SESSION["objeto"]["table"]."<br>");
+		print_r($_SESSION["objeto"]["year"]."<br>");
+		print_r($_SESSION["objeto"]["month"]."<br>");
+		print_r($_SESSION["objeto"]["fecha_ini"]."<br>");
+		print_r($_SESSION["objeto"]["fecha_fin"]."<br>");
+		print_r($_SESSION["objeto"]["fecha"]."<br>");
+		print_r($_SESSION["objeto"]["tipo_busqueda"]."<br>");*/
 
 		$criteria=new CDbCriteria;
 		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
 		$cond_oper = OperadorasActivas::model()->find($criteria);
 
 		$sql = "SELECT sc AS id, sc, $cond_oper->descripcion FROM (
-					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM ".$this->table." r 
+					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
 						WHERE ".$condicion." GROUP BY r.sc, r.operadora) AS t 
 				GROUP BY sc";
+
+		/*$criteria = new CDbCriteria;
+		$criteria->select = "sc, $cond_oper->descripcion "*/
 
 		/*$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 
 		return new CArrayDataProvider($criteria, array(
 			'id'=>'t.sc',
+			'pagination'=>array(
+		        //'route'=>Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) ),
+				 'pageSize'=>10,
+		        //'params'=>array("asd"=>"sss"),
+		    ),
 			'sort'=>array(
+				//'route'=>Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) ),
 				'defaultOrder'=>'sc DESC',
         		'attributes'=>array(
              		'sc',

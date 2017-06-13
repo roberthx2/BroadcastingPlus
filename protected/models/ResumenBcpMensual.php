@@ -102,6 +102,38 @@ class ResumenBcpMensual extends CActiveRecord
 		));
 	}
 
+	public function searchSmsPorCodigo()
+	{
+		$condicion = "year = ".$this->year." AND month = ".$this->month;
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
+		$cond_oper = OperadorasActivas::model()->find($criteria);
+
+		$sql = "SELECT sc AS id, sc, $cond_oper->descripcion FROM (
+					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
+						WHERE ".$condicion." GROUP BY r.sc, r.operadora) AS t 
+				GROUP BY sc";
+
+		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
+		//$sql='SELECT * FROM tbl_user';
+		return new CSqlDataProvider($sql, array(
+			'db'=>Yii::app()->db_masivo_premium,
+		    'totalItemCount'=>$count,
+		    'sort'=>array(
+				'defaultOrder'=>'sc DESC',
+        		'attributes'=>array(
+             		'sc',
+        		),
+    		),
+		    'pagination'=>array(
+		        'pageSize'=>10,
+		        //'route'=>Yii::app()->createUrl('resumenBcpMensual/mensualSmsPorCodigo'),
+		        //'params'=>array("asd"=>"sss"),
+		    ),
+		));
+	}
+
 	/**
 	 * @return CDbConnection the database connection used for this class
 	 */

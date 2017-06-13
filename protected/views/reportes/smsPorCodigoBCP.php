@@ -40,8 +40,12 @@ $columnas = array_merge($data_arr, $grid);
 ?>
 
 <?php
+/*$url=Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) );
+print_r($url);
+print_r("<br><br><br>");
+print_r($url." deco: ".Yii::app()->createUrl($url)."<br>");*/
 
-$this->widget( 'booster.widgets.TbExtendedGridView' , array (
+/*$this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
@@ -55,10 +59,17 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
             'params' => array('my_new_param' => 'myvalue'),
         ),*/
         //'extraParams'=>array("a"=>"asd"),
-         'ajaxUrl' => Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) ),
-        'columns'=> $columnas,
-    ));
+         //'ajaxUrl' => Yii::app()->createUrl($this->route, array( 'Agent' => 'asas' ) ),
+      /*  'columns'=> $columnas,
+    ));*/
 ?>
+
+<?php $this->widget('zii.widgets.grid.CGridView', array(
+    'id'=>'mensualSmsPorCodigoBCP',
+    'dataProvider'=>$model->searchSmsPorCodigo(),
+    //'filter'=>$model,
+    'columns'=> $columnas,
+)); ?>
 </fieldset>
 
 <script type="text/javascript">

@@ -91,51 +91,58 @@ class ReportesController extends Controller
 
     public function actionMensualSmsPorCodigo()
     {
-        $model = new Reportes();
-        $model->table = "resumen_bcp_mensual";
-        //$model->unsetAttributes();
-        $tipo_busqueda=null;
+        /*$model = new Reportes();
+        //$model->table = "resumen_bcp_mensual";
+        $model->unsetAttributes();*/
+        //$tipo_busqueda=null;
 
-        if(isset($_GET['Reportes']))
+        if (Yii::app()->request->isAjaxRequest)
         {
-            if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+            if(isset($_GET['Reportes']))
             {
-                $model->table = 'resumen_bcp_mensual';
-                $model->year=$_GET['Reportes']["year"];
-                $model->month=$_GET['Reportes']["month"];
-            }
-            else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
-            {
-                $model->table = 'resumen_bcp_diario';
-                $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
-                $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
-            }
-            else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
-            {
-                $model->table = 'resumen_bcp_diario';
-                $model->fecha=$_GET['Reportes']["fecha"];
-            }
+                if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_GET['Reportes']["year"];
+                    $model->month=$_GET['Reportes']["month"];
 
-            $model->tipo_busqueda=$_GET['Reportes']["tipo_busqueda"]; 
+                    $_SESSION["objeto"]["table"] = 'resumen_bcp_mensual';
+                    $_SESSION["objeto"]["year"]=$_GET['Reportes']["year"];
+                    $_SESSION["objeto"]["month"]=$_GET['Reportes']["month"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+                {
+                    $_SESSION["objeto"]["table"] = 'resumen_bcp_diario';
+                    $_SESSION["objeto"]["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                    $_SESSION["objeto"]["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+                {
+                    $_SESSION["objeto"]["table"] = 'resumen_bcp_diario';
+                    $_SESSION["objeto"]["fecha"]=$_GET['Reportes']["fecha"];
+                }
+
+                $_SESSION["objeto"]["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"]; 
+            }
+            else
+            {
+                if ($_SESSION["objeto"]["tipo_busqueda"] == 1)//Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_SESSION["objeto"]["year"];
+                    $model->month=$_SESSION["objeto"]["month"];
+                }
+            }
+        }
+        else
+        {
+            unset($_SESSION["objeto"]);
+            $model = new Reportes();
+            //$model->table = "resumen_bcp_mensual";
+            $model->unsetAttributes();
         }
 
-        /////GRID VIEW
-
-        /*$data_arr[] = array(
-                'name' => 'sc',
-                'header' => 'sc',
-                'type' => 'raw',
-                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
-                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
-            );
-
-        $grid = $this->actionCreateColumnasOper();
-
-        $columnas = array_merge($data_arr, $grid);*/
-
-        ////////////////////////
-
-        $this->render('smsPorCodigoBCP', array('model'=>$model, /*'columnas'=>$columnas*/));
+        $this->render('smsPorCodigoBCP', array('model'=>$model));
     }
 
     public function actionCreateColumnasOper()
