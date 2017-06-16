@@ -114,22 +114,22 @@ class ResumenBcpMensual extends CActiveRecord
 					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
 						WHERE ".$condicion." GROUP BY r.sc, r.operadora) AS t 
 				GROUP BY sc";
+				print_r($sql);
 
-		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
-		//$sql='SELECT * FROM tbl_user';
-		return new CSqlDataProvider($sql, array(
-			'db'=>Yii::app()->db_masivo_premium,
-		    'totalItemCount'=>$count,
-		    'sort'=>array(
+		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.sc',
+			'pagination'=>array(
+				'pageSize'=>10,
+		        'route'=>'reportes/mensualSmsPorCodigo',
+		    ),
+			'sort'=>array(
 				'defaultOrder'=>'sc DESC',
         		'attributes'=>array(
              		'sc',
         		),
     		),
-		    'pagination'=>array(
-		        'pageSize'=>10,
-		        'route'=>'reportes/mensualSmsPorCodigo',
-		    ),
 		));
 	}
 

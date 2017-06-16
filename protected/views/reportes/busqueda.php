@@ -12,11 +12,11 @@
 	      	<div class="panel-body">
 				<?php
 				    $contenido = array();
-				    array_push($contenido, array('label' => 'Mensual', 'content' => $this->renderPartial('busquedaPorMes', array('model'=>$model), true), 'active' => true));
+				    array_push($contenido, array('label' => 'Mensual', 'content' => $this->renderPartial('busquedaPorMes', array('model'=>new Reportes()), true), 'active' => true));
 
-				    array_push($contenido, array('label' => 'Periodo', 'content' => $this->renderPartial('busquedaPorPeriodo', array('model'=>$model), true), 'active' => false));
+				    array_push($contenido, array('label' => 'Periodo', 'content' => $this->renderPartial('busquedaPorPeriodo', array('model'=>new Reportes()), true), 'active' => false));
 
-				    array_push($contenido, array('label' => 'Día', 'content' => $this->renderPartial('busquedaPorDia', array('model'=>$model), true), 'active' => false));
+				    array_push($contenido, array('label' => 'Día', 'content' => $this->renderPartial('busquedaPorDia', array('model'=>new Reportes()), true), 'active' => false));
 
 				    $this->widget(
 				        'booster.widgets.TbTabs',

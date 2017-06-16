@@ -91,11 +91,6 @@ class ReportesController extends Controller
 
     public function actionMensualSmsPorCodigo()
     {
-        /*$model = new Reportes();
-        //$model->table = "resumen_bcp_mensual";
-        $model->unsetAttributes();*/
-        //$tipo_busqueda=null;
-
         if (Yii::app()->request->isAjaxRequest)
         {
             if(isset($_GET['Reportes']))
@@ -106,19 +101,23 @@ class ReportesController extends Controller
                     $model->year=$_GET['Reportes']["year"];
                     $model->month=$_GET['Reportes']["month"];
 
-                    $_SESSION["objeto"]["table"] = 'resumen_bcp_mensual';
                     $_SESSION["objeto"]["year"]=$_GET['Reportes']["year"];
                     $_SESSION["objeto"]["month"]=$_GET['Reportes']["month"];
                 }
                 else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
                 {
-                    $_SESSION["objeto"]["table"] = 'resumen_bcp_diario';
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                    $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+
                     $_SESSION["objeto"]["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
                     $_SESSION["objeto"]["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
                 }
                 else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
                 {
-                    $_SESSION["objeto"]["table"] = 'resumen_bcp_diario';
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_GET['Reportes']["fecha"];
+
                     $_SESSION["objeto"]["fecha"]=$_GET['Reportes']["fecha"];
                 }
 
@@ -131,6 +130,17 @@ class ReportesController extends Controller
                     $model = new ResumenBcpMensual();
                     $model->year=$_SESSION["objeto"]["year"];
                     $model->month=$_SESSION["objeto"]["month"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_SESSION["objeto"]["fecha_ini"];
+                    $model->fecha_fin=$_SESSION["objeto"]["fecha_fin"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_SESSION["objeto"]["fecha"];
                 }
             }
         }
