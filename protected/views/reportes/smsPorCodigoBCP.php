@@ -33,43 +33,26 @@ $data_arr[] = array(
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             );
 
-$grid = $this->actionCreateColumnasOper(/*$model*/);
+$grid = $this->actionCreateColumnasOper();
 
 $columnas = array_merge($data_arr, $grid);
 
 ?>
 
 <?php
-/*$url=Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array( 'Agent' => 'asas' ) );
-print_r($url);
-print_r("<br><br><br>");
-print_r($url." deco: ".Yii::app()->createUrl($url)."<br>");*/
 
-/*$this->widget( 'booster.widgets.TbExtendedGridView' , array (
+$this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'mensualSmsPorCodigoBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model->searchSmsPorCodigo(),
-        'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
-        //'template'=>"{items}\n{pager}",
+        'summaryText'=>'Mostrando {start} a {end} de {count} registros',
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
-        /*'pagination' => array(
-            'pageSize' => 3,
-            'params' => array('my_new_param' => 'myvalue'),
-        ),*/
-        //'extraParams'=>array("a"=>"asd"),
-         //'ajaxUrl' => Yii::app()->createUrl($this->route, array( 'Agent' => 'asas' ) ),
-      /*  'columns'=> $columnas,
-    ));*/
+        'ajaxUrl' => Yii::app()->createUrl('reportes/mensualSmsPorCodigo'),
+        'columns'=> $columnas,
+    ));
 ?>
-
-<?php $this->widget('zii.widgets.grid.CGridView', array(
-    'id'=>'mensualSmsPorCodigoBCP',
-    'dataProvider'=>$model->searchSmsPorCodigo(),
-    //'filter'=>$model,
-    'columns'=> $columnas,
-)); ?>
 </fieldset>
 
 <script type="text/javascript">

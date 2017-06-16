@@ -197,14 +197,6 @@ class Reportes extends CActiveRecord
 			$condicion = "false";
 		//}
 
-		/*print_r($_SESSION["objeto"]["table"]."<br>");
-		print_r($_SESSION["objeto"]["year"]."<br>");
-		print_r($_SESSION["objeto"]["month"]."<br>");
-		print_r($_SESSION["objeto"]["fecha_ini"]."<br>");
-		print_r($_SESSION["objeto"]["fecha_fin"]."<br>");
-		print_r($_SESSION["objeto"]["fecha"]."<br>");
-		print_r($_SESSION["objeto"]["tipo_busqueda"]."<br>");*/
-
 		$criteria=new CDbCriteria;
 		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
 		$cond_oper = OperadorasActivas::model()->find($criteria);
@@ -248,7 +240,7 @@ class Reportes extends CActiveRecord
     		),
 		    'pagination'=>array(
 		        'pageSize'=>10,
-		        //'route'=>Yii::app()->createUrl('reportes/mensualSmsPorCodigo', array("asddd"=>"asas")),
+		        'route'=>'reportes/mensualSmsPorCodigo',
 		        //'params'=>array("asd"=>"sss"),
 		    ),
 		));

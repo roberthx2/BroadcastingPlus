@@ -128,8 +128,7 @@ class ResumenBcpMensual extends CActiveRecord
     		),
 		    'pagination'=>array(
 		        'pageSize'=>10,
-		        //'route'=>Yii::app()->createUrl('resumenBcpMensual/mensualSmsPorCodigo'),
-		        //'params'=>array("asd"=>"sss"),
+		        'route'=>'reportes/mensualSmsPorCodigo',
 		    ),
 		));
 	}

@@ -138,7 +138,6 @@ class ReportesController extends Controller
         {
             unset($_SESSION["objeto"]);
             $model = new Reportes();
-            //$model->table = "resumen_bcp_mensual";
             $model->unsetAttributes();
         }
 
