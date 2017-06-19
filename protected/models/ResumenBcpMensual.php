@@ -66,7 +66,7 @@ class ResumenBcpMensual extends CActiveRecord
 			'month' => 'Month',
 			'cantd_msj' => 'Cantd Msj',
 			'operadora' => 'Operadora',
-			'sc' => 'Sc',
+			'Sc' => 'Sc',
 		);
 	}
 
@@ -114,7 +114,6 @@ class ResumenBcpMensual extends CActiveRecord
 					SELECT r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
 						WHERE ".$condicion." GROUP BY r.sc, r.operadora) AS t 
 				GROUP BY sc";
-				print_r($sql);
 
 		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
 
@@ -122,12 +121,46 @@ class ResumenBcpMensual extends CActiveRecord
 			'id'=>'t.sc',
 			'pagination'=>array(
 				'pageSize'=>10,
-		        'route'=>'reportes/mensualSmsPorCodigo',
+		        'route'=>'reportes/smsPorCodigo',
 		    ),
 			'sort'=>array(
 				'defaultOrder'=>'sc DESC',
         		'attributes'=>array(
              		'sc',
+        		),
+    		),
+		));
+	}
+
+	public function searchSmsPorCliente()
+	{
+		$condicion = "year = ".$this->year." AND month = ".$this->month;
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
+		$cond_oper = OperadorasActivas::model()->find($criteria);
+
+		$sql = "SELECT id_cliente_bcnl AS id, id_cliente_bcnl, $cond_oper->descripcion FROM (
+					SELECT r.id_cliente_bcnl, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_mensual r 
+						WHERE ".$condicion." GROUP BY r.id_cliente_bcnl, r.operadora) AS t 
+				GROUP BY id_cliente_bcnl";
+
+		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		foreach ($criteria as $key => $value) {
+			$criteria[$key]["id_cliente_bcnl"]=ReportesController::actionGetDescripcionClienteBCNL($value["id_cliente_bcnl"]);
+		}
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.id_cliente_bcnl',
+			'pagination'=>array(
+				'pageSize'=>10,
+		        'route'=>'reportes/smsPorClienteBcp',
+		    ),
+			'sort'=>array(
+				'defaultOrder'=>'id_cliente_bcnl ASC',
+        		'attributes'=>array(
+             		'id_cliente_bcnl',
         		),
     		),
 		));

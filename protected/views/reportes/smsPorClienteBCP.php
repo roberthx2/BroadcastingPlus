@@ -1,11 +1,9 @@
-<fieldset> 
-    <legend>Reporte de SMS por Código</legend>
 <br>
 <?php
-Yii::app()->clientScript->registerScript('searchSmsPorCodigoBCP', "
+Yii::app()->clientScript->registerScript('searchSmsPorClienteBCP', "
 
 $('.BCP form').submit(function(){
-    $('#smsPorCodigoBCP').yiiGridView('update', {
+    $('#smsPorClienteBCP').yiiGridView('update', {
         data: $(this).serialize()
     });
     updateInfo($(this));
@@ -26,9 +24,10 @@ $('.BCP form').submit(function(){
 <?php
 
 $data_arr[] = array(
-                'name' => 'sc',
-                'header' => 'Sc',
+                'name' => 'id_cliente_bcnl',
+                'header' => 'Cliente',
                 'type' => 'raw',
+                'sortable' => false,
                 'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
                 'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
             );
@@ -42,18 +41,17 @@ $columnas = array_merge($data_arr, $grid);
 <?php
 
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'smsPorCodigoBCP',
+        'id'=>'smsPorClienteBCP',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
-        'dataProvider' => $model->searchSmsPorCodigo(),
+        'dataProvider' => $model->searchSmsPorCliente(),
         'summaryText'=>'Mostrando {start} a {end} de {count} registros',
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
-        'ajaxUrl' => Yii::app()->createUrl('reportes/smsPorCodigo'),
+        'ajaxUrl' => Yii::app()->createUrl('reportes/smsPorClienteBcp'),
         'columns'=> $columnas,
     ));
 ?>
-</fieldset>
 
 <script type="text/javascript">
 

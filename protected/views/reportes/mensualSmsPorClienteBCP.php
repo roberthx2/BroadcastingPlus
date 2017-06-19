@@ -14,11 +14,11 @@ $('.BCP form').submit(function(){
 
 ?>
 <div class="BCP col-xs-12 col-sm-5 col-md-5 col-lg-5">
-    <?php $this->renderPartial('busquedaMensualSmsPorPeriodo',array('model'=>$model)); ?>
+    <?php //$this->renderPartial('busquedaMensualSmsPorPeriodo',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-    <?php 	$this->renderPartial('mensualSmsDetallePeriodo',array('model'=>$model)); ?>
+    <?php 	//$this->renderPartial('mensualSmsDetallePeriodo',array('model'=>$model)); ?>
 </div><!-- search-form -->
 
 <?php

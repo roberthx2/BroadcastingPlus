@@ -27,8 +27,8 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'mensualSmsPorCodigo', 'smsRecibidos'),
-                'users' => array('*'),
+                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'smsRecibidos'),
+                'users' => array('@'),
             ),
 
             array('deny', // deny all users
@@ -37,7 +37,7 @@ class ReportesController extends Controller
         ));
     }
 
-    public function actionIndex()
+    /*public function actionIndex()
     {
         $this->render("index");
     }
@@ -45,7 +45,7 @@ class ReportesController extends Controller
     public function actionMensualSms()
     {
         $this->render("mensualSms");
-    }
+    }*/
 
     public function actionMensualSmsPorCliente()
     {
@@ -89,7 +89,7 @@ class ReportesController extends Controller
         $this->render('smsPorCodigoBCP', array('model'=>$model));
     }*/
 
-    public function actionMensualSmsPorCodigo()
+    public function actionSmsPorCodigo()
     {
         if (Yii::app()->request->isAjaxRequest)
         {
@@ -152,6 +152,128 @@ class ReportesController extends Controller
         }
 
         $this->render('smsPorCodigoBCP', array('model'=>$model));
+    }
+
+    public function actionSmsPeriodoResumen()
+    {
+        $tipo_busqueda = $_POST['Reportes']["tipo_busqueda"];
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "SUM(cantd_msj) AS cantd_msj, operadora, descripcion AS sc";
+        $criteria->join = "INNER JOIN operadoras_activas o ON t.operadora = o.id_operadora";
+        $criteria->group = "operadora";
+        
+        if ($tipo_busqueda == 1) //Mensual
+        {
+            $criteria->compare("year", $_POST["Reportes"]["year"]);
+            $criteria->compare("month", $_POST["Reportes"]["month"]);
+            $model=ResumenBcpMensual::model()->findAll($criteria);
+            $periodo = Yii::app()->Funciones->getNombreMes($_POST["Reportes"]["month"]).", ".$_POST["Reportes"]["year"];
+        }
+        else if ($tipo_busqueda == 2) //Periodo
+        {
+            $criteria->addBetweenCondition("fecha", $_POST["Reportes"]["fecha_ini"], $_POST["Reportes"]["fecha_fin"]);
+            $model=ResumenBcpDiario::model()->findAll($criteria);
+            $periodo = $_POST["Reportes"]["fecha_ini"]." / ".$_POST["Reportes"]["fecha_fin"];
+        }
+        else if ($tipo_busqueda == 3) //Dia
+        {
+            $criteria->compare("fecha", $_POST["Reportes"]["fecha"]);
+            $model=ResumenBcpDiario::model()->findAll($criteria);
+            $periodo = $_POST["Reportes"]["fecha"];
+        }
+
+        $total = 0;
+        $data = array();
+
+        foreach ($model as $value)
+        {
+            $data[] = '<li class="list-group-item">'.
+                        $this->widget(
+                            'booster.widgets.TbBadge',
+                            array(
+                                'label' => number_format($value["cantd_msj"], 0, '', '.'),
+                                'htmlOptions' => array('id'=>'detalleEnviadosBCP', 'style' => 'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($value["operadora"]).'; color: white', 'class'=>'trOverFlow', 'title'=>'', 'data-tooltip'=>'tooltip'),
+                            ), true
+                        ).'<strong class="">'.ucfirst(strtolower($value["sc"])).'</strong></li>';
+
+            $total += $value["cantd_msj"];
+        }
+
+        $objeto = array(
+                'total' => number_format($total, 0, '', '.'),
+                'data' => implode(" ", $data),
+                'periodo' => $periodo,
+            );
+
+        echo CJSON::encode(array('objeto'=>$objeto));
+
+        Yii::app()->end();   
+    }
+
+    public function actionSmsPorClienteBcp()
+    {
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if(isset($_GET['Reportes']))
+            {
+                if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_GET['Reportes']["year"];
+                    $model->month=$_GET['Reportes']["month"];
+
+                    $_SESSION["objeto"]["year"]=$_GET['Reportes']["year"];
+                    $_SESSION["objeto"]["month"]=$_GET['Reportes']["month"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                    $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+
+                    $_SESSION["objeto"]["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                    $_SESSION["objeto"]["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_GET['Reportes']["fecha"];
+
+                    $_SESSION["objeto"]["fecha"]=$_GET['Reportes']["fecha"];
+                }
+
+                $_SESSION["objeto"]["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"]; 
+            }
+            else
+            {
+                if ($_SESSION["objeto"]["tipo_busqueda"] == 1)//Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_SESSION["objeto"]["year"];
+                    $model->month=$_SESSION["objeto"]["month"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_SESSION["objeto"]["fecha_ini"];
+                    $model->fecha_fin=$_SESSION["objeto"]["fecha_fin"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_SESSION["objeto"]["fecha"];
+                }
+            }
+        }
+        else
+        {
+            unset($_SESSION["objeto"]);
+            $model = new Reportes();
+            $model->unsetAttributes();
+        }
+
+        $this->render('smsPorClienteBCP', array('model'=>$model));
     }
 
     public function actionCreateColumnasOper()
@@ -264,4 +386,4 @@ class ReportesController extends Controller
     }
 }
 
-?>|
+?>
