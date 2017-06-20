@@ -21,7 +21,7 @@ $('.BCP_pager form').change(function(){
 </div><!-- search-form -->
 
 <div class="BCP_pager">
-    <?php $this->renderPartial('/busqueda/pager'); ?>
+    <?php // $this->renderPartial('/busqueda/pager'); ?>
 </div>
 
 <?php

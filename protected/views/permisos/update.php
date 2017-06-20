@@ -334,6 +334,84 @@
   	</div>
 </div>
 
+<!--Reportes -->
+
+<div class="accion panel-group col-md-7" id="act_reportes" style="display:none;">
+  	<div class="panel panel-grey">
+    	<div class="panel-heading">
+      		<h4 class="panel-title">
+          		<span class="glyphicon glyphicon-eye-open"></span> Acciones
+          		<div style="float: right; align: middle;"><?php
+					Controller::widget(
+						    'booster.widgets.TbSwitch',
+						    array(
+						        'name' => 'modulo_reportes',
+							    'value' => $model->modulo_reportes,
+							    'events' => array(
+							        'switchChange' => 'js:function(event, state){
+										unCheckAccion($(this).attr("name"), state);
+							        }'
+							    ),
+							    'options' => array(
+							    	'onColor'=>'success', 
+										'offColor'=>'danger',
+							    )
+						    )
+						);
+				?></div>
+      		</h4>
+    	</div>
+  		<div class="panel-body modulo_reportes" style="align:middle;">
+  			<ul class="list-group">
+  				<?php if (UsuarioSmsController::actionIsAdmin($model->id_usuario)) { ?>
+  				<li class="list-group-item">SMS por Cliente BCP
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'reporte_mensual_sms_por_cliente_bcp',
+								    'value' => $model->reporte_mensual_sms_por_cliente_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_reportes");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<?php } ?>
+				<?php if (UsuarioSmsController::actionIsAdmin($model->id_usuario)) { ?>
+				<li class="list-group-item">SMS por código
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'reporte_mensual_sms_por_codigo_bcp',
+								    'value' => $model->reporte_mensual_sms_por_codigo_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_reportes");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<?php } ?>
+    		</ul>
+   		</div>
+  	</div>
+</div>
+
 <!--Herramientas -->
 
 <div class="accion panel-group col-md-7" id="act_herramientas" style="display:none;">

@@ -194,7 +194,8 @@ class PromocionesPremium extends CActiveRecord
         		),
     		),
     		'pagination' => array(
-				'pageSize' => (isset($_SESSION["pageSize"]) == true) ? $_SESSION["pageSize"] : Yii::app()->params['defaultPageSize']
+    			'pageSize' =>10,
+				//'pageSize' => (isset($_SESSION["pageSize"]) == true) ? $_SESSION["pageSize"] : Yii::app()->params['defaultPageSize']
 				//Yii::app()->user->getState( 'pageSize', Yii::app()->params[ 'defaultPageSize' ] ),
 			),
 		));

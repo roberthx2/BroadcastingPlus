@@ -179,6 +179,12 @@ class ResumenBcpDiario extends CActiveRecord
 		
 		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
 
+		/*$sort = new CSort();
+		$sort->modelClass=new ClienteSms;
+		$sort->attributes=array('id_cliente_bcnl');
+		$sort->defaultOrder='id_cliente_bcnl ASC';*/
+
+
 		$data = new CSqlDataProvider($sql, array(
 			'db'=>Yii::app()->db_masivo_premium,
 		    'totalItemCount'=>$count,
@@ -200,15 +206,15 @@ class ResumenBcpDiario extends CActiveRecord
 			$data_tmp[$key]["id_cliente_bcnl"]=ReportesController::actionGetDescripcionClienteBCNL($value["id_cliente_bcnl"]);
 		}
 
-		print_r($data_tmp);
+		/*print_r($data_tmp);
 		print_r("<br><br>");
 
 		print_r($data->getData());
-		print_r("<br><br>");
+		print_r("<br><br>");*/
 
 		$data->setData($data_tmp);
 
-		print_r($data->getData());
+		/*print_r($data->getData());
 		print_r("<br><br>");
 
 		print_r($data->getKeys());
@@ -217,13 +223,13 @@ class ResumenBcpDiario extends CActiveRecord
 		print_r($data->getSort());
 
 		$array = array(
-					'defaultOrder'=>'id_cliente_bcnl ASC',
+					'defaultOrder'=>'id_cliente_bcnl DESC',
         			'attributes'=>array(
              			'id_cliente_bcnl',
         			),
     			);
 
-		$data->setSort($array);
+		//$data->setSort($array);
 
 		print_r("<br><br>");
 		print_r($data->getSort());
@@ -231,7 +237,7 @@ class ResumenBcpDiario extends CActiveRecord
 		print_r("<br><br>");
 
 		print_r($data->getData());
-		print_r("<br><br>");
+		print_r("<br><br>");*/
 
 		return $data;
 	}

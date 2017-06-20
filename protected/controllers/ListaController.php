@@ -105,6 +105,7 @@ class ListaController extends Controller
 						$model_lista = new Lista;
 						$model_lista->id_usuario = $model->id_usuario;
 						$model_lista->nombre = $model->nombre;
+						$model_lista->fecha = date("Y-m-d");
 						$model_lista->save();
 						$id_lista = $model_lista->primaryKey;
 

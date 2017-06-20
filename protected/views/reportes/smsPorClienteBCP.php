@@ -49,6 +49,8 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
         'ajaxUrl' => Yii::app()->createUrl('reportes/smsPorClienteBcp'),
+        //'sortableRows' => true,
+        //'sortableAttribute' => 'id_cliente_bcnl',
         'columns'=> $columnas,
     ));
 ?>

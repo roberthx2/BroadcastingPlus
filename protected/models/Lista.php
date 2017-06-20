@@ -65,6 +65,7 @@ class Lista extends CActiveRecord
 			'id_lista' => 'Id Lista',
 			'id_usuario' => 'Id Usuario',
 			'nombre' => 'Nombre',
+			'fecha' => 'Fecha',
 		);
 	}
 

@@ -28,12 +28,12 @@ if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermis
 
 if (Yii::app()->user->getPermisos()->broadcasting_premium)
 {
-    if ( isset( $_GET[ 'pageSize' ] ) )
+    /*if ( isset( $_GET[ 'pageSize' ] ) )
     {
         //Yii::app()->user->setState( 'pageSize', (int) $_GET[ 'pageSize' ] );
         $_SESSION["pageSize"] = (int) $_GET[ 'pageSize' ];
         unset( $_GET[ 'pageSize' ] );
-    }
+    }*/
 
     $modelBCP = new PromocionesPremium('searchHome');
     $modelBCP->unsetAttributes();
