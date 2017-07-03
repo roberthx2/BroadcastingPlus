@@ -59,6 +59,26 @@
 		)
 	); ?>
 
+	<?php 
+		if (isset($cliente) && $cliente)
+		{
+			echo $form->dropDownListGroup(
+				$model,
+				'id_cliente_bcnl',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+					),
+					'widgetOptions' => array(
+						'data' => CHtml::listData(Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id), 'id_cliente', 'descripcion'),
+						//'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+					),
+					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
+				)
+			); 
+		}
+	?>
+
   	<?php $this->widget(
     'booster.widgets.TbButton',
         array(

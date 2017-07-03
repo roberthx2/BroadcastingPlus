@@ -369,8 +369,8 @@
 						Controller::widget(
 							    'booster.widgets.TbSwitch',
 							    array(
-							        'name' => 'reporte_mensual_sms_por_cliente_bcp',
-								    'value' => $model->reporte_mensual_sms_por_cliente_bcp,
+							        'name' => 'reporte_sms_por_cliente_bcp',
+								    'value' => $model->reporte_sms_por_cliente_bcp,
 								    'events' => array(
 								        'switchChange' => 'js:function(event, state){
 											unCheckModulo("modulo_reportes");
@@ -391,8 +391,8 @@
 						Controller::widget(
 							    'booster.widgets.TbSwitch',
 							    array(
-							        'name' => 'reporte_mensual_sms_por_codigo_bcp',
-								    'value' => $model->reporte_mensual_sms_por_codigo_bcp,
+							        'name' => 'reporte_sms_por_codigo_bcp',
+								    'value' => $model->reporte_sms_por_codigo_bcp,
 								    'events' => array(
 								        'switchChange' => 'js:function(event, state){
 											unCheckModulo("modulo_reportes");

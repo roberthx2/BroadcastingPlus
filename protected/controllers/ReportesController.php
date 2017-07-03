@@ -27,7 +27,7 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'mensualSms', 'mensualSmsBCP', 'mensualSmsPorCliente', 'smsRecibidos'),
+                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen'),
                 'users' => array('@'),
             ),
 
@@ -35,21 +35,6 @@ class ReportesController extends Controller
                 'users' => array('*'),
             ),
         ));
-    }
-
-    /*public function actionIndex()
-    {
-        $this->render("index");
-    }
-
-    public function actionMensualSms()
-    {
-        $this->render("mensualSms");
-    }*/
-
-    public function actionMensualSmsPorCliente()
-    {
-        $this->render("mensualSmsPorCliente");
     }
 
     /*public function actionMensualSmsPorCodigo()
@@ -307,9 +292,127 @@ class ReportesController extends Controller
         return $data_arr;
     }
 
-    public function actionSmsRecibidos()
+    public function actionSmsEnviadosBcp()
     {
-        $this->render("smsRecibidos");
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            $model = new ResumenBcpPromocion();
+
+            if(isset($_GET['Reportes']))
+            {
+                if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+                {
+                    $model->year=$_GET['Reportes']["year"];
+                    $model->month=$_GET['Reportes']["month"];
+
+                    $_SESSION["objeto"]["year"]=$_GET['Reportes']["year"];
+                    $_SESSION["objeto"]["month"]=$_GET['Reportes']["month"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                    $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+
+                    $_SESSION["objeto"]["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                    $_SESSION["objeto"]["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+                {
+                    $model->fecha=$_GET['Reportes']["fecha"];
+
+                    $_SESSION["objeto"]["fecha"]=$_GET['Reportes']["fecha"];
+                }
+
+                $model->id_cliente_bcnl = $_GET['Reportes']["id_cliente_bcnl"];
+
+                $_SESSION["objeto"]["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"];
+                $_SESSION["objeto"]["id_cliente_bcnl"]=$_GET['Reportes']["id_cliente_bcnl"];  
+            }
+            else
+            {
+                if ($_SESSION["objeto"]["tipo_busqueda"] == 1)//Mes
+                {
+                    $model->year=$_SESSION["objeto"]["year"];
+                    $model->month=$_SESSION["objeto"]["month"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model->fecha_ini=$_SESSION["objeto"]["fecha_ini"];
+                    $model->fecha_fin=$_SESSION["objeto"]["fecha_fin"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
+                {
+                    $model->fecha=$_SESSION["objeto"]["fecha"];
+                }
+
+                $model->id_cliente_bcnl = $_SESSION["objeto"]["id_cliente_bcnl"];
+            }
+        }
+        else
+        {
+            unset($_SESSION["objeto"]);
+            $model = new Reportes();
+            $model->unsetAttributes();
+        }
+
+        $this->render('smsEnviadosBCP', array('model'=>$model));
+    }
+
+    public function actionSmsEnviadosBcpResumen()
+    {
+        $tipo_busqueda = $_POST['Reportes']["tipo_busqueda"];
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "SUM(cantd_msj) AS cantd_msj, operadora, descripcion AS sc";
+        $criteria->join = "INNER JOIN operadoras_activas o ON t.operadora = o.id_operadora";
+        $criteria->group = "operadora";
+        
+        if ($tipo_busqueda == 1) //Mensual
+        {
+            $fecha_ini = $_POST["Reportes"]["year"]."-".$_POST["Reportes"]["month"]."-01";
+            $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($_POST["Reportes"]["year"], $_POST["Reportes"]["month"]);
+            $criteria->addBetweenCondition("fecha", $fecha_ini, $fecha_fin);
+            $periodo = Yii::app()->Funciones->getNombreMes($_POST["Reportes"]["month"]).", ".$_POST["Reportes"]["year"];
+        }
+        else if ($tipo_busqueda == 2) //Periodo
+        {
+            $criteria->addBetweenCondition("fecha", $_POST["Reportes"]["fecha_ini"], $_POST["Reportes"]["fecha_fin"]);
+            $periodo = $_POST["Reportes"]["fecha_ini"]." / ".$_POST["Reportes"]["fecha_fin"];
+        }
+        else if ($tipo_busqueda == 3) //Dia
+        {
+            $criteria->compare("fecha", $_POST["Reportes"]["fecha"]);
+            $periodo = $_POST["Reportes"]["fecha"];
+        }
+
+        $model=ResumenBcpPromocion::model()->findAll($criteria);
+
+        $total = 0;
+        $data = array();
+
+        foreach ($model as $value)
+        {
+            $data[] = '<li class="list-group-item">'.
+                        $this->widget(
+                            'booster.widgets.TbBadge',
+                            array(
+                                'label' => number_format($value["cantd_msj"], 0, '', '.'),
+                                'htmlOptions' => array('id'=>'detalleEnviadosBCP', 'style' => 'background-color: '.Yii::app()->Funciones->getColorOperadoraBCNL($value["operadora"]).'; color: white', 'class'=>'trOverFlow', 'title'=>'', 'data-tooltip'=>'tooltip'),
+                            ), true
+                        ).'<strong class="">'.ucfirst(strtolower($value["sc"])).'</strong></li>';
+
+            $total += $value["cantd_msj"];
+        }
+
+        $objeto = array(
+                'total' => number_format($total, 0, '', '.'),
+                'data' => implode(" ", $data),
+                'periodo' => $periodo,
+            );
+
+        echo CJSON::encode(array('objeto'=>$objeto));
+
+        Yii::app()->end();   
     }
 
     public function actionGetDescripcionClienteBCP($id_cliente)

@@ -1,5 +1,5 @@
 <?php
-
+ 
 class Reportes extends CActiveRecord
 {
 	/**
@@ -13,6 +13,7 @@ class Reportes extends CActiveRecord
 	public $tipo_busqueda; //1. Mes / 2.Periodo / 3. Dia
 	public $table;
 	public $total;
+	public $id_cliente_bcnl;
 
 	//private $tableName = 'resumen_bcp_mensual'; // <=default value
     //private static $_models=array();
@@ -229,6 +230,37 @@ class Reportes extends CActiveRecord
 				'defaultOrder'=>'id_cliente_bcnl DESC',
         		'attributes'=>array(
              		'id_cliente_bcnl',
+        		),
+    		),
+		));
+	}
+
+	public function searchEnviadosBCP()
+	{
+		//Consulta por defecto, no traee ningun resultado solo es para que se muestre la data table
+		$condicion = "false";
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
+		$cond_oper = OperadorasActivas::model()->find($criteria);
+
+		$sql = "SELECT id_promo AS id, sc, fecha, nombrePromo, $cond_oper->descripcion FROM (
+					SELECT r.id_promo, r.sc, r.operadora, r.fecha, r.nombrePromo, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_promocion r 
+						WHERE ".$condicion." GROUP BY r.id_promo, r.operadora) AS t 
+				GROUP BY id_promo";
+
+		$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.id_promo',
+			'pagination'=>array(
+		        'route'=>'reportes/smsEnviadosBcp',
+				'pageSize'=>10,
+		    ),
+			'sort'=>array(
+				'defaultOrder'=>'fecha DESC',
+        		'attributes'=>array(
+             		'fecha', 'nombrePromo', 'sc'
         		),
     		),
 		));
