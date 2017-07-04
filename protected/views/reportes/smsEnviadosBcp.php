@@ -16,7 +16,7 @@ $('.BCP form').submit(function(){
 
 ?>
 <div class="BCP col-xs-12 col-sm-5 col-md-5 col-lg-5">
-    <?php $this->renderPartial('busqueda',array('model'=>$model, 'cliente'=>true)); ?>
+    <?php $this->renderPartial('busqueda'); ?>
 </div><!-- search-form -->
 
 <div class="col-xs-12 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-sm-6 col-md-6 col-lg-6">
@@ -91,6 +91,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 $(".detallePeriodoBCP").text(objeto.periodo);
                 $("#detalleTotalBCP").text(objeto.total);
                 $("#detalleOperadoraBCP").html(objeto.data);
+                $("#detalleCliente").html(objeto.cliente);
             },
             error: function()
             {

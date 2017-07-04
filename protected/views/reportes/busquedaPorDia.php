@@ -1,4 +1,6 @@
 <?php 
+	//$model = new Reportes();
+
 	$form = $this->beginWidget(
 	'booster.widgets.TbActiveForm',
 	array(
@@ -8,7 +10,7 @@
 		'type' => 'vertical',
 		//'enableAjaxValidation'=>false,
 	)
-);
+); 
 ?>
 <?php echo $form->hiddenField($model, 'tipo_busqueda', array('value'=>3)); ?>
 <br>
@@ -37,22 +39,26 @@
 	); ?>
 
 	<?php 
-		if (isset($cliente) && $cliente)
+		if (isset($_SESSION["objeto"]["show_cliente"]) && $_SESSION["objeto"]["show_cliente"])
 		{
-			echo $form->dropDownListGroup(
-				$model,
-				'id_cliente_bcnl',
-				array(
-					'wrapperHtmlOptions' => array(
-						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-					),
-					'widgetOptions' => array(
-						'data' => CHtml::listData(Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id), 'id_cliente', 'descripcion'),
-						//'htmlOptions' => array('prompt' => 'Seleccionar...'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
-					),
-					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
-				)
-			); 
+			$show = (Yii::app()->user->isAdmin()) ? "block" : "none";
+
+			echo "<div style='display: ".$show."'>";
+				echo $form->dropDownListGroup(
+					$model,
+					'id_cliente_bcnl',
+					array(
+						'wrapperHtmlOptions' => array(
+							'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+						),
+						'widgetOptions' => array(
+							'data' => CHtml::listData(Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id), 'id_cliente', 'descripcion'),
+							'htmlOptions' => array(/*'prompt' => 'Seleccionar...'*/), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+						),
+						'prepend' => '<i class="glyphicon glyphicon-user"></i>',
+					)
+				);
+			echo "</div>"; 
 		}
 	?>
 

@@ -277,12 +277,15 @@ class UsuarioMasivoController extends Controller
 		}
 
 		$criteria = new CDbCriteria;
-		$criteria->select = "id_cliente, cadena_sc";
+		$criteria->select = "cadena_sc, cadena_serv";
 		$criteria->compare("id_usuario", $id);
 		$usuario = UsuarioSms::model()->find($criteria);
 
 		$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea($usuario->cadena_sc);
 		$cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
+
+		$cadena_serv = Yii::app()->Funciones->limpiarNumerosTexarea($usuario->cadena_serv);
+		$cadena_serv = ($cadena_serv == "") ? "null" : $cadena_serv;
 
 		$criteria = new CDbCriteria;
 		$criteria->select = "GROUP_CONCAT(DISTINCT sc_id) AS sc_id";
@@ -291,12 +294,20 @@ class UsuarioMasivoController extends Controller
 
 		$cadena_sc = ($sc_id->sc_id == "") ? "null" : $sc_id->sc_id;
 
+		$criteria = new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(DISTINCT cliente) AS cliente";
+		$criteria->addInCondition("id_producto", explode(",", $cadena_serv));
+		$clientes = Producto::model()->find($criteria);
+
+		$clientes_sms = ($clientes->cliente == "") ? "null" : $clientes->cliente;
+
 		$sql = "SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
-						WHERE c.id_cliente_sms = ".$usuario->id_cliente." 
+						WHERE c.id_cliente_sms IN (".$clientes_sms.")  
 							AND c.id_cliente_sc_numerico = 0 
 							AND sc IN (".$cadena_sc.") 
 							AND sc NOT REGEXP '[a-zA-Z]+' 
 							AND c.onoff = 1";
+							print_r($sql);
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 

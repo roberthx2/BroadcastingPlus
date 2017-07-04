@@ -15,7 +15,7 @@ class BtlController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm', 'getNumeros'),
+                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm', 'getNumeros', 'getFechaMinSmsin'),
                 'users' => array('@'),
             ),
 
@@ -217,7 +217,7 @@ class BtlController extends Controller
         $criteria->compare("sc", $sc);
         $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
 
-        $numeros = Smsin::model()->findAll($criteria);
+        $numeros = SmsinBtl::model()->findAll($criteria);
         $numeros_array = array();
 
         foreach ($numeros as $value)
@@ -290,6 +290,15 @@ class BtlController extends Controller
         }
 
         return $numeros_btl;
+    }
+
+    public function actionGetFechaMinSmsin()
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "MIN(data_arrive) AS data_arrive";
+        $model = Smsin::model()->find($criteria);
+
+        return ($model->data_arrive) ? $model->data_arrive : date("Y-m-d");
     }
 }
 

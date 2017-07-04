@@ -37,43 +37,6 @@ class ReportesController extends Controller
         ));
     }
 
-    /*public function actionMensualSmsPorCodigo()
-    {
-        $model = new Reportes('resumen_bcp_mensual', 'resumen_bcp_mensual');
-        $model->unsetAttributes();
-
-        if(isset($_GET['Reportes']))
-        {
-            if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
-            {
-                $model = new Reportes('resumen_bcp_mensual', 'resumen_bcp_mensual');
-                $model->unsetAttributes();
-                //$model->scenario = 'resumen_bcp_mensual';
-                $_SESSION["year"]=$_GET['Reportes']["year"];
-                $_SESSION["month"]=$_GET['Reportes']["month"];
-            }
-            else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
-            {
-                $model = new Reportes('resumen_bcp_diario', 'resumen_bcp_diario');
-                $model->unsetAttributes();
-                //$model->scenario = 'resumen_bcp_diario';
-                $_SESSION["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
-                $_SESSION["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
-            }
-            else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
-            {
-                $model = new Reportes('resumen_bcp_diario', 'resumen_bcp_diario');
-                $model->unsetAttributes();
-                //$model->scenario = 'resumen_bcp_diario';
-                $_SESSION["fecha"]=$_GET['Reportes']["fecha"];
-            }
-
-            $_SESSION["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"];
-        }
-        
-        $this->render('smsPorCodigoBCP', array('model'=>$model));
-    }*/
-
     public function actionSmsPorCodigo()
     {
         if (Yii::app()->request->isAjaxRequest)
@@ -351,6 +314,7 @@ class ReportesController extends Controller
         else
         {
             unset($_SESSION["objeto"]);
+            $_SESSION["objeto"]["show_cliente"] = true;
             $model = new Reportes();
             $model->unsetAttributes();
         }
@@ -361,6 +325,7 @@ class ReportesController extends Controller
     public function actionSmsEnviadosBcpResumen()
     {
         $tipo_busqueda = $_POST['Reportes']["tipo_busqueda"];
+        $id_cliente_bcnl = $_POST['Reportes']["id_cliente_bcnl"];
 
         $criteria = new CDbCriteria;
         $criteria->select = "SUM(cantd_msj) AS cantd_msj, operadora, descripcion AS sc";
@@ -375,7 +340,7 @@ class ReportesController extends Controller
             $periodo = Yii::app()->Funciones->getNombreMes($_POST["Reportes"]["month"]).", ".$_POST["Reportes"]["year"];
         }
         else if ($tipo_busqueda == 2) //Periodo
-        {
+        { 
             $criteria->addBetweenCondition("fecha", $_POST["Reportes"]["fecha_ini"], $_POST["Reportes"]["fecha_fin"]);
             $periodo = $_POST["Reportes"]["fecha_ini"]." / ".$_POST["Reportes"]["fecha_fin"];
         }
@@ -384,6 +349,8 @@ class ReportesController extends Controller
             $criteria->compare("fecha", $_POST["Reportes"]["fecha"]);
             $periodo = $_POST["Reportes"]["fecha"];
         }
+
+        $criteria->compare("id_cliente_bcnl", $id_cliente_bcnl);
 
         $model=ResumenBcpPromocion::model()->findAll($criteria);
 
@@ -404,10 +371,20 @@ class ReportesController extends Controller
             $total += $value["cantd_msj"];
         }
 
+        $cliente = '<li class="list-group-item">'.
+                        $this->widget(
+                            'booster.widgets.TbBadge',
+                            array(
+                                'label' => $this->actionGetDescripcionClienteBCNL($id_cliente_bcnl),
+                                'htmlOptions' => array('style' => 'background-color: white; color: black;', 'class'=>'trOverFlow', 'title'=>'', 'data-tooltip'=>'tooltip'),
+                            ), true
+                        ).'<strong class="">Cliente</strong></li>';
+
         $objeto = array(
                 'total' => number_format($total, 0, '', '.'),
                 'data' => implode(" ", $data),
                 'periodo' => $periodo,
+                'cliente' => $cliente
             );
 
         echo CJSON::encode(array('objeto'=>$objeto));
@@ -433,59 +410,6 @@ class ReportesController extends Controller
         if ($sql)
             return $sql["Des_cliente"];
         else return "NO EXISTE";
-    }
-
-    public function actionMensualSmsBCP()
-    {
-        $id_cliente = 102;//$_POST['PromocionesPremium']["id_cliente"];
-        $mes = 11;//$_POST['PromocionesPremium']["mes"];
-        $ano = 2016;//$_POST['PromocionesPremium']["ano"];
-        $fecha_ini = date($ano."-".$mes."-01");
-        $fecha_fin = Yii::app()->Funciones->getUltimoDiaMes($ano, $mes);
-
-        $sql = "SELECT IFNULL(SUM(total),0) AS total, IFNULL(SUM(enviados),0) AS enviados FROM 
-                (SELECT  
-                    (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
-                    (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados
-                    FROM promociones_premium t
-                    WHERE t.id_cliente = :id_cliente AND t.fecha BETWEEN :fecha_ini AND :fecha_fin
-                ) AS tabla";
-
-        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        $sql->bindParam(":id_cliente", $id_cliente, PDO::PARAM_INT);
-        $sql->bindParam(":fecha_ini", $fecha_ini, PDO::PARAM_STR);
-        $sql->bindParam(":fecha_fin", $fecha_fin, PDO::PARAM_STR);
-        $sql = $sql->queryRow();
-
-        $enviados = 0;
-        $no_enviados = 0;
-
-        if ($sql["total"] > 0)
-        {
-            $enviados = floor(($sql["enviados"] * 100) / $sql["total"]);
-            $enviados = number_format($enviados, 1, '.', '.');
-
-            $no_enviados = floor((($sql["total"] - $sql["enviados"]) * 100) / $sql["total"]);
-            $no_enviados = number_format($no_enviados, 1, '.', '.');
-        }
-
-        $total = number_format($sql["total"], 0, '', '.');
-
-        $objeto = array(
-                'total' => $total,
-                'enviados_title' => $enviados." %",
-                'enviados_label' => number_format($sql["enviados"], 0, '', '.'),
-                'no_enviados_title' => $no_enviados." %",
-                'no_enviados' => number_format(($sql["total"] - $sql["enviados"]), 0, '', '.'),
-                'periodo' => $fecha_ini." / ".$fecha_fin,
-            );
-
-
-        echo CJSON::encode(array(
-            'objeto'=>$objeto,
-        ));
-
-        Yii::app()->end();
     }
 }
 

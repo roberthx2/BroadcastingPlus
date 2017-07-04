@@ -1,6 +1,7 @@
 <?php 
 	$baseUrl = Yii::app()->baseUrl; 
 	Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/funciones.js');
+	$smsinBtl_minDate = $this->actionGetFechaMinSmsin();
 ?>
 
 <?php
@@ -101,7 +102,8 @@
 						'language' => 'es',
 						'format' => 'yyyy-mm-dd',
 						'endDate' => date("Y-m-d"),
-						'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
+						//'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
+						'startDate' => $smsinBtl_minDate,
 						'autoclose' => true,
 					),
 					'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
@@ -125,7 +127,8 @@
 						'language' => 'es',
 						'format' => 'yyyy-mm-dd',
 						'endDate' => date("Y-m-d"),
-						'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
+						//'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
+						'startDate' => $smsinBtl_minDate,
 						'autoclose' => true,
 					),
 					'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),

@@ -112,13 +112,16 @@ class ResumenBcpPromocion extends CActiveRecord
 
 	public function searchEnviadosBCP()
 	{
+		$pageSize = 10;
+
 		if ($_SESSION["objeto"]["tipo_busqueda"] == 1) //Mensual
 		{
 			$condicion = "fecha BETWEEN '".$this->year."-".$this->month."-01' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->year, $this->month)."'";
 		}
-		if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+		else if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
 		{
 			$condicion = "fecha BETWEEN '".$this->fecha_ini."' AND '".$this->fecha_fin."'";
+			$pageSize = "100000000000";
 		}
 		else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
 		{
@@ -133,8 +136,6 @@ class ResumenBcpPromocion extends CActiveRecord
 					SELECT r.id_promo, r.sc, r.operadora, r.fecha, r.nombrePromo, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_promocion r 
 						WHERE ".$condicion." AND id_cliente_bcnl = ".$this->id_cliente_bcnl." GROUP BY r.id_promo, r.operadora) AS t 
 				GROUP BY id_promo";
-				print_r($sql);
-print_r("CLIENTE:".$this->id_cliente_bcnl);
 
 		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
 
@@ -148,26 +149,10 @@ print_r("CLIENTE:".$this->id_cliente_bcnl);
         		),
     		),
 		    'pagination'=>array(
-		        'pageSize'=>10,
+		        'pageSize'=>$pageSize,
 		        'route'=>'reportes/smsEnviadosBcp',
 		    ),
 		));
-
-		/*$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
-
-		return new CArrayDataProvider($criteria, array(
-			'id'=>'t.id_promo',
-			'pagination'=>array(
-				'pageSize'=>10,
-		        'route'=>'reportes/smsEnviadosBcp',
-		    ),
-			'sort'=>array(
-				'defaultOrder'=>'fecha DESC',
-        		'attributes'=>array(
-             		'fecha', 'nombrePromo', 'sc'
-        		),
-    		),
-		));*/
 	}
 
 	/**

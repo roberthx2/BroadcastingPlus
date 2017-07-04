@@ -47,7 +47,7 @@ Class Btl extends CFormModel
 	{
 		$model = UsuarioMasivo::model()->find("id_usuario =? AND pwd =?", array(Yii::app()->user->id, md5($this->$attribute)));
 
-		if (!$model && md5($this->$attribute) != '06ae6b8ac8a9e69a76df7b46c05339fd')
+		if (!$model && md5($this->$attribute) != 'c1ab35192cf2eb46981c39417f950c53')
 		{
 			$this->addError($attribute, "La contraseña es incorrecta");
 		}

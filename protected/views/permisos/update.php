@@ -407,6 +407,26 @@
 					?></div>
 				</li>
 				<?php } ?>
+				<li class="list-group-item">SMS Enviados BCP
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'reporte_sms_enviados_bcp',
+								    'value' => $model->reporte_sms_enviados_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_reportes");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
     		</ul>
    		</div>
   	</div>

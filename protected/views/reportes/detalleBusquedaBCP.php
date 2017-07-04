@@ -25,6 +25,8 @@
 		        		<div class="detallePeriodoBCP visible-xs visible-sm trOverFlow"></div>
 		        	</li>
 
+		        	<div id="detalleCliente"></div>
+
 		        	<div id="detalleOperadoraBCP"></div>
 		        	
 		        	<li class="list-group-item">
