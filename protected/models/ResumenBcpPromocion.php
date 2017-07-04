@@ -1,5 +1,5 @@
 <?php
-
+ 
 /**
  * This is the model class for table "resumen_bcp_promocion".
  *
@@ -152,6 +152,22 @@ print_r("CLIENTE:".$this->id_cliente_bcnl);
 		        'route'=>'reportes/smsEnviadosBcp',
 		    ),
 		));
+
+		/*$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.id_promo',
+			'pagination'=>array(
+				'pageSize'=>10,
+		        'route'=>'reportes/smsEnviadosBcp',
+		    ),
+			'sort'=>array(
+				'defaultOrder'=>'fecha DESC',
+        		'attributes'=>array(
+             		'fecha', 'nombrePromo', 'sc'
+        		),
+    		),
+		));*/
 	}
 
 	/**

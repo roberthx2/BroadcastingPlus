@@ -1,5 +1,5 @@
 <?php
-
+ 
 class ReportesController extends Controller
 {
     /**
