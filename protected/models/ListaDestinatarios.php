@@ -114,7 +114,7 @@ class ListaDestinatarios extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_lista, t.numero, t.id_operadora, o.descripcion AS descripcion_oper";
+		$criteria->select = "t.id_lista, t.numero, t.id_operadora, t.estado, o.descripcion AS descripcion_oper";
 		$criteria->condition = "(t.id_lista = ".$id_lista.") AND ";
 		$criteria->condition .= "(numero LIKE '%". $this->buscar."%' OR ";
 		$criteria->condition .= "o.descripcion LIKE '%". $this->buscar."%')";

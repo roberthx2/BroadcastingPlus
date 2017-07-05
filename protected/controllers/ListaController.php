@@ -170,7 +170,7 @@ class ListaController extends Controller
 	{
 		//$model_lista = $this->loadModel($id);
 		$criteria = new CDbCriteria;
-		$criteria->select = "t.id_lista, t.nombre, u.login AS login, COUNT(ld.id_lista) AS total ";
+		$criteria->select = "t.id_lista, t.nombre, t.fecha, t.estado, u.login AS login, COUNT(ld.id_lista) AS total ";
 		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
 		$criteria->compare("t.id_lista", $id);

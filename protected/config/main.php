@@ -101,6 +101,10 @@ return array(
 			'class'=>'ext.Procedimientos',
 		),
 
+		'Levenshtein'=>array(
+			'class'=>'ext.Levenshtein',
+		),
+
 		'user'=>array(
 			'class' => 'WebUser',
 			// enable cookie-based authentication

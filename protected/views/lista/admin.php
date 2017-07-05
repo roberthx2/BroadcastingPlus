@@ -76,6 +76,35 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
               	)
         	),
         	array(
+	            'name' => 'fecha',
+	            'header' => 'Fecha',
+	            'type' => 'raw',
+	            'value' => function($data) {
+	            	return ($data["fecha"] == '0000-00-00') ? '-' : $data["fecha"];
+	            },
+	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover')
+        	),
+        	array(
+        		'name' => 'estado',
+	            'header' => 'Estado',
+	            'type' => 'raw',
+	            'value' => function($data) {
+	            	
+	            	$bg = Yii::app()->Funciones->getColorValidoInvalido($data["estado"]);
+
+	            	Controller::widget(
+					    'booster.widgets.TbLabel',
+					    array(
+					        'label' => ($data["estado"] == 1) ? "Analizada" : "Pendiente",
+					        'htmlOptions'=>array('style'=>'background-color: '.$bg.';'),	
+					    )
+					);
+	            },
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+        	),
+        	array(
 	            'name' => 'total',
 	            'header' => 'Total Destinatarios',
 	            'type' => 'number',

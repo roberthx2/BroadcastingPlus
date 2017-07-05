@@ -41,13 +41,31 @@
 			        		<?php $this->widget(
 			                    'booster.widgets.TbBadge',
 			                    array(
-			                        //'context' => $context,
-			                        // 'default', 'success', 'info', 'warning', 'danger'
 			                        'label' => $model_lista->login,
 			                        'htmlOptions' => array('style' => 'background-color: white; color: black'),
 			                    )
 			                ); ?>
 			                <?php echo '<strong>Usuario</strong>'; ?>
+			        	</li>
+			        	<li class="list-group-item">
+			        		<?php $this->widget(
+			                    'booster.widgets.TbBadge',
+			                    array(
+			                        'label' => $model_lista->fecha,
+			                        'htmlOptions' => array('style' => 'background-color: white; color: black'),
+			                    )
+			                ); ?>
+			                <?php echo '<strong>Fecha</strong>'; ?>
+			        	</li>
+			        	<li class="list-group-item">
+			        		<?php $this->widget(
+			                    'booster.widgets.TbBadge',
+			                    array(
+			                        'label' => ($model_lista->estado == 1) ? "Analizada" : "Pendiente",
+			                        'htmlOptions' => array('style' => 'background-color: '.Yii::app()->Funciones->getColorValidoInvalido($model_lista->estado).'; color: white'),
+			                    )
+			                ); ?>
+			                <?php echo '<strong>Estado</strong>'; ?>
 			        	</li>
 			        	<li class="list-group-item">
 			        		<?php $this->widget(
@@ -154,6 +172,24 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'name' => 'numero',
 	            'header' => 'Número',
 	            'type' => 'raw',
+	            'htmlOptions' => array('style' => 'text-align: center;'),
+	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+        	),
+        	array(
+	            'header' => 'Estado',
+	            'type' => 'raw',
+	            'value' => function($data) {
+	            	
+	            	$bg = Yii::app()->Funciones->getColorValidoInvalido($data["estado"]);
+
+	            	Controller::widget(
+					    'booster.widgets.TbLabel',
+					    array(
+					        'label' => ($data["estado"] == 1) ? "Valido" : "Invalido",
+					        'htmlOptions'=>array('style'=>'background-color: '.$bg.';'),	
+					    )
+					);
+	            },
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),

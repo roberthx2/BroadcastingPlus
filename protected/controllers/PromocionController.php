@@ -358,7 +358,7 @@ class PromocionController extends Controller
 
         if (Yii::app()->user->getPermisos()->modulo_listas)
         {
-            $model_lista = Lista::model()->findAll("id_usuario = ".Yii::app()->user->id);
+            $model_lista = Lista::model()->findAll("id_usuario = ".Yii::app()->user->id." AND estado = 1");
             
             foreach ($model_lista as $value)
             {
@@ -857,12 +857,12 @@ class PromocionController extends Controller
     {
         if ($tipo == 1 || $tipo == 2) //BCNL / CPEI
         {
-            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") ";
+            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND estado = 1";
         }
 
         else if ($tipo == 3) //BCP
         {
-            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND id_operadora IN(".$operadorasPermitidasBCP.")";
+            $sql = "SELECT GROUP_CONCAT(DISTINCT numero) AS numeros FROM lista_destinatarios WHERE id_lista IN (".implode(",", $id_listas).") AND id_operadora IN(".$operadorasPermitidasBCP.") AND estado = 1";
         }
 
         $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();

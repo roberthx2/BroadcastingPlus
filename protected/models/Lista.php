@@ -170,7 +170,7 @@ class Lista extends CActiveRecord
 	public function searchTmp($id_usuario)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_lista, t.nombre, t.id_usuario, u.login AS login, COUNT(ld.id_lista) AS total ";
+		$criteria->select = "t.id_lista, t.nombre, t.id_usuario, t.fecha, t.estado, u.login AS login, COUNT(ld.id_lista) AS total ";
 		$criteria->join = "INNER JOIN lista_destinatarios ld ON t.id_lista = ld.id_lista ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario ";
 
@@ -188,7 +188,7 @@ class Lista extends CActiveRecord
 			'sort'=>array(
 				'defaultOrder'=>'login ASC',
         		'attributes'=>array(
-             		'u.login','nombre'
+             		'u.login','nombre', 'fecha', 'estado'
         		),
     		),
     		'pagination'=>array(

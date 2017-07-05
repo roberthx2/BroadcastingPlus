@@ -168,7 +168,7 @@ Class PromocionForm extends CFormModel
 			$this->addError($attribute, "El mensaje ya existe para la fecha seleccionada por favor cambie su contenido ya que puede ser considerado como spam");	
 	}
 
-	public function palabrasObscenas($attribute, $params)
+	/*public function palabrasObscenas($attribute, $params)
 	{
 		$sql = "SELECT group_concat(palabra separator '|') AS palabras FROM palabras_obscenas";
         $sql = Yii::app()->db->createCommand($sql)->queryRow();
@@ -183,6 +183,18 @@ Class PromocionForm extends CFormModel
         {
             $palabras_obscenas = "<br>(".implode(",",$palabras_obscenas[0]).")";
             $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$palabras_obscenas);
+        }
+	}*/
+
+	public function palabrasObscenas($attribute, $params)
+	{
+        $contenido = strtolower($this->$attribute);
+
+        $contenido_inapropiado = Yii::app()->Levenshtein->run($contenido, 70);
+        
+        if ($contenido_inapropiado['return'] == 1)
+        {
+            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$contenido_inapropiado['words']);
         }
 	}
 
