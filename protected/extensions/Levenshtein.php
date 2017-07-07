@@ -1,11 +1,16 @@
-<?php
+<?php 
 
 class Levenshtein extends CApplicationComponent
 {
 	# MAIN
-	public function run($sms, $perc)
+	public function run($sms)
 	{
-	    $a = $this->levenshteinFunction($sms, $perc);
+		$criteria = new CDbcriteria;
+		$criteria->select = "valor";
+		$criteria->compare('propiedad', 'levenshtein_porcentaje');
+		$levenshtein = ConfiguracionSistema::model()->find($criteria);
+
+	    $a = $this->levenshteinFunction($sms, $levenshtein->valor);
 	    $words = $this->deleteDuplicates($a['coincidencias']);
 
 	    $return = array();

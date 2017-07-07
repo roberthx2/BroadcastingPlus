@@ -15,6 +15,9 @@
  */
 class Log extends CActiveRecord
 {
+	public $buscar;
+	public $login;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -82,7 +85,7 @@ class Log extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	/*public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
@@ -99,6 +102,32 @@ class Log extends CActiveRecord
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function search()
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "t.id_usuario, hora, descripcion, CASE t.id_usuario WHEN 0 THEN 'SISTEMA' ELSE u.login END AS login";
+		$criteria->join = "LEFT JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario";
+		$criteria->condition = "fecha = '".date("Y-m-d")."' AND ";
+		$criteria->condition .= "(login LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "hora LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "descripcion LIKE '%".$this->buscar."%')";
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'hora DESC',
+        		'attributes'=>array(
+             		'hora'
+        		),
+    		),
+    		'pagination'=>array(
+		        'pageSize'=>20,
+		    ),
 		));
 	}
 

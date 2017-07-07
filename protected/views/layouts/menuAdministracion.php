@@ -42,6 +42,13 @@
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioMasivo/accesoBcplus');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Acceso de Usuarios </a></li>  <?php } */ ?>
                     </ul>
                  <?php } ?>
+                <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
+                    <a href="#"> Herramientas <span class="caret brandMenu" aria-hidden="true"></span></a>
+                </li>
+                    <ul class="sub-menu collapse" id="menu_herramientas">
+                        <?php if (Yii::app()->user->getPermisos()->supervisar_log) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('log/admin');?>"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Supervisar log </a></li>  <?php } ?>
+                    </ul>
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->

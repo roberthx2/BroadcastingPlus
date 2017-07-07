@@ -61,6 +61,8 @@ class ConfiguracionSistemaAcciones extends CActiveRecord
 			array('valor', 'validarUserMaster'),
 			//Cambiar formato de usuarios master
 			array("valor","filter","filter"=>array($this, "usuariosMaster"), "on"=>"usersMaster"),
+			//Filtro Levenshtein para las palabras obscenas
+			array('valor', 'numerical', 'min'=>50, 'max'=>100, 'integerOnly'=>true, "on"=>"levenshteinPorcentaje"),
 			
 		);
 	}

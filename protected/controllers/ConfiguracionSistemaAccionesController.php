@@ -192,6 +192,9 @@ class ConfiguracionSistemaAccionesController extends Controller
 
 				if($model_configuracion->save())
 				{
+					$log = "Configuracion Sistema: El usuario ".UsuarioSmsController::actionGetLogin(Yii::app()->user->id)." cambio la configuracion '".$model->propiedad."' = ".$model->valor;
+					Yii::app()->Procedimientos->setLog($log);
+					
 					$valido = "true";
 					header('Content-Type: application/json; charset="UTF-8"');
 					echo CJSON::encode(array('salida' => $valido, 'error'=>array()));

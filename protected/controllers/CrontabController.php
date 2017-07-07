@@ -38,7 +38,11 @@ class CrontabController extends Controller
     //Sirve la información del cupo de cada usuario de BCNL
     public function actionServirCupoBCNL()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Tabla servida Cupo BCNL: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         print_r("Buscando usuarios con acceso al sistema...\n");
         $criteria = new CDbCriteria;
@@ -153,7 +157,11 @@ class CrontabController extends Controller
             print_r("No existen usuarios con acceso al sistema \n");
         }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Tabla servida Puertos BCNL: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n------------------------------------------------------------\n");
     }
@@ -162,7 +170,11 @@ class CrontabController extends Controller
     //Sirve la información de los puertos de cada usuario de BCNL
     public function actionServirPuertosBCNL()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Tabla servida Cupo BCNL: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         print_r("Inicia la transaction1...\n");
         $transaction = Yii::app()->db->beginTransaction();
@@ -385,7 +397,11 @@ class CrontabController extends Controller
                     $transaction2->rollBack();
                 }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Tabla servida Puertos BCNL: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------<br>");
     }
@@ -426,7 +442,11 @@ class CrontabController extends Controller
     //Se ejecuta todos los dias a media noche luego de llenar la tabla original de smsxnumeros de insingia_masivo
     public function actionServirTablaTmpSmsXnumero()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Tabla servida SmsXnumero: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
@@ -540,7 +560,11 @@ class CrontabController extends Controller
                     $transaction->rollBack();
                 }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Tabla servida SmsXnumero: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
@@ -548,7 +572,11 @@ class CrontabController extends Controller
     //Se ejecuta todos los dias cada 15 minutos, verifica todas las promociones BCP que finalizaron y verifica cuantos sms no fuerón enviados para realizar el reintegro de cupo al usuario que creo la promoción
     public function actionReintegroCupoBCP()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Reintegro cupo BCP: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         print_r("Inicia la transaction...\n");
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
@@ -649,7 +677,11 @@ class CrontabController extends Controller
                     $transaction->rollBack();
                 }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Reintegro cupo BCP: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
@@ -657,7 +689,11 @@ class CrontabController extends Controller
     public function actionReintegroCupoBCNL()
     {
         //NO ES MI CULPA QUE ESTA BROMA QUEDARA ASI DE FEA, SOLO SEGUI LA LOGICA EN QUE HICIERON EL MANEJO DEL CUPO BCNL
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Reintegro cupo BCNL: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         print_r("Inicia la transaction1...\n");
         $transaction = Yii::app()->db->beginTransaction();
@@ -787,7 +823,11 @@ class CrontabController extends Controller
                 $transaction2->rollBack();
             }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Reintegro cupo BCNL: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
@@ -795,7 +835,11 @@ class CrontabController extends Controller
     //Se ejecuta todos los dias a media noche para llenar la tabla servida de exentos
     public function actionServirTablaTmpExentos()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."\n");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Tabla servida Exentos: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio."\n");
 
         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
@@ -886,7 +930,11 @@ class CrontabController extends Controller
                     $transaction->rollBack();
                 }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Tabla servida Exentos: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
@@ -895,9 +943,13 @@ class CrontabController extends Controller
 
     public function actionProcesarListas()
     {
-        printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Filtrado de listas: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
 
-        print_r("Buscando usuarios administrativos para excluirlos del proceso...<br>");
+        printf("Hora inicio: ".$hora_inio."\n");
+
+        print_r("Buscando usuarios administrativos para excluirlos del proceso...\n");
 
         $criteria = new CDbCriteria;
         $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
@@ -907,25 +959,24 @@ class CrontabController extends Controller
 
         $usuarios_admin = UsuarioSms::model()->find($criteria);
 
-        print_r("<br>Id_usuarios: ".$usuarios_admin->id_usuario."<br>");
+        print_r("\nId_usuarios: ".$usuarios_admin->id_usuario."\n");
 
-        print_r("Consultado operadoras BCP...<br>");
+        print_r("Consultado operadoras BCP...\n");
         $operadoras = $this->getOperadorasBCP();
 
-        print_r("<br>Consultado operadoras Hostgator...<br>");
+        print_r("\nConsultado operadoras Hostgator...\n");
         $operadoras_hostgator = $this->getOperadorasHostgator();
 
-        /*$criteria = new CDbCriteria;
+        $criteria = new CDbCriteria;
         $criteria->select = "MIN(data_arrive) AS data_arrive";
         print_r($criteria->toArray());
         $smsin_btl = SmsinBtl::model()->find($criteria);
+        $fecha_smsin_btl = $smsin_btl->data_arrive;
+        
+        //$fecha_smsin_btl = "2016-01-01";
+        print_r("\nFecha minima de smsin_btl: ".$fecha_smsin_btl."...\n");
 
-        print_r("<br>Fecha minima de smsin_btl: ".$smsin_btl->data_arrive."...<br>");*/
-
-        $fecha_smsin_btl = "2016-01-01";
-        print_r("<br>Fecha minima de smsin_btl: ".$fecha_smsin_btl."...<br>");
-
-        print_r("Consultado las listas prendientes por procesar...<br>");
+        print_r("Consultado las listas prendientes por procesar...\n");
 
         $criteria = new CDbCriteria;
         $criteria->select = "id_lista, id_usuario";
@@ -939,73 +990,71 @@ class CrontabController extends Controller
             {
                 try
                 {
-                    print_r("<br>Iniciando transaction...<br><br>");
+                    print_r("\nIniciando transaction...\n\n");
                     $transaction = Yii::app()->db->beginTransaction();
                     $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
 
                     $id_proceso = "";
 
-                    print_r("Consultado información del usuario...<br>");
+                    print_r("Consultado información del usuario...\n");
                     $user = $this->getInfoUser($value["id_usuario"]);
-                    print_r("<br>Procesando listas del usuario: ".$user["login"]."...<br>");
+                    print_r("\nProcesando listas del usuario: ".$user["login"]."...\n");
 
                     if ($user["sc"] != "null") 
                     {
-                        print_r("<br>Sc obtenidos: ".$user["sc"]."<br>");
+                        print_r("\nSc obtenidos: ".$user["sc"]."\n");
 
-                        print_r("Obteniendo numeros de la lista...<br>");
+                        print_r("Obteniendo numeros de la lista...\n");
                         $numeros_lista = $this->getNumerosLista($value["id_lista"]);
 
-                        print_r("<br>Obteniendo numero de proceso...<br>");
+                        print_r("\nObteniendo numero de proceso...\n");
                         $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
 
                         if (COUNT($numeros_lista) > 0)
                         {
                             $numeros_lista = implode(",", $numeros_lista);
 
-                            print_r("Almacenando numeros en la tabla temporal tmp_procesamiento...<br>");
+                            print_r("Almacenando numeros en la tabla temporal tmp_procesamiento...\n");
                             Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros_lista);
 
-                            print_r("Updateando los id operadoras...<br>");
+                            print_r("Updateando los id operadoras...\n");
                             $this->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
 
-                            print_r("Asignando el prefijo correspondiente para smsin...<br>");
+                            print_r("Asignando el prefijo correspondiente para smsin...\n");
                             $this->updateNumberFormatSmsin($id_proceso, $operadoras_hostgator);
 
-                            print_r("Consultado numeros en smsin_admin...<br>");
+                            print_r("Consultado numeros en smsin_admin...\n");
                             $this->getNumberSmsin($id_proceso, $user["sc"], $user["cadena_serv"], $fecha_smsin_btl);
 
-                            print_r("Obteniendo numeros validos...<br>");
+                            print_r("Obteniendo numeros validos...\n");
                             $this->updateNumerosListas($id_proceso, $value["id_lista"]);
                         }
                         else
                         {
                             Lista::model()->deleteAll("id_lista = ".$value["id_lista"]);
-                            print_r("Lista vacia, Eliminando...<br>");
+                            print_r("Lista vacia, Eliminando...\n");
                         }
                     }
                     else
                     {
-                        print_r("El usuario no posee short codes asociados por lo que se procedera a inhabilitar todos los numeros de sus listas...<br>");
+                        print_r("El usuario no posee short codes asociados por lo que se procedera a inhabilitar todos los numeros de sus listas...\n");
         
                         $sql = "UPDATE lista SET estado = 1 WHERE id_lista = ".$value["id_lista"];
-                        print_r($sql."<br>");
+                        print_r($sql."\n");
                         Yii::app()->db_masivo_premium->createCommand($sql)->execute(); 
 
                         $sql = "UPDATE lista_destinatarios SET estado = 0 WHERE id_lista = ".$value["id_lista"];
-                        print_r($sql."<br>");
+                        print_r($sql."\n");
                         Yii::app()->db_masivo_premium->createCommand($sql)->execute();
                     }
 
-                    print_r("<br>Aplicando commit a la transaction...<br>");
+                    print_r("\nAplicando commit a la transaction...\n");
                     $transaction->commit();
                     $transaction2->commit();
-                    //$transaction->rollBack();
-                    //$transaction2->rollBack();
 
                 } catch (Exception $e)
                         {
-                            print_r("Ocurrio un error al procesar los datos<br><br>");
+                            print_r("Ocurrio un error al procesar los datos\n\n");
                             print_r($e);
                             $transaction->rollBack();
                             $transaction2->rollBack();
@@ -1014,12 +1063,16 @@ class CrontabController extends Controller
         }
         else
         {
-            print_r("<br>No hay listas pendientes por procesar...<br>");
+            print_r("\nNo hay listas pendientes por procesar...\n");
         }
 
-        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Filtrado de listas: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
 
-        print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");   
+        print_r("Hora de finalización: ".$hora_finalizacion);
+
+        print_r("\n----------------------------------------------------------------------------------------------------------------------\n");   
     }
 
     private function getOperadorasBCP()

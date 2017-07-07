@@ -190,11 +190,11 @@ Class PromocionForm extends CFormModel
 	{
         $contenido = strtolower($this->$attribute);
 
-        $contenido_inapropiado = Yii::app()->Levenshtein->run($contenido, 70);
+        $contenido_inapropiado = Yii::app()->Levenshtein->run($contenido);
         
         if ($contenido_inapropiado['return'] == 1)
         {
-            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$contenido_inapropiado['words']);
+            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar: ".$contenido_inapropiado['words']);
         }
 	}
 

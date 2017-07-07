@@ -40,6 +40,14 @@ $form = $this->beginWidget(
 	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
 	<?php if (Yii::app()->user->isAdmin()){ ?>
+
+		<?php
+			$criteria = new CDbcriteria;
+			$criteria->select = "t.id_usuario, t.login";
+			$criteria->join = "INNER JOIN insignia_masivo_premium.permisos p ON t.id_usuario = p.id_usuario";
+			$criteria->compare("p.acceso_sistema", 1);
+			$criteria->order = "login ASC";
+		?>
 		<div>
 			<?php echo $form->dropDownListGroup(
 				$model,
@@ -49,7 +57,8 @@ $form = $this->beginWidget(
 						//'class' => 'col-sm-5',
 					),
 					'widgetOptions' => array(
-						'data' => CHtml::listData(UsuarioMasivo::model()->findAll(array("order"=>"login")), 'id_usuario', 'login'),
+						//'data' => CHtml::listData(UsuarioMasivo::model()->findAll(array("order"=>"login")), 'id_usuario', 'login'),
+						'data' => CHtml::listData(UsuarioMasivo::model()->findAll($criteria), 'id_usuario', 'login'),
 						'htmlOptions' => array('prompt' => 'Seleccionar...'),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
