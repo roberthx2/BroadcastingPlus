@@ -28,6 +28,14 @@ class Filtros extends CApplicationComponent
 		return OperadorasRelacion::model()->findAll($criteria);
 	}*/
 
+	public function getOperPrefijoBCP()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->select = "id_operadora_bcp, prefijo";
+		$criteria->compare("alfanumerico", 0);
+		$criteria->order = "id_operadora_bcp ASC";
+	}
+
 	private function updateOperadoraTblProcesamiento($id_proceso, $operadoras)
 	{
 		foreach ($operadoras as $value)

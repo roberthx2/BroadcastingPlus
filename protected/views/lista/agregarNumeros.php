@@ -32,10 +32,15 @@ $form = $this->beginWidget(
 		'id' => 'lista-form',
 		'type' => 'horizontal',
 		'enableAjaxValidation'=>false,
+		'enableClientValidation'=>true,
+		'clientOptions' => array(
+                'validateOnSubmit'=>true,
+                'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
+            ),
 	)
 ); ?>
 
-	<fieldset>
+	<fieldset> 
  
 	<legend>Agregar Números</legend>
 

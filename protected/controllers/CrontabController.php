@@ -890,6 +890,352 @@ class CrontabController extends Controller
 
         print_r("\n----------------------------------------------------------------------------------------------------------------------\n");
     }
+
+    /////////////////////////////////////METODOS USADOS PARA EL PROSAMIENTO DE LAS LISTAS////////////////////////////////
+
+    public function actionProcesarListas()
+    {
+        printf("Hora inicio: ".date("Y-m-d H:i:s")."<br>");
+
+        print_r("Buscando usuarios administrativos para excluirlos del proceso...<br>");
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "GROUP_CONCAT(id_usuario) AS id_usuario";
+        $criteria->addInCondition("id_perfil", array(1,2));
+        
+        print_r($criteria->toArray());
+
+        $usuarios_admin = UsuarioSms::model()->find($criteria);
+
+        print_r("<br>Id_usuarios: ".$usuarios_admin->id_usuario."<br>");
+
+        print_r("Consultado operadoras BCP...<br>");
+        $operadoras = $this->getOperadorasBCP();
+
+        print_r("<br>Consultado operadoras Hostgator...<br>");
+        $operadoras_hostgator = $this->getOperadorasHostgator();
+
+        /*$criteria = new CDbCriteria;
+        $criteria->select = "MIN(data_arrive) AS data_arrive";
+        print_r($criteria->toArray());
+        $smsin_btl = SmsinBtl::model()->find($criteria);
+
+        print_r("<br>Fecha minima de smsin_btl: ".$smsin_btl->data_arrive."...<br>");*/
+
+        $fecha_smsin_btl = "2016-01-01";
+        print_r("<br>Fecha minima de smsin_btl: ".$fecha_smsin_btl."...<br>");
+
+        print_r("Consultado las listas prendientes por procesar...<br>");
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "id_lista, id_usuario";
+        $criteria->compare("estado", 0);
+        print_r($criteria->toArray());
+        $model_lista = Lista::model()->findAll($criteria);
+
+        if (count($model_lista) > 0)
+        {
+            foreach ($model_lista as $value)
+            {
+                try
+                {
+                    print_r("<br>Iniciando transaction...<br><br>");
+                    $transaction = Yii::app()->db->beginTransaction();
+                    $transaction2 = Yii::app()->db_masivo_premium->beginTransaction();
+
+                    $id_proceso = "";
+
+                    print_r("Consultado información del usuario...<br>");
+                    $user = $this->getInfoUser($value["id_usuario"]);
+                    print_r("<br>Procesando listas del usuario: ".$user["login"]."...<br>");
+
+                    if ($user["sc"] != "null") 
+                    {
+                        print_r("<br>Sc obtenidos: ".$user["sc"]."<br>");
+
+                        print_r("Obteniendo numeros de la lista...<br>");
+                        $numeros_lista = $this->getNumerosLista($value["id_lista"]);
+
+                        print_r("<br>Obteniendo numero de proceso...<br>");
+                        $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+
+                        if (COUNT($numeros_lista) > 0)
+                        {
+                            $numeros_lista = implode(",", $numeros_lista);
+
+                            print_r("Almacenando numeros en la tabla temporal tmp_procesamiento...<br>");
+                            Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros_lista);
+
+                            print_r("Updateando los id operadoras...<br>");
+                            $this->updateOperadoraTblProcesamiento($id_proceso, $operadoras);
+
+                            print_r("Asignando el prefijo correspondiente para smsin...<br>");
+                            $this->updateNumberFormatSmsin($id_proceso, $operadoras_hostgator);
+
+                            print_r("Consultado numeros en smsin_admin...<br>");
+                            $this->getNumberSmsin($id_proceso, $user["sc"], $user["cadena_serv"], $fecha_smsin_btl);
+
+                            print_r("Obteniendo numeros validos...<br>");
+                            $this->updateNumerosListas($id_proceso, $value["id_lista"]);
+                        }
+                        else
+                        {
+                            Lista::model()->deleteAll("id_lista = ".$value["id_lista"]);
+                            print_r("Lista vacia, Eliminando...<br>");
+                        }
+                    }
+                    else
+                    {
+                        print_r("El usuario no posee short codes asociados por lo que se procedera a inhabilitar todos los numeros de sus listas...<br>");
+        
+                        $sql = "UPDATE lista SET estado = 1 WHERE id_lista = ".$value["id_lista"];
+                        print_r($sql."<br>");
+                        Yii::app()->db_masivo_premium->createCommand($sql)->execute(); 
+
+                        $sql = "UPDATE lista_destinatarios SET estado = 0 WHERE id_lista = ".$value["id_lista"];
+                        print_r($sql."<br>");
+                        Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+                    }
+
+                    print_r("<br>Aplicando commit a la transaction...<br>");
+                    $transaction->commit();
+                    $transaction2->commit();
+                    //$transaction->rollBack();
+                    //$transaction2->rollBack();
+
+                } catch (Exception $e)
+                        {
+                            print_r("Ocurrio un error al procesar los datos<br><br>");
+                            print_r($e);
+                            $transaction->rollBack();
+                            $transaction2->rollBack();
+                        }
+            }
+        }
+        else
+        {
+            print_r("<br>No hay listas pendientes por procesar...<br>");
+        }
+
+        print_r("Hora de finalización: ".date("Y-m-d H:i:s"));
+
+        print_r("<br>----------------------------------------------------------------------------------------------------------------------<br>");   
+    }
+
+    private function getOperadorasBCP()
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "id_operadora_bcp, prefijo";
+        $criteria->compare("alfanumerico", 0);
+        $criteria->order = "id_operadora_bcp ASC";
+        print_r($criteria->toArray());
+        $model_operadoras = OperadorasRelacion::model()->findAll($criteria);
+
+        foreach ($model_operadoras as $value)
+        {
+            $operadoras[] = array("id_operadora"=>$value["id_operadora_bcp"], "prefijo"=>$value["prefijo"]);
+        }
+
+        print_r("<br>");
+        print_r($operadoras);
+        
+        return $operadoras;   
+    }
+
+    private function getOperadorasHostgator()
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "id, prefijo";
+        print_r($criteria->toArray());
+        $model_operadoras_hostgator = OperadoraHostgator::model()->findAll($criteria);
+
+        foreach ($model_operadoras_hostgator as $value)
+        {
+            $operadoras_hostgator[$value["id"]] = $value["prefijo"];
+        }
+
+        print_r("<br>");
+        print_r($operadoras_hostgator);
+
+        return $operadoras_hostgator;
+    }
+
+    private function getInfoUser($id_usuario)
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "login, cadena_sc, cadena_serv";
+        print_r($criteria->toArray());
+        $criteria->compare("id_usuario", $id_usuario);
+        $model = UsuarioSms::model()->find($criteria);
+
+        $cadena_sc = trim(preg_replace('/,{2,}/', ",", str_replace(' ', "", $model->cadena_sc)), ",");
+        $cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
+
+        $cadena_serv = trim(preg_replace('/,{2,}/', ",", str_replace(' ', "", $model->cadena_serv)), ",");
+        $cadena_serv = ($cadena_serv == "") ? "null" : $cadena_serv;
+
+        $criteria = new CDbCriteria;
+        $criteria->select = "GROUP_CONCAT(DISTINCT sc_id) AS sc_id";
+        $criteria->addInCondition("id_sc", explode(",", $cadena_sc));
+        //print_r($criteria->toArray());
+        $model_sc = ScId::model()->find($criteria);
+
+        $cadena_sc = ($model_sc->sc_id == "") ? "null" : trim($model_sc->sc_id, ",");
+
+        return array("login"=>$model->login, "sc"=>$cadena_sc, "cadena_serv"=>$cadena_serv);
+    }
+
+    private function getNumerosLista($id_lista)
+    {
+        $criteria = new CDbCriteria;
+        $criteria->select = "numero";
+        $criteria->compare("id_lista", $id_lista);
+        print_r($criteria->toArray());
+        $model = ListaDestinatarios::model()->findAll($criteria);
+
+        $numeros = array();
+
+        foreach ($model as $value)
+        {
+            $numeros[] = $value["numero"];
+        }
+
+        return $numeros;
+    }
+
+    private function updateOperadoraTblProcesamiento($id_proceso, $operadoras)
+    {
+        foreach ($operadoras as $value)
+        {
+            $sql = "UPDATE tmp_procesamiento SET id_operadora = ".$value["id_operadora"]." WHERE id_proceso = ".$id_proceso." AND numero REGEXP '^".$value["prefijo"]."' AND LENGTH(numero) = 10";
+            print_r($sql."<br>");
+            
+            Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+        }
+    }
+
+    private function updateNumberFormatSmsin($id_proceso, $operadoras_hostgator)
+    {
+        foreach ($operadoras_hostgator as $key => $value)
+        {
+            $sql = "UPDATE tmp_procesamiento SET mensaje = CONCAT('".$value."', SUBSTRING(numero, 4)) WHERE id_proceso = ".$id_proceso." AND id_operadora = ".$key;
+            print_r($sql."<br>");
+
+            Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+        }
+    }
+
+    private function getNumberSmsin($id_proceso, $sc, $cadena_serv, $fecha_min)
+    {
+        $ini = 0;
+        $iterator = 3;
+        $bandera = true;
+        $fecha = date("Y-m-d");
+        $numeros_smsin = array();
+
+        while ($bandera)
+        {
+            $sql = "SELECT mensaje AS numero FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado IS NULL LIMIT ".$ini.",".$iterator;
+            print_r($sql."<br>");
+            $resultado = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+            $numeros_tmp = "";
+
+            $total_tmp = COUNT($resultado);
+
+            if ($total_tmp > 0)
+            {
+                foreach ($resultado as $value)
+                {
+                    $numeros_tmp[] = "'".$value["numero"]."'";
+                }
+
+                $numeros_tmp = implode(",", $numeros_tmp);
+
+                $sql = "SELECT SQL_NO_CACHE DISTINCT origen FROM smsin_admin  
+                        WHERE data_arrive BETWEEN '".$fecha_min."' AND '".$fecha."' 
+                        AND id_producto IN (".$cadena_serv.") 
+                        AND sc IN (".$sc.") 
+                        AND origen IN (".$numeros_tmp.")
+                        GROUP BY origen";
+                print_r($sql."<br>");
+                $resultado = Yii::app()->db_sms_admin->createCommand($sql)->queryAll();
+
+                foreach ($resultado as $value)
+                {
+                    $numeros_smsin[] = "'".$value["origen"]."'";
+                }
+
+                $ini+=$iterator;
+            }
+            else
+            {
+                $bandera = false;
+            }
+
+            print_r("Ejecutando ping hacia todas las BD para no perder la conexion<br>");
+
+            $this->pingDB();
+        }
+
+        $numeros_smsin = implode(",", $numeros_smsin);
+
+        if ($numeros_smsin != "")
+        {
+            $sql = "UPDATE tmp_procesamiento SET estado = 1 WHERE id_proceso = ".$id_proceso." AND estado IS NULL AND mensaje IN (".$numeros_smsin.")";
+            print_r($sql."<br>");
+            Yii::app()->db_masivo_premium->createCommand($sql)->execute();    
+        }
+    }
+
+    private function pingDB()
+    {
+        $sql = "SELECT true";
+
+        Yii::app()->db->createCommand($sql)->queryRow();
+        Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+        Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+        Yii::app()->db_sms_admin->createCommand($sql)->queryRow();
+        Yii::app()->db_sms->createCommand($sql)->queryRow();
+    }
+
+    private function updateNumerosListas($id_proceso, $id_lista)
+    {
+        $sql = "UPDATE lista_destinatarios SET estado = 0 WHERE id_lista =".$id_lista;
+        print_r($sql."<br>");
+        Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+        $sql = "SELECT numero FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
+        print_r($sql."<br>");
+        $resultado = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll(); 
+
+        $numeros_tmp = array();
+
+        foreach ($resultado as $value)
+        {
+            $numeros_tmp[] = "'".$value["numero"]."'";
+        }
+
+        if (COUNT($numeros_tmp) > 0)
+        {
+            $numeros_tmp = implode(",", $numeros_tmp);
+
+            $sql = "UPDATE lista_destinatarios SET estado = 1 WHERE id_lista = ".$id_lista." AND numero IN (".$numeros_tmp.")";
+            print_r($sql."<br>");
+            Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+        }
+        else
+        {
+            print_r("No hay numeros validos...<br>");
+        }
+
+        $sql = "UPDATE lista SET estado = 1 WHERE id_lista = ".$id_lista;
+        print_r($sql."<br>");
+        Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 ?>

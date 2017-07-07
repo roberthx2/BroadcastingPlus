@@ -6,6 +6,7 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 	$host_F1 = "localhost";//"200.109.237.18";
 	$host_F2 = "localhost";//"200.109.237.18";
 	$host_Hostgator = "localhost";//"200.109.237.18";
+	$host_Linode_3 = "localhost";
 
 	//Datos F1
 	$user_F1 = 'root';
@@ -22,12 +23,17 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 	//Datos Hostgator
 	$user_Hostgator = 'root';//roberth.riera
 	$pwd_Hostgator = '';//WPjvzyb7na
+
+	//Datos Linode 3
+	$user_Linode_3 = 'root';
+	$pwd_Linode_3 = '';
 } else
 	{
 		//Servidores
 		$host_F1 = "72.233.82.70";
 		$host_F2 = "72.232.85.20";
 		$host_Hostgator = "www.insigniamobile.com.ve";
+		$host_Linode_3 = "162.216.16.200";
 
 		//Datos F1
 		$user_F1 = 'rcma';
@@ -44,6 +50,10 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 		//Datos Hostgator
 		$user_Hostgator = 'insignia_envios';
 		$pwd_Hostgator = 'fkhXOF3UXhIMC2015';
+
+		//Datos Linode 3
+		$user_Linode_3 = 'bcp_listas';
+		$pwd_Linode_3 = 'IMC$L!sta2';
 	}
 
 // uncomment the following to define a path alias
@@ -215,6 +225,15 @@ return array(
 			'emulatePrepare' => true,
 			'username' => $user_F2,
 			'password' => $pwd_F2,
+			'charset' => 'utf8',
+		),
+
+		'db_sms_admin'=>array(
+			'class' => 'CDbConnection',
+			'connectionString' => 'mysql:host='.$host_Linode_3.';dbname=sms_admin',
+			'emulatePrepare' => true,
+			'username' => $user_Linode_3,
+			'password' => $pwd_Linode_3,
 			'charset' => 'utf8',
 		),
 
