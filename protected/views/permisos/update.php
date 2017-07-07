@@ -685,6 +685,26 @@
 							);
 					?></div>
 				</li>
+				<li class="list-group-item">Supervisar Log
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'supervisar_log',
+								    'value' => $model->supervisar_log,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_administracion");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
     		</ul>
    		</div>
   	</div>

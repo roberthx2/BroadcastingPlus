@@ -319,7 +319,7 @@ class ReportesController extends Controller
             $model->unsetAttributes();
         }
 
-        $this->render('smsEnviadosBCP', array('model'=>$model));
+        $this->render('smsEnviadosBcp', array('model'=>$model));
     }
 
     public function actionSmsEnviadosBcpResumen()

@@ -12,7 +12,6 @@
                     </a>
                 </li>
 
-                <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
                 <li data-toggle="collapse" data-target="#menu_configuracion" class="collapsed active">
                     <a href="#"> Configuraciones <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
@@ -28,8 +27,6 @@
                         <?php if (Yii::app()->user->getPermisos()->configurar_recarga_cupo_bcp_por_dia) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('configuracionRecargaCupoPorDia/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Recarga de cupo por dia </a></li>  <?php } ?>
                     </ul>
-                 <?php } ?>
-                 <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
                 <li data-toggle="collapse" data-target="#menu_accesos" class="collapsed active">
                     <a href="#"> Administrar <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
@@ -41,7 +38,6 @@
                         <?php /*if (Yii::app()->user->getPermisos()->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioMasivo/accesoBcplus');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Acceso de Usuarios </a></li>  <?php } */ ?>
                     </ul>
-                 <?php } ?>
                 <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
                     <a href="#"> Herramientas <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
