@@ -1,6 +1,6 @@
 <fieldset>
  
-    <legend>Historial de Cupo</legend>
+    <legend>Recarga de Cupo</legend>
 <?php
 
 $contenido = array();
@@ -21,12 +21,9 @@ $active = true;
 
 if (Yii::app()->user->getPermisos()->historico_cupo_bcp)
 {
-    $modelBCP = new UsuarioCupoHistoricoPremium('search');
-    $modelBCP->unsetAttributes();
-    if(isset($_GET['UsuarioCupoHistoricoPremium']))
-        $modelBCP->buscar = $_GET['UsuarioCupoHistoricoPremium']["buscar"];
+    $modelBCP = new RecargaCupoBcpForm;
 
-    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('/usuarioCupoHistoricoPremium/admin', array('model'=>$modelBCP), true), 'active' => $active));
+    array_push($contenido, array('label' => 'BCP', 'content' => $this->renderPartial('recargaBcp', array('model'=>$modelBCP), true), 'active' => $active));
 }
 
 $this->widget(

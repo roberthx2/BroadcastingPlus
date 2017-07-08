@@ -15,7 +15,7 @@ class CupoController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index'),
+                'actions' => array('historico', 'recarga', 'getInfoCupoBcp'),
                 'users' => array('@'),
             ),
 
@@ -25,9 +25,52 @@ class CupoController extends Controller
         ));
     }
 
-    public function actionIndex()
+    public function actionHistorico()
     {
-        $this->render("index");
+        $this->render("historico");
+    }
+
+    public function actionRecarga()
+    {
+        $this->render("recarga");
+    }
+
+    public function actionGetInfoCupoBcp()
+    {
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if (isset($_POST['id_usuario']) && $_POST['id_usuario'] !== "")
+                $id_usuario = $_POST['id_usuario'];
+            else 
+                $id_usuario = Yii::app()->user->id;
+
+            $cupo = UsuarioCupoPremium::model()->find("id_usuario = ".$id_usuario);
+
+            $criteria = new CDbcriteria;
+            $criteria->select = "ejecutado_por, MAX(fecha) AS fecha";
+            $criteria->compare("id_usuario", $id_usuario);
+            $criteria->compare("tipo_operacion", 1);
+
+            $historico = UsuarioCupoHistoricoPremium::model()->find($criteria);
+            
+            $ejecutado_por = "";
+            $fecha = "-";
+
+            if ($historico)
+            {
+                $ejecutado_por = ($historico->ejecutado_por != 0) ? UsuarioSmsController::actionGetLogin($historico->ejecutado_por) : 'NO EXISTE';
+                $fecha = $historico->fecha;
+            }
+
+            echo CJSON::encode(array(
+                        'cupo_disponible'=>$cupo->disponible,
+                        'login' => UsuarioSmsController::actionGetLogin($id_usuario),
+                        'ejecutado_por' => $ejecutado_por,
+                        'fecha' => $fecha
+                    ));
+
+            Yii::app()->end();
+        }
     }
 }
 ?>

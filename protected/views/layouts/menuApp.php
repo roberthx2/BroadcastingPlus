@@ -41,10 +41,10 @@
                     <a href="#"> Cupo <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
                     <ul class="sub-menu collapse" id="menu_cupo">
-                        <?php /*if (Yii::app()->user->getPermisos()->recargar_cupo_bcnl || Yii::app()->user->getPermisos()->recargar_cupo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Recargar </a></li> <?php } */?>
+                        <?php if (Yii::app()->user->getPermisos()->recargar_cupo_bcnl || Yii::app()->user->getPermisos()->recargar_cupo_bcp) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('cupo/recarga');?>"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Recargar </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->historico_cupo_bcnl || Yii::app()->user->getPermisos()->historico_cupo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('cupo/index');?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Histórico </a></li> <?php } ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('cupo/historico');?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Histórico </a></li> <?php } ?>
                     </ul>
                 <?php } ?>
 
