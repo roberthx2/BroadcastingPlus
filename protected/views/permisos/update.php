@@ -309,7 +309,27 @@
     	</div>
   		<div class="panel-body modulo_cupo" style="align:middle;">
   			<ul class="list-group">
-  				<li class="list-group-item">Histórico BCP
+  				<li class="list-group-item">Recarga BCP
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'recargar_cupo_bcp',
+								    'value' => $model->recargar_cupo_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_cupo");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<li class="list-group-item">Histórico BCP
 	  				<div style="float: right;"><?php
 						Controller::widget(
 							    'booster.widgets.TbSwitch',

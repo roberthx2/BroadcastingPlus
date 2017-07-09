@@ -15,6 +15,12 @@
 	    </div>
 <?php endif; ?>
 
+<div id="respuesta_bcp" class="alert alert-success col-xs-12 col-sm-12 col-md-12 col-lg-12" role="alert" style="display: none;"></div>
+
+<div class="form col-xs-12 col-sm-6 col-md-6 col-lg-6" >
+	<?php $this->renderPartial('recargaBcpDetalle'); ?>
+</div>
+
 <div class="form col-xs-12 col-sm-6 col-md-6 col-lg-6" >
 
 <?php 
@@ -29,7 +35,7 @@ $form = $this->beginWidget(
         'clientOptions' => array(
             'validateOnSubmit'=>true,
             'validateOnChange'=>false,
-            //'afterValidate'=>'js:enviar'
+            'afterValidate'=>'js:enviar'
         ),
 	)
 ); ?>
@@ -58,7 +64,7 @@ $form = $this->beginWidget(
 					'widgetOptions' => array(
 						//'data' => CHtml::listData(UsuarioMasivo::model()->findAll(array("order"=>"login")), 'id_usuario', 'login'),
 						'data' => CHtml::listData(UsuarioMasivo::model()->findAll($criteria), 'id_usuario', 'login'),
-						'htmlOptions' => array('prompt' => 'Seleccionar...'),
+						'htmlOptions' => array('prompt' => 'Seleccionar...', 'onChange'=>'updateInfoBcp();'),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-user"></i>',
 					'hint' => 'En caso de seleccionar un usuario, el cupo sera asignado a dicho usuario',
@@ -86,7 +92,7 @@ $form = $this->beginWidget(
 	<br><br>
 	<div class="">
 		<center><?php
-            echo CHtml::submitButton('Recargar', array('id' => 'bontonRecargar', 'class'=>'btn btn-success', 'js:onClick=updateInfoBcp();'));
+            echo CHtml::tag('button', array('id'=>'bontonRecargar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Recargar');
         ?>
 		</center>
 	</div>
@@ -94,28 +100,23 @@ $form = $this->beginWidget(
 </div><!-- form -->
 <?php $this->endWidget(); unset($form); ?>
 
-
-<div class="form col-xs-12 col-sm-6 col-md-6 col-lg-6" >
-	<br>
-	<?php $this->renderPartial('recargaBcpDetalle'); ?>
-</div>
-
 <script type="text/javascript">
     function enviar(form,data,hasError)
     {
         if(!hasError)
         {
             $.ajax({
-                url:"<?php echo Yii::app()->createUrl('prefijoPromocion/create2'); ?>",
+                url:"<?php echo Yii::app()->createUrl('cupo/recargarCupoBcp'); ?>",
                 type:"POST",    
-                data:$("#prefijo-promocion-form").serialize(),
+                data:$("#cupoBcp-form").serialize(),
                 
                 beforeSend: function()
                 {
-                   // $("#bontonCrear").attr("disabled",true);
-                   $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
-                   $("#PrefijoPromocion_prefijo_em_").hide();
-                   $("#respuesta").hide();
+                   $("#cupoBcp-form div.form-group").removeClass("has-error").removeClass("has-success");
+                   $("#bontonRecargar i.fa").addClass("fa-spinner").addClass("fa-spin");
+                   $("#bontonRecargar").addClass("disabled");
+                   $("#RecargaCupoBcpForm_cantidad_em_").hide();
+                   $("#respuesta_bcp").hide();
                 },
                 complete: function()
                 {
@@ -123,41 +124,36 @@ $form = $this->beginWidget(
                    // $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
                    // $("#PrefijoPromocion_prefijo_em_").hide();
                     //$("#respuesta").hide();
+                    $("#bontonRecargar i.fa").removeClass("fa-spinner").removeClass("fa-spin");
+                    $("#bontonRecargar").removeClass("disabled");
                 },
                 success: function(data)
                 {
                     if (data.salida == 'true')
                     {
-                    	$("#PrefijoPromocion_prefijo").val("");
-                    	$("#prefijo-promocion-form div.form-group").addClass("has-success");
-                        $("#respuesta").html("El prefijo fue creado correctamente");
-                        $("#respuesta").show();
-
-                        $('#prefijo-promocion-grid').yiiGridView('update', {
-							data: $(this).serialize()
-						});
+                    	$("#RecargaCupoBcpForm_cantidad").val("");
+                    	$("#cupoBcp-form div.form-group").addClass("has-success");
+                        $("#respuesta_bcp").html("Recarga realizada con exito");
+                        $("#respuesta_bcp").show();
+                        updateInfoBcp();
 						return;
                     }
                     else (data.salida == 'false')
                     {
-                    	$("#prefijo-promocion-form div.form-group").addClass("has-error");
-                    	$("#PrefijoPromocion_prefijo_em_").show();
+                    	$("#cupoBcp-form div.form-group").addClass("has-error");
+                    	$("#RecargaCupoBcpForm_cantidad_em_").show();
 
-                        var error = data.error.prefijo;
+                        var error = data.error.cantidad;
 
                         $.each(error, function(i, value) {
-                            $("#PrefijoPromocion_prefijo_em_").html(value);
+                            $("#RecargaCupoBcpForm_cantidad_em_").html(value);
                         });
                         return;
                     }
-                    
-                   // $("#bontonCrear").attr("disabled",false);
                 },
                 error: function()
                 {
-                	//$("#respuesta").show();
-                    //$("#respuesta").html("Ocurrio un error al procesar los datos intente nuevamente" + data);
-                    //$("#bontonCrear").attr("disabled",false);
+
                 }
             });
         }
@@ -175,11 +171,13 @@ $form = $this->beginWidget(
             
             beforeSend: function()
             {
-
+            	$("#bontonRecargar").addClass("disabled");
+            	$(".loader").css("display", "block");
             },
             complete: function()
             {
-
+            	$("#bontonRecargar").removeClass("disabled");
+            	$(".loader").css("display", "none");
             },
             success: function(data)
             {
@@ -187,6 +185,7 @@ $form = $this->beginWidget(
                 $(".detalleDisponibleoBCP").text(data.cupo_disponible);
                 $(".detalleUltimaRecargaBCP").text(data.fecha);
                 $(".detalleEjecutadoPorBCP").text(data.ejecutado_por);
+                $(".detalleMontoMaximoBCP").text(data.maximo);
             },
             error: function()
             {
@@ -201,4 +200,3 @@ $form = $this->beginWidget(
     });
 
 </script>
-

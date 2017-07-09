@@ -21,7 +21,8 @@
 
 	<?php  
 	 $baseUrl = Yii::app()->baseUrl; 
-	  Yii::app()->clientScript->registerCssFile($baseUrl.'/css/estilos.css');  
+	  Yii::app()->clientScript->registerCssFile($baseUrl.'/css/estilos.css'); 
+	  Yii::app()->clientScript->registerCssFile($baseUrl.'/plugins/font-awesome-4.7.0/css/font-awesome.min.css'); 
 	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/funciones.js');
 	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/bootstrap-notify/bootstrap-notify.min.js');/*
 	  $cs = Yii::app()->getClientScript();

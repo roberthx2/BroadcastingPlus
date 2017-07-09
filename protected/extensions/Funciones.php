@@ -7,6 +7,12 @@ class Funciones extends CApplicationComponent
 		return trim(preg_replace('/,{2,}/', ",", str_replace(' ', "", $cadena)), ",");
 	}
 
+	public function limpiarCadenaQuery($cadena)
+	{
+		$cadena = $this->limpiarNumerosTexarea($cadena);
+		return ($cadena == "") ? "null" : $cadena;
+	}
+
 	public function limpiarNombre($cadena)
 	{
 		return strtoupper(trim(preg_replace('/\s{2,}/', " ", $cadena)));
