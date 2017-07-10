@@ -39,21 +39,30 @@ class CupoController extends Controller
     {
         if (Yii::app()->request->isAjaxRequest)
         {
-            if (isset($_POST['RecargaCupoBcpForm']['id_usuario']) && $_POST['RecargaCupoBcpForm']['id_usuario'] !== "")
+            if (isset($_POST['RecargaCupoBcpForm']['id_usuario']) && $_POST['RecargaCupoBcpForm']['id_usuario'] != "")
                 $id_usuario = $_POST['RecargaCupoBcpForm']['id_usuario'];
             else 
                 $id_usuario = Yii::app()->user->id;
 
             $cupo = UsuarioCupoPremium::model()->find("id_usuario = ".$id_usuario);
+            $cupo_disponible = ($cupo) ? $cupo->disponible : 0;
 
             $criteria = new CDbcriteria;
-            $criteria->select = "ejecutado_por, MAX(fecha) AS fecha";
+            $criteria->select = "id_cliente, login";
             $criteria->compare("id_usuario", $id_usuario);
-            $criteria->compare("tipo_operacion", 1);
+            $model_usuario = UsuarioSms::model()->find($criteria);
+
+            $criteria = new CDbcriteria;
+            $criteria->select = "ejecutado_por, fecha";
+            $criteria->condition = "fecha = (SELECT MAX(fecha) FROM usuario_cupo_historico_premium WHERE id_cliente = ".$model_usuario->id_cliente." AND tipo_operacion = 1) AND ";
+            $criteria->condition .= "id_cliente = ".$model_usuario->id_cliente." AND ";
+            $criteria->condition .= "tipo_operacion = 1";
+            $criteria->order = "id DESC";
+            $criteria->limit = 1;
 
             $historico = UsuarioCupoHistoricoPremium::model()->find($criteria);
-            
-            $ejecutado_por = "";
+
+            $ejecutado_por = "-";
             $fecha = "-";
 
             if ($historico)
@@ -63,8 +72,8 @@ class CupoController extends Controller
             }
 
             echo CJSON::encode(array(
-                        'cupo_disponible'=> number_format($cupo->disponible, 0, '', '.'),
-                        'login' => UsuarioSmsController::actionGetLogin($id_usuario),
+                        'cupo_disponible'=> number_format($cupo_disponible, 0, '', '.'),
+                        'login' => $model_usuario->login,
                         'ejecutado_por' => $ejecutado_por,
                         'fecha' => $fecha,
                         'maximo' => number_format($this->actionMaximoMontoBcp($id_usuario), 0, '', '.')
@@ -125,7 +134,7 @@ class CupoController extends Controller
             $criteria->compare("tipo_operacion", 1);
             $model_fecha = UsuarioCupoHistoricoPremium::model()->find($criteria);
 
-            if ($model_fecha)
+            if ($model_fecha->fecha != "")
             {
                 $cliente_nuevo = false;
                 $fecha_inicial = $model_fecha->fecha;
@@ -155,7 +164,7 @@ class CupoController extends Controller
             $criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
             $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
             $criteria->condition .= "desp_op IN (".$oper_activas.")";
-            $total = SmsinBtl::model()->find($criteria);
+            $total = Smsin::model()->find($criteria);
             
             if ($tipo_consulta == 1)
                 $maximo = round(($total->id_sms / $cantidad_meses_consulta) * $multiplicacion_base);
@@ -173,8 +182,7 @@ class CupoController extends Controller
                 $criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
                 $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
                 $criteria->condition .= "desp_op IN (".$oper_activas.")";
-                $total = SmsinBtl::model()->find($criteria);
-                
+                $total = Smsin::model()->find($criteria);
                 $maximo = $total->id_sms * $multiplicacion_base;
             }
             else //Existe una o más recargas para el dia actual
@@ -193,11 +201,10 @@ class CupoController extends Controller
                 $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
                 $criteria->condition .= "desp_op IN (".$oper_activas.")";
                 $total = Smsin::model()->find($criteria);
-                
                 $maximo = ($total->id_sms * $multiplicacion_base) + $cupo_tmp->disponible;
             }
         }
-
+        
         return $maximo;
     }
 

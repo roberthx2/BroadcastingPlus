@@ -65,9 +65,9 @@
 			                        'htmlOptions' => array('style' => 'background-color: white; color: black', 'class'=>'detalleEjecutadoPorBCP visible-md visible-lg trOverFlow'),
 			                    )
 			                ); ?>
-			                <?php echo '<strong class="visible-md visible-lg">Ejecutado por</strong>'; ?>
+			                <?php echo '<strong class="visible-md visible-lg">Ejecutada por</strong>'; ?>
 
-			                <div class="visible-xs visible-sm"><strong>Ejecutado por</strong></div>
+			                <div class="visible-xs visible-sm"><strong>Ejecutada por</strong></div>
 			        		<div class="detalleEjecutadoPorBCP visible-xs visible-sm trOverFlow"></div>
 			        	</li>
 					<?php } ?>		        	
