@@ -25,6 +25,7 @@
 		array(
 			'id' => 'promocion-form',
 			'type' => 'vertical',
+			'htmlOptions' => array('enctype' => 'multipart/form-data'),
 			'enableAjaxValidation'=>true,
 			'enableClientValidation'=>true,
             'clientOptions' => array(
@@ -297,6 +298,11 @@
 			<?php echo $form->fileFieldGroup($model, 'archivo',
 					array(
 						'wrapperHtmlOptions' => array(
+						),
+						'widgetOptions' => array(
+							'htmlOptions'=>array(
+								'required'=>true,
+							),
 						),
 					)
 				); ?>

@@ -22,7 +22,7 @@ Class PromocionPersonalizadaForm extends CFormModel
 			//Length
 			array('nombre', 'length', 'max'=>25),
 			//Archivo
-			array('archivo', 'file', 'allowEmpty' => true, 'types'=>'txt', 'wrongType'=>'La extenxion del archivo debe ser *.txt'),
+			array('archivo', 'file', 'types'=>'txt', 'allowEmpty' => true),
 			//Safe
 			array("prefijo, puertos, fecha_inicio, fecha_fin, sc_bcp", "safe"),
 			//array("prefijo, puertos, destinatarios, listas", "safe"),
@@ -220,3 +220,4 @@ Class PromocionPersonalizadaForm extends CFormModel
     }
 }
 ?>
+
