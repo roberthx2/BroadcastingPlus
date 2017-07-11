@@ -254,6 +254,69 @@ function hideShowFormPromocion(tipo)
     }
 }
 
+function hideShowFormPromocionPersonalizada(tipo)
+{
+    //BCL
+    if (tipo == 1)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_fecha").show();
+        $("#div_hora_inicio").show();
+        $("#div_hora_fin").show();
+        $("#div_duracion").hide();
+        $("#div_puertos").show();
+        $("#div_botones").show();
+        $("#div_id_sc").hide();
+        $("#div_archivo").show();
+    }
+    //CPEI
+    else if (tipo == 2)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_fecha").hide();
+        $("#div_hora_inicio").hide();
+        $("#div_hora_fin").hide();
+        $("#div_duracion").show();
+        $("#div_puertos").show();
+        $("#PromocionForm_all_puertos").prop("checked", true);
+        $("#PromocionForm_puertos").prop('disabled', true);
+        $("#div_botones").show();
+        $("#div_id_sc").hide();
+        $("#div_archivo").show();
+    }
+    //BCP
+    else if (tipo == 3)
+    {       
+        $("#div_id_cliente").show();
+        $("#div_nombre").show();
+        $("#div_fecha").show();
+        $("#div_hora_inicio").show();
+        $("#div_hora_fin").show();
+        $("#div_duracion").hide();
+        $("#div_puertos").hide();
+        $("#div_botones").show();
+        $("#div_id_sc").show();
+        $("#div_archivo").show();
+    }
+    //Desconocido
+    else
+    {       
+        $("#div_id_cliente").hide();
+        $("#div_nombre").hide();
+        $("#div_prefijo").hide();
+        $("#div_fecha").hide();
+        $("#div_hora_inicio").hide();
+        $("#div_hora_fin").hide();
+        $("#div_duracion").hide();
+        $("#div_puertos").hide();
+        $("#div_botones").hide();
+        $("#div_id_sc").hide();
+        $("#div_archivo").hide();
+    }
+}
+
 function insertarPrefijo()
 {
     /*if ($("#PromocionForm_prefijo").val() != "")
