@@ -18,7 +18,8 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_promocion">
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl || Yii::app()->user->getPermisos()->crear_promo_bcp || Yii::app()->user->getPermisos()->broadcasting_cpei) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li> <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->crear_promo_personalizada_bcnl || Yii::app()->user->getPermisos()->crear_promo_personalizada_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/createPersonalizada');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear Personalizada </a></li>  <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->detalles_promo_bcnl || Yii::app()->user->getPermisos()->detalles_promo_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/verDetalles');?>"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Ver detalles </a></li> <?php } ?>

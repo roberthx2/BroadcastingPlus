@@ -1,7 +1,7 @@
 <div class="col-md-5">
 	<?php 
 		$objeto = TmpProcesamientoController::actionResumenGeneral($id_proceso, $nombre);
-		echo $this->renderPartial("/tmpProcesamiento/resumenGeneralPromocion", array("objeto"=>$objeto, "url_confirmar"=>$url_confirmar), true); 
+		echo $this->renderPartial("/tmpProcesamiento/resumenGeneralPromocion", array("objeto"=>$objeto, "url_confirmar"=>$url_confirmar, 'personalizada'=>$personalizada), true); 
 	?>
 </div>
 <div class="col-md-7">

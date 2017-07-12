@@ -73,6 +73,17 @@
                         <stong><center style='color:#5cb85c; font-size: 16px;'>Confirmada</center></stong>
                     </li>
                 <?php } ?>
+
+            <?php 
+                if ($personalizada == 'true')
+                {
+                    if (isset($_SESSION["errores"]) && COUNT($_SESSION["errores"]) > 0)
+                    { ?>
+                        <li id="div_agregar" class="list-group-item">
+                            <stong><center style='color:black; font-size: 16px;'>El archivo contiene destinatario inválidos. <a href='<?php echo Yii::app()->createUrl("promocion/generarArchivoError"); ?>'>Ver detalles</a></center></stong>
+                        </li>
+                   <?php  }
+                } ?>
         </ul>
       </div>
     </div>

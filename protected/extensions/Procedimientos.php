@@ -38,6 +38,14 @@ class Procedimientos extends CApplicationComponent
         $sql->execute();
 	}
 
+	public function setNumerosPersonalizadosTmpProcesamiento($id_proceso, $numeros)
+	{
+		$numeros = implode(", ", $numeros);
+		$numeros = str_replace("#id_proceso#", $id_proceso, $numeros);
+		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero, mensaje) VALUES ".$numeros;
+		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+	}
+
 	public function getNumerosValidos($id_proceso)
 	{
 		$sql = "SELECT COUNT(id_proceso) AS total FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";

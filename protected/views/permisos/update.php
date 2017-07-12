@@ -160,6 +160,46 @@
 							);
 					?></div>
 				</li>
+				<li class="list-group-item">Crear Personalizada BNCL
+	  				<div style="float: right; align: middle;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'crear_promo_personalizada_bcnl',
+								    'value' => $model->crear_promo_personalizada_bcnl,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_promocion");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<li class="list-group-item">Crear Personalizada BCP
+	  				<div style="float: right; align: middle;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'crear_promo_personalizada_bcp',
+								    'value' => $model->crear_promo_personalizada_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_promocion");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
   				<li class="list-group-item">Ver detalles BCNL
 	  				<div style="float: right;"><?php
 						Controller::widget(
