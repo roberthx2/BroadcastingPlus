@@ -15,13 +15,19 @@
 	");
 ?>
 <br>
-<?php if(Yii::app()->user->hasFlash('success')):?>
-	<br>
-    <div class="container-fluid alert alert-success">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span class="glyphicon glyphicon-ok"></span> <?php echo Yii::app()->user->getFlash('success'); ?>
-	</div>
-<?php endif; ?>
+
+<?php
+    $flashMessages = Yii::app()->user->getFlashes();
+    if ($flashMessages) {
+        echo '<br><div class="container-fluid">';
+        foreach($flashMessages as $key => $message) {
+            echo '<div class="alert alert-'.$key.'">';
+            echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+            echo '<span class="glyphicon glyphicon-'. (($key == "success") ? "ok":"ban-circle").'"></span> '.$message;
+        }
+        echo '</div></div>';
+    }
+?>
 
 <fieldset>
  
@@ -110,14 +116,14 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
-	            	'Editar'=>array(
+	            		'Editar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/update", array("id"=>$data["id_contacto"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Contacto', 'style'=>'color:black;'),
                             ),
-	            	'Eliminar'=>array(
+	            		'Eliminar'=>array(
 	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/delete", array("id_lista" => $data["id_contacto]))',
+	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/viewDelete", array("id" => $data["id_contacto"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-trash', 'title'=>'Eliminar Contacto', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalEliminar'),
 	            			'click' => 'function(){
                                     $.ajax({
@@ -138,7 +144,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                     });
                                 }'
 	            			)
-	            ),
+	            	),
 	        ),
         ),
     ));

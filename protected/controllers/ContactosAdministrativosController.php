@@ -28,7 +28,7 @@ class ContactosAdministrativosController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'admin', 'delete'),
+				'actions'=>array('create','update', 'admin', 'deleteContacto', 'viewDelete'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -114,13 +114,41 @@ class ContactosAdministrativosController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id)
-	{
-		$this->loadModel($id)->delete();
 
-		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-		if(!isset($_GET['ajax']))
-			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+	public function actionViewDelete($id)
+	{
+		$model = $this->loadModel($id);
+
+		$this->renderPartial('viewDelete',array("model"=>$model));
+	}
+
+	public function actionDeleteContacto($id)
+	{
+		$transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+		try
+        {
+			$model = $this->loadModel($id);
+
+			$login = UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+			$log = "Contactos Administrativos (Eliminar) | contacto: ".$model->nombre." | Ejecutado por: ".$login;
+
+			$model->delete();
+		    Yii::app()->Procedimientos->setLog($log);
+
+		    Yii::app()->user->setFlash("success", "Contacto eliminado correctamente");
+
+		    $transaction->commit();
+
+		    if(!isset($_GET['ajax']))
+				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin')); 
+
+	   } catch (Exception $e)
+			{
+        		$transaction->rollBack();
+        		Yii::app()->user->setFlash("danger", "Ocurrio un error al eliminar el contacto");
+        		$this->redirect(array('admin'));
+    		}
 	}
 
 	/**
