@@ -106,10 +106,11 @@ class Filtros extends CApplicationComponent
 	{
 		//FALTA EL FILTRO DE EXENTOS DE F1
 
-		$this->fltrarExentosF2($id_proceso, $tipo, $operadorasPermitidas);
+		$this->filtrarExentosF2($id_proceso, $tipo, $operadorasPermitidas);
+		$this->filtrarExentosUsuario($id_proceso, $tipo, $operadorasPermitidas);
 	}
 
-	private function fltrarExentosF2($id_proceso, $tipo, $operadorasPermitidas)
+	private function filtrarExentosF2($id_proceso, $tipo, $operadorasPermitidas)
 	{
 		//TIPO = 1 BCNL / CPEI
 		//TIPO = 2 BCP
@@ -139,6 +140,37 @@ class Filtros extends CApplicationComponent
 		{
 			$sql = "UPDATE tmp_procesamiento SET estado = 4 WHERE id IN(".$id["ids"].")";
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		}
+	}
+
+	private function filtrarExentosUsuario($id_proceso, $tipo, $operadorasPermitidas)
+	{
+		//TIPO = 1 BCNL / CPEI
+		//TIPO = 2 BCP
+
+		$id_usuario = Yii::app()->user->id;
+		$model = ListaExentos::model()->find("id_usuario = ".$id_usuario);
+
+		if($model)
+		{
+			if ($tipo == 1)
+			{
+	        	$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND numero IN (SELECT numero FROM lista_exentos_destinatarios WHERE id_lista = ".$model->id_lista.")";
+			}
+			else if ($tipo == 2)
+			{
+	        	$sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND numero IN (SELECT numero FROM lista_exentos_destinatarios WHERE id_lista = ".$model->id_lista." AND id_operadora IN (".$operadorasPermitidas.") )";
+			}
+			
+	        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+	    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+	    	$id = $sql->queryRow();
+
+	    	if ($id["ids"] != "")
+			{
+				$sql = "UPDATE tmp_procesamiento SET estado = 4 WHERE id IN(".$id["ids"].")";
+				Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+			}
 		}
 	}
 
@@ -289,6 +321,7 @@ class Filtros extends CApplicationComponent
         }
 	}
 
+	//Filtro aplicado a BTL
 	public function filtrarPorcentaje($id_proceso, $porcentaje)
 	{
 		$criteria = new CDbCriteria;
@@ -349,7 +382,7 @@ class Filtros extends CApplicationComponent
 
     	if ($id["ids"] != "")
 		{
-			$sql = "UPDATE tmp_procesamiento SET estado = 10 WHERE id IN(".$id["ids"].")";
+			$sql = "UPDATE tmp_procesamiento SET estado = 12 WHERE id IN(".$id["ids"].")";
 			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 		}	
 	}

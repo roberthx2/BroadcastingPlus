@@ -44,6 +44,7 @@
                     <ul class="sub-menu collapse" id="menu_herramientas">
                         <?php if (Yii::app()->user->getPermisos()->supervisar_log) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('log/admin');?>"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Supervisar log </a></li>  <?php } ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('contactosAdministrativos/admin');?>"><span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> Contactos Administrativos </a></li>
                     </ul>
             </ul>
         </div>
