@@ -542,6 +542,28 @@
 					?></div>
 				</li>
     		</ul>
+    		<ul class="list-group">
+  				<li class="list-group-item">Administrar Exentos
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'modulo_exentos',
+								    'value' => $model->modulo_exentos,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_herramientas");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+    		</ul>
    		</div>	
   	</div>
 </div>

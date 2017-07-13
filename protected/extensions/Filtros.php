@@ -337,6 +337,22 @@ class Filtros extends CApplicationComponent
 		$sql = "UPDATE tmp_procesamiento SET estado = 11 WHERE id_proceso = ".$id_proceso." AND id_operadora NOT IN (".$ids_operadoras.")";
 		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 	}
+
+	//Aplica solo para al agregar numeros a las listas de exentos por ususario
+	public function filtrarNumerosAdministrativos($id_proceso)
+	{
+        $sql = "SELECT GROUP_CONCAT(id) AS ids FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado IS NULL AND numero IN (SELECT numero FROM contactos_administrativos WHERE estado = 1)";
+		
+        $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+    	$sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+    	$id = $sql->queryRow();
+
+    	if ($id["ids"] != "")
+		{
+			$sql = "UPDATE tmp_procesamiento SET estado = 10 WHERE id IN(".$id["ids"].")";
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+		}	
+	}
 }
 
 ?>

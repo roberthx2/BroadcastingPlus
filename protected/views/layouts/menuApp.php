@@ -89,6 +89,8 @@
                     <ul class="sub-menu collapse" id="menu_herramientas">
                         <?php if (Yii::app()->user->getPermisos()->administrar_prefijo) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('prefijoPromocion/admin');?>"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Prefijos </a></li> <?php } ?>
+                        <?php if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
+                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('listaExentos/index');?>"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Exentos </a></li><?php } ?>
                     </ul>
                 <?php } ?>
 
