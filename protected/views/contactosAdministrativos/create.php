@@ -4,13 +4,18 @@
 ?>
 
 <br>
-<?php if(Yii::app()->user->hasFlash('danger')):?>
-	<br>
-    <div class="container-fluid alert alert-danger">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo Yii::app()->user->getFlash('danger'); ?>
-	</div>
-<?php endif; ?>
+<?php
+    $flashMessages = Yii::app()->user->getFlashes();
+    if ($flashMessages) {
+        echo '<br><div class="container-fluid">';
+        foreach($flashMessages as $key => $message) {
+            echo '<div class="alert alert-'.$key.'">';
+            echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+            echo '<span class="glyphicon glyphicon-'. (($key == "success") ? "ok":"ban-circle").'"></span> '.$message;
+        }
+        echo '</div></div>';
+    }
+?>
 
 <?php /** @var TbActiveForm $form */
 	$form = $this->beginWidget(
@@ -81,8 +86,8 @@
 					'prepend' => '<i class="glyphicon glyphicon-envelope"></i>'
 				)
 			); ?>
-		<div>
-	<div>
+		</div>
+	</div>
 
 </fieldset>
 <br><br>

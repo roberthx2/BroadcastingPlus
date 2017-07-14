@@ -47,7 +47,7 @@
         	'id'=>'agregar',
         	'buttonType' => 'link',
             'context' => 'dafault',
-            'label' => 'Agregar Números',
+            'label' => 'Agregar Número',
             'icon' => 'glyphicon glyphicon-plus',
             'url' => Yii::app()->createUrl("contactosAdministrativos/create"),
             'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),

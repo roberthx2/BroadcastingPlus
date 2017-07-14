@@ -20,8 +20,8 @@ Class ListaForm extends CFormModel
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
 			array("numeros","filter","filter"=>array($this, "limpiarNumeros")),
 			//Validaciones
-			array("nombre", "ext.ValidarNombre", "on"=>"create"), //Valida los caracteres
-			array("numeros", "ext.ValidarNumerosTexarea"), //Valida los caracteres
+			array("nombre", "ext.validator.Nombre", "on"=>"create"), //Valida los caracteres
+			array("numeros", "ext.validator.NumerosTexarea"), //Valida los caracteres
 			array("nombre", "existe", "usuario"=>$this->id_usuario)
 		);
 	}

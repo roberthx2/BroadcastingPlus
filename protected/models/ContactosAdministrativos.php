@@ -34,14 +34,12 @@ class ContactosAdministrativos extends CActiveRecord
 			array('nombre, correo, numero', 'required'),
 			array('id_operadora, estado', 'numerical', 'integerOnly'=>true),
 			array('nombre, correo', 'length', 'max'=>50),
-			array('numero', 'length', 'min'=> 10, 'max'=>10),
-			array('correo', 'match', 'pattern' => '/^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/', 'message' => 'Correo incorrecto'),
-
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
 
-			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
-			array("numero", "ext.ValidarNumero"), //Valida los caracteres
-			array("numero", "ext.ValidarOperadora"), //Valida los caracteres
+			array("nombre", "ext.validator.Nombre"), //Valida los caracteres
+			array("numero", "ext.validator.Numero"),
+			array("numero", "ext.validator.PrefijoOperadora"),
+			array("correo", "ext.validator.email"),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id_contacto, nombre, correo, numero, id_operadora, estado', 'safe', 'on'=>'search'),
@@ -94,18 +92,25 @@ class ContactosAdministrativos extends CActiveRecord
 	public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
-
+ 
 		$criteria=new CDbCriteria;
-
-		$criteria->compare('id_contacto',$this->id_contacto);
-		$criteria->compare('nombre',$this->nombre,true);
-		$criteria->compare('correo',$this->correo,true);
-		$criteria->compare('numero',$this->numero,true);
-		$criteria->compare('id_operadora',$this->id_operadora);
-		$criteria->compare('estado',$this->estado);
+		$criteria->select = "id_contacto, nombre, correo, numero, estado";
+		$criteria->condition = "nombre LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "correo LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "numero LIKE '%".$this->buscar."%'";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'nombre ASC',
+        		'attributes'=>array(
+             		'nombre', 'correo', 'numero'
+        		),
+    		),
+    		'pagination'=>array(
+		        'pageSize'=>10,
+		        //'route'=>'contactosAdministrativos/admin',
+		    ),
 		));
 	}
 

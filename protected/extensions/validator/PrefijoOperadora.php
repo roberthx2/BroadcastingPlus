@@ -1,5 +1,6 @@
 <?php
-Class ValidarOperadora extends CValidator
+
+Class PrefijoOperadora extends CValidator
 {
 	public function validateAttribute($object, $attribute)
 	{
@@ -24,7 +25,8 @@ Class ValidarOperadora extends CValidator
 		}
 
 		if ($bandera)
-			$this->addError($object, $attribute, "Número invalido");
+			$this->addError($object, $attribute, "Operadora invalida");
 	}
 }
+
 ?>

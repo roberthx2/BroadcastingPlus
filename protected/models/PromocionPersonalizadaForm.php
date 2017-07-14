@@ -32,7 +32,7 @@ Class PromocionPersonalizadaForm extends CFormModel
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
 			//Validaciones
 			//Nombre
-			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
+			array("nombre", "ext.validator.Nombre"), //Valida los caracteres
 			array("nombre", "existe"), //Valida si existe el nombre de la promoción segun su tipo
 			array("hora_fin", "horaActual"), //Valida que la hora fin sea mayor que la hora actual
 			array("hora_inicio, hora_fin", "compararHoras"), //Valida que la hora inicio sea menor que la hora fin

@@ -18,6 +18,7 @@ $this->widget(
         'booster.widgets.TbButton',
         array(
             'context' => 'danger',
+            'id' => 'boton_eliminar',
             'label' => 'Confirmar',
             'buttonType' =>'link',
             'url' => Yii::app()->controller->createUrl("deleteContacto", array("id" => $model->id_contacto)),
@@ -33,3 +34,13 @@ $this->widget(
         )
     ); ?>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#boton_eliminar").click(function(){
+            $("#boton_eliminar i.glyphicon").removeClass("glyphicon glyphicon-trash").addClass("fa fa-spinner fa-spin");
+            $("#boton_eliminar").addClass("disabled");
+        });
+    });
+</script>

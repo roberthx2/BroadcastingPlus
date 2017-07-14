@@ -36,7 +36,7 @@ class Lista extends CActiveRecord
 			array('id_usuario', 'numerical', 'integerOnly'=>true),
 			array('nombre', 'length', 'max'=>30),
 			array("nombre","filter","filter"=>array($this, "limpiarNombre")),
-			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
+			array("nombre", "ext.validator.Nombre"), //Valida los caracteres
 			array("nombre", "existe", "usuario"=>$this->id_usuario),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.

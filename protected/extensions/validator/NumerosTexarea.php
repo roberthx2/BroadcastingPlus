@@ -1,5 +1,6 @@
 <?php
-Class ValidarNumerosTexarea extends CValidator
+
+Class NumerosTexarea extends CValidator
 {
 	public function validateAttribute($object, $attribute)
 	{
@@ -12,4 +13,5 @@ Class ValidarNumerosTexarea extends CValidator
 		}
 	}
 }
+
 ?>

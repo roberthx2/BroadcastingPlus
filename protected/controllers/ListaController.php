@@ -373,7 +373,7 @@ class ListaController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Lista('search2');
+		$model=new Lista('search2'); 
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Lista']))
 			$model->buscar = $_GET['Lista']["buscar"];

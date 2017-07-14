@@ -33,7 +33,7 @@ class PrefijoPromocion extends CActiveRecord
 			array('prefijo', 'length', 'max'=>10),
 			
 			array("prefijo","filter","filter"=>array($this, "limpiarPrefijo")),
-			array("prefijo", "ext.ValidarNombre"), //Valida los caracteres
+			array("prefijo", "ext.validator.Nombre"), //Valida los caracteres
 			array("prefijo", "existe"), //Valida si existe el nombre de la promoción segun su tipo
 			array("prefijo", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas 
 			// The following rule is used by search().

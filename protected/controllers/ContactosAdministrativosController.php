@@ -69,13 +69,17 @@ class ContactosAdministrativosController extends Controller
 
 			if($model->save())
 			{
+				$login = UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+				$log = "Contactos Administrativos (Crear) | contacto: ".$model->nombre." | Ejecutado por: ".$login;
+				Yii::app()->Procedimientos->setLog($log);
+
 				$msj = "Contacto creado correctamente";
 				Yii::app()->user->setFlash("success", $msj);
 				$this->redirect(array('admin'));
 			}
 			else
 			{
-				$error = "Ocurrio un error al guardar el contanto. Intente nuevamente";
+				$error = "Ocurrio un error al guardar el contacto. Intente nuevamente";
 				Yii::app()->user->setFlash("danger", $error);
 			}
 		}
@@ -95,13 +99,31 @@ class ContactosAdministrativosController extends Controller
 		$model=$this->loadModel($id);
 
 		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+		$this->performAjaxValidation($model);
 
 		if(isset($_POST['ContactosAdministrativos']))
 		{
 			$model->attributes=$_POST['ContactosAdministrativos'];
+
+			$model_oper = OperadorasRelacion::model()->find("prefijo REGEXP '^".substr($model->numero, 0, 3)."' AND alfanumerico = 0");
+
+			$model->id_operadora = $model_oper->id_operadora_bcnl;
+
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id_contacto));
+			{
+				$login = UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+				$log = "Contactos Administrativos (Editar) | contacto: ".$model->nombre." | Ejecutado por: ".$login;
+				Yii::app()->Procedimientos->setLog($log);
+
+				$msj = "Contacto editado correctamente";
+				Yii::app()->user->setFlash("success", $msj);
+				$this->redirect(array('admin'));
+			}
+			else
+			{
+				$error = "Ocurrio un error al editado el contacto. Intente nuevamente";
+				Yii::app()->user->setFlash("danger", $error);
+			}
 		}
 
 		$this->render('update',array(
@@ -170,7 +192,7 @@ class ContactosAdministrativosController extends Controller
 		$model=new ContactosAdministrativos('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['ContactosAdministrativos']))
-			$model->attributes=$_GET['ContactosAdministrativos'];
+			$model->buscar=$_GET['ContactosAdministrativos']['buscar'];
 
 		$this->render('admin',array(
 			'model'=>$model,

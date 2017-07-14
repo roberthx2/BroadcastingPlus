@@ -1,5 +1,6 @@
 <?php
-Class ValidarNombre extends CValidator
+
+Class Nombre extends CValidator
 {
 	public function validateAttribute($object, $attribute)
 	{
@@ -9,4 +10,5 @@ Class ValidarNombre extends CValidator
 			$this->addError($object, $attribute, "Solo se permiten letras, números, espacios, punto y piso.");
 	}
 }
+
 ?>

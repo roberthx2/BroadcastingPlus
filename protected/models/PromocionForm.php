@@ -47,7 +47,7 @@ Class PromocionForm extends CFormModel
 			array("destinatarios","filter","filter"=>array($this, "limpiarNumeros")),
 			//Validaciones
 			//Nombre
-			array("nombre", "ext.ValidarNombre"), //Valida los caracteres
+			array("nombre", "ext.validator.Nombre"), //Valida los caracteres
 			array("nombre", "existe"), //Valida si existe el nombre de la promoción segun su tipo
 			array("mensaje", "spam"), //Valida si el mensaje ya existe para el dia seleccionado
 			array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas 
@@ -58,7 +58,7 @@ Class PromocionForm extends CFormModel
 			array("hora_inicio, hora_fin", "horarioPermitido"), //Valida que la hora este en el rango permitido para la carga de promociones
 			array("puertos", "puertosSeleccionados"), //Valida que se seleccione por lo menos 1 puerto
 			array("destinatarios, listas, sc", "ingresarDestinatarios"), //Valida que se ingrese por lo menos 1 destinatario
-			array("destinatarios", "ext.ValidarNumerosTexarea"), //Valida los caracteres
+			array("destinatarios", "ext.validator.NumerosTexarea"), //Valida los caracteres
 			array("sc_bcp", "validarScBCP"),
 			
 		);
