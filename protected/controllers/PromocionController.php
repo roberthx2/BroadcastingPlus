@@ -1405,7 +1405,7 @@ class PromocionController extends Controller
         $id_proceso = Yii::app()->request->getParam('id_proceso');
         $nombre = Yii::app()->request->getParam('nombre');
         $url_confirmar = $_SESSION["url_confirmar"];
-        unset($_SESSION["url_confirmar"]);
+        //unset($_SESSION["url_confirmar"]);
         $tipo = Yii::app()->request->getParam('tipo');
         $personalizada = Yii::app()->request->getParam('personalizada');
 
