@@ -18,11 +18,11 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_promocion">
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl || Yii::app()->user->getPermisos()->crear_promo_bcp || Yii::app()->user->getPermisos()->broadcasting_cpei) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('promocion/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_personalizada_bcnl || Yii::app()->user->getPermisos()->crear_promo_personalizada_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/createPersonalizada');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear Personalizada </a></li>  <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('promocion/createPersonalizada');?>"><span class="glyphicon glyphicon-plus-sign " aria-hidden="true"></span> Crear Personalizada </a></li>  <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->detalles_promo_bcnl || Yii::app()->user->getPermisos()->detalles_promo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('promocion/verDetalles');?>"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Ver detalles </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('promocion/verDetalles');?>"><span class="glyphicon glyphicon-eye-open " aria-hidden="true"></span> Ver detalles </a></li> <?php } ?>
                     </ul>
                  <?php } ?>
                 
@@ -32,9 +32,9 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_listas">
                         <?php if (Yii::app()->user->getPermisos()->crear_listas) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus-sign " aria-hidden="true"></span> Crear </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->administrar_listas) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('lista/admin');?>"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Administrar </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('lista/admin');?>"><span class="glyphicon glyphicon-wrench " aria-hidden="true"></span> Administrar </a></li> <?php } ?>
                     </ul>
                 <?php } ?>    
 
@@ -44,9 +44,9 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_cupo">
                         <?php if (Yii::app()->user->getPermisos()->recargar_cupo_bcnl || Yii::app()->user->getPermisos()->recargar_cupo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('cupo/recarga');?>"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Recargar </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/recarga');?>"><span class="glyphicon glyphicon-shopping-cart " aria-hidden="true"></span> Recargar </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->historico_cupo_bcnl || Yii::app()->user->getPermisos()->historico_cupo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('cupo/historico');?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Histórico </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/historico');?>"><span class="glyphicon glyphicon-list-alt " aria-hidden="true"></span> Histórico </a></li> <?php } ?>
                     </ul>
                 <?php } ?>
 
@@ -72,11 +72,11 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_reportes">
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_enviados_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsEnviadosBcp');?>"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> SMS Enviados</a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsEnviadosBcp');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS Enviados</a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_por_cliente_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsPorClienteBcp');?>"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> SMS por Cliente </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorClienteBcp');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por Cliente </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_por_codigo_bcp) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsPorCodigo');?>"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> SMS por código </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorCodigo');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por código </a></li> <?php } ?>
                         <?php /*if (Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcnl || Yii::app()->user->getPermisos()->reporte_sms_recibidos_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsRecibidos');?>"><span class="glyphicon glyphicon-import" aria-hidden="true"></span> SMS Recibidos </a></li> <?php } */?>
                     </ul>
@@ -88,9 +88,9 @@
                 </li>
                     <ul class="sub-menu collapse" id="menu_herramientas">
                         <?php if (Yii::app()->user->getPermisos()->administrar_prefijo) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('prefijoPromocion/admin');?>"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Prefijos </a></li> <?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('prefijoPromocion/admin');?>"><span class="glyphicon glyphicon-tags " aria-hidden="true"></span> Prefijos </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
-                        <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('listaExentos/index');?>"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Exentos </a></li><?php } ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('listaExentos/index');?>"><span class="glyphicon glyphicon-ban-circle " aria-hidden="true"></span> Exentos </a></li><?php } ?>
                     </ul>
                 <?php } ?>
 
@@ -126,6 +126,11 @@
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
+
+    $(".opcion_menu").click(function(){
+        $(".loader_superior").css("display", "block");
+    });
+
     </script>
 
 <?php $this->endContent(); ?>

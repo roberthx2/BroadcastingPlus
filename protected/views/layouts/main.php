@@ -34,6 +34,7 @@
 </head>
 
 <body>
+<div class="loader_superior"><div class="loader" style="display: block;"></div></div>
 <?php
 	$color = "";
 	$label = "";
@@ -149,6 +150,8 @@ body {
 <script type="text/javascript">
 	$(document).ready(function() 
 	{
+		$(".loader_superior").css("display", "none");
+
 	    var controlador = "<?php echo Yii::app()->controller->id; ?>";
 
 	    if (controlador == "home")

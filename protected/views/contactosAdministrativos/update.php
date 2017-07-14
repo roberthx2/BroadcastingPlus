@@ -93,12 +93,12 @@
 				'estado',
 				array(
 					'wrapperHtmlOptions' => array(
-						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12 input-group-lg',
 					),
 					'widgetOptions' => array(
 						'htmlOptions' => array('maxlength' => 10, 'autocomplete' => 'off', 'placeholder'=>'416XXXXXXX'),
 					),
-					//'prepend' => '<i class="glyphicon glyphicon-envelope"></i>',
+					'prepend' => '<i class="glyphicon glyphicon-off"></i>',
 
 				)
 			); ?>

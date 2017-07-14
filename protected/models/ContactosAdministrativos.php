@@ -14,6 +14,7 @@
 class ContactosAdministrativos extends CActiveRecord
 {
 	public $buscar;
+	public $estado_descripcion;
 
 	/**
 	 * @return string the associated database table name
@@ -39,10 +40,10 @@ class ContactosAdministrativos extends CActiveRecord
 			array("nombre", "ext.validator.Nombre"), //Valida los caracteres
 			array("numero", "ext.validator.Numero"),
 			array("numero", "ext.validator.PrefijoOperadora"),
-			array("correo", "ext.validator.email"),
+			array("correo", "ext.validator.Email"),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_contacto, nombre, correo, numero, id_operadora, estado', 'safe', 'on'=>'search'),
+			array('id_contacto, nombre, correo, numero, id_operadora, estado, buscar', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -94,22 +95,22 @@ class ContactosAdministrativos extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
  
 		$criteria=new CDbCriteria;
-		$criteria->select = "id_contacto, nombre, correo, numero, estado";
-		$criteria->condition = "nombre LIKE '%".$this->buscar."%' OR ";
-		$criteria->condition .= "correo LIKE '%".$this->buscar."%' OR ";
-		$criteria->condition .= "numero LIKE '%".$this->buscar."%'";
+		$criteria->select = "id_contacto, nombre, correo, numero, estado, CASE estado WHEN 1 THEN 'ACTIVO' ELSE 'INACTIVO' END AS estado_descripcion";
+		$criteria->having  = "nombre LIKE '%".$this->buscar."%' OR ";
+		$criteria->having .= "correo LIKE '%".$this->buscar."%' OR ";
+		$criteria->having .= "numero LIKE '%".$this->buscar."%' OR ";
+		$criteria->having .= "estado_descripcion LIKE '%".$this->buscar."%'";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
 				'defaultOrder'=>'nombre ASC',
         		'attributes'=>array(
-             		'nombre', 'correo', 'numero'
+             		'nombre', 'correo', 'numero', 'estado'
         		),
     		),
     		'pagination'=>array(
 		        'pageSize'=>10,
-		        //'route'=>'contactosAdministrativos/admin',
 		    ),
 		));
 	}

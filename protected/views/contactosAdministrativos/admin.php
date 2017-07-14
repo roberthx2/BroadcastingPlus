@@ -1,12 +1,11 @@
-
 <?php
 	/* @var $this ContactosAdministrativosController */
 	/* @var $model ContactosAdministrativos */
 
-	Yii::app()->clientScript->registerScript('searchUpdateLista', "
+	Yii::app()->clientScript->registerScript('searchUpdateContactos', "
 
 	$('.search-form form').submit(function(){
-	    $('#contactos-administrativos-grid').yiiGridView('update', {
+	    $('#contactos-grid').yiiGridView('update', {
 	        data: $(this).serialize()
 	    });
 	    return false;
@@ -61,7 +60,7 @@
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
-        'id'=>'contactos-administrativos-grid',
+        'id'=>'contactos-grid',
         'type'=>'striped bordered', 
         'responsiveTable' => true,
         'dataProvider' => $model->search(),
@@ -101,7 +100,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            	Controller::widget(
 					    'booster.widgets.TbLabel',
 					    array(
-					        'label' => ($data["estado"] == 1) ? "Activo" : "Inactivo",
+					        'label' => $data["estado_descripcion"],
 					        'htmlOptions'=>array('style'=>'background-color: '.$bg.';'),	
 					    )
 					);
@@ -119,7 +118,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            		'Editar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/update", array("id"=>$data["id_contacto"]))',
-	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Contacto', 'style'=>'color:black;'),
+	            			'options'=>array('class'=>'action glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Contacto', 'style'=>'color:black;'),
                             ),
 	            		'Eliminar'=>array(
 	            			'label'=>' ',
@@ -180,5 +179,9 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 		});
 
 		$('[data-tooltip="tooltip"]').tooltip();
+
+		$(".action").click(function(){
+            $(".loader_superior").css("display", "block");
+        });
 	});
 </script>
