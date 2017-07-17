@@ -9,6 +9,13 @@ $('.BCNL form').submit(function(){
     return false;
 });
 
+$('.BCNL form').change(function(){
+    $('#detallesBCNLToday').yiiGridView('update', {
+        data: $(this).serialize()
+    });
+    return false;
+});
+
 ");
 
 ?>
@@ -155,6 +162,9 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promociones/view", array("id"=>$data["id_promo"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Ver', 'style'=>'color:black;'),
+                            'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
 	            			),
 	            	'Confirmar'=>array(
 	            			'label'=>' ',

@@ -8,7 +8,7 @@
 <?php endif; ?>
 
 <?php
-echo "<h3>Promociones del dia</h3>";
+echo "<h3>Promociones del día</h3>";
 
 $contenido = array();
 $active = true;
@@ -17,8 +17,23 @@ if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermis
 {
     $modelBCNL = new Promociones('searchHome');
     $modelBCNL->unsetAttributes();
-    if(isset($_GET['Promociones']))
-        $modelBCNL->buscar = $_GET['Promociones']["buscar"];
+    
+    if (Yii::app()->request->isAjaxRequest)
+    {
+        if(isset($_GET['Promociones']))
+        {
+            $modelBCNL->buscar = $_GET['Promociones']["buscar"];
+            $modelBCNL->pageSize = $_GET['Promociones']["pageSize"];
+
+            $_SESSION["buscarBcnl"] = $_GET['Promociones']["buscar"];
+            $_SESSION["pageSizeBcnl"] = $_GET['Promociones']["pageSize"];
+        }
+        else if($_GET["ajax"] == "detallesBCNLToday")
+        {
+            $modelBCNL->buscar = $_SESSION["buscarBcnl"];
+            $modelBCNL->pageSize = $_SESSION["pageSizeBcnl"];
+        }
+    }
             
     $contenido = array(
             		array('label' => 'Broadcasting', 'content' => $this->renderPartial('promocionesBCNL', array('model'=>$modelBCNL), true), 'active' => $active),
@@ -28,17 +43,25 @@ if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermis
 
 if (Yii::app()->user->getPermisos()->broadcasting_premium)
 {
-    /*if ( isset( $_GET[ 'pageSize' ] ) )
-    {
-        //Yii::app()->user->setState( 'pageSize', (int) $_GET[ 'pageSize' ] );
-        $_SESSION["pageSize"] = (int) $_GET[ 'pageSize' ];
-        unset( $_GET[ 'pageSize' ] );
-    }*/
-
     $modelBCP = new PromocionesPremium('searchHome');
     $modelBCP->unsetAttributes();
-    if(isset($_GET['PromocionesPremium']))
-        $modelBCP->buscar = $_GET['PromocionesPremium']["buscar"];
+
+    if (Yii::app()->request->isAjaxRequest)
+    {
+        if(isset($_GET['PromocionesPremium']))
+        {
+            $modelBCP->buscar = $_GET['PromocionesPremium']["buscar"];
+            $modelBCP->pageSize = $_GET['PromocionesPremium']["pageSize"];
+
+            $_SESSION["buscarBcp"] = $_GET['PromocionesPremium']["buscar"];
+            $_SESSION["pageSizeBcp"] = $_GET['PromocionesPremium']["pageSize"];
+        }
+        else if($_GET["ajax"] == "detallesBCPToday")
+        {
+            $modelBCP->buscar = $_SESSION["buscarBcp"];
+            $modelBCP->pageSize = $_SESSION["pageSizeBcp"];
+        }
+    }
 
     array_push($contenido, array('label' => 'Broadcasting Premium', 'content' => $this->renderPartial('promocionesBCP', array('model'=>$modelBCP), true), 'active' => $active));
 }

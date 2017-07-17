@@ -281,7 +281,7 @@
 						'asDropDownList' => true,
 						'data'=> $puertos,
 						'options' => array(
-							'placeholder' => 'Seleccione sus listas...',
+							'placeholder' => 'Seleccione sus puertos...',
 							'allowClear'=>true,
 							'tokenSeparators' => array(',', ' ')
 						),

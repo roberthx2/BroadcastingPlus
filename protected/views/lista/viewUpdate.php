@@ -277,16 +277,22 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 		    }
 		});
 
-		$('#confirmar').click(function(){
+		$('#confirmar').click(function(){ 
 			var id_lista = "<?php echo $model_lista->id_lista; ?>";
 		    $.ajax({
                 url:"<?php echo Yii::app()->createUrl('lista/deleteNumero'); ?>",
                 type:"POST",    
                 data:{id_lista:id_lista, numeros:$("#numeros_eliminar").val()},
-                
+
+                beforeSend: function()
+                {
+                	$("#confirmar i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
+                    $("#confirmar").addClass("disabled");
+                },
                 complete: function()
                 {
-                    //alert("termine");
+                    $("#confirmar i.fa").removeClass("fa fa-spinner fa-spin").addClass("glyphicon glyphicon-remove");
+                    $("#confirmar").removeClass("disabled");
                 },
                 success: function(data)
                 {

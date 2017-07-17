@@ -27,6 +27,7 @@ $this->widget(
     <?php $this->widget(
         'booster.widgets.TbButton',
         array(
+            'id' => 'boton_cancelar_bcnl',
             'context' => 'danger',
             'label' => 'Cancelar',
             'buttonType' =>'link',
@@ -43,3 +44,13 @@ $this->widget(
         )
     ); ?>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#boton_cancelar_bcnl").click(function(){
+            $("#boton_cancelar_bcnl i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
+            $("#boton_cancelar_bcnl").addClass("disabled");
+        });
+    });
+</script>

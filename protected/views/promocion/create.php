@@ -399,7 +399,7 @@
 						//'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
 						'options' => array(
 							//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
-							'placeholder' => 'Seleccione sus listas...',
+							'placeholder' => 'Seleccione sus puertos...',
 							'allowClear'=>true,
 							/* 'width' => '40%', */
 							'tokenSeparators' => array(',', ' ')

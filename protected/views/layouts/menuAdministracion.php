@@ -71,6 +71,20 @@
         $(".loader_superior").css("display", "block");
     });
 
+    $(".collapsed").click(function()
+    {
+        $(this).addClass("in");
+
+        var principal = $(this);
+
+        $(".collapse").each(function ()
+        {
+            if (principal != $(this)) {
+                $(this).removeClass("in");
+            }
+        });
+    });
+
     </script>
 
 <?php $this->endContent(); ?>

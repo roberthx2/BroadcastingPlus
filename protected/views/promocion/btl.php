@@ -58,8 +58,7 @@
     </div>
     <div class="modal-footer" id="modal_footer_btl">
         <?php
-            echo CHtml::submitButton('Enviar', array('id' => 'bontonEnviar', 'class'=>'btn btn-success'));
-
+            echo CHtml::tag('button', array('id'=>'bontonEnviar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Enviar');
             $this->endWidget();
             unset($form_btl);
         ?>
@@ -79,13 +78,16 @@
                 
                 beforeSend: function()
                 {
-                   $("#btl-form div.form-group").removeClass("has-error").removeClass("has-success");
-                   $("#Btl_password_em_").hide();
-                   $("#respuesta").hide();
+                    $("#bontonEnviar i.fa").addClass("fa-spinner").addClass("fa-spin");
+                    $("#bontonEnviar").addClass("disabled");
+                    $("#btl-form div.form-group").removeClass("has-error").removeClass("has-success");
+                    $("#Btl_password_em_").hide();
+                    $("#respuesta").hide();
                 },
                 complete: function()
                 {
-
+                    $("#bontonEnviar i.fa").removeClass("fa-spinner").removeClass("fa-spin");
+                    $("#bontonEnviar").removeClass("disabled");
                 },
                 success: function(data)
                 {
@@ -150,7 +152,7 @@
                 
             }
         });
-    }
+    } 
 
     function sleep(milliseconds) {
       var start = new Date().getTime();

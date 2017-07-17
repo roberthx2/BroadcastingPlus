@@ -152,6 +152,10 @@ body {
 	{
 		$(".loader_superior").css("display", "none");
 
+		$(".menu_superior a").click(function(){
+	        $(".loader_superior").css("display", "block");
+	    });
+
 	    var controlador = "<?php echo Yii::app()->controller->id; ?>";
 
 	    if (controlador == "home")

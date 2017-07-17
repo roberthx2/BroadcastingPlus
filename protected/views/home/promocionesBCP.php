@@ -9,8 +9,15 @@ $('.BCP form').submit(function(){
     return false;
 });
 
-$('.BCP_pager form').change(function(){
+/*$('.BCP_pager form').change(function(){
     $.fn.yiiGridView.update('detallesBCPToday',{data:{pageSize:$('#pageSize').val()}});
+});*/
+
+$('.BCP form').change(function(){
+    $('#detallesBCPToday').yiiGridView('update', {
+        data: $(this).serialize()
+    });
+    return false;
 });
 
 ");
@@ -19,10 +26,6 @@ $('.BCP_pager form').change(function(){
 <div class="BCP">
     <?php $this->renderPartial('/promocion/busqueda',array('model'=>$model)); ?>
 </div><!-- search-form -->
-
-<div class="BCP_pager">
-    <?php // $this->renderPartial('/busqueda/pager'); ?>
-</div>
 
 <?php
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
@@ -33,6 +36,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'summaryText'=>'Mostrando {start} a {end} de {count} registros', 
         'template' => '{items}<div class="form-group"><div class="col-md-5 col-sm-12">{summary}</div><div class="col-md-7 col-sm-12">{pager}</div></div><br />',
         'htmlOptions' => array('class' => 'trOverFlow col-xs-12 col-sm-12 col-md-12 col-lg-12'),
+        'ajaxUrl' => Yii::app()->createUrl('home/index'),
         'columns'=> array( 
         	array(
 	            'name' => 'id_promo',
@@ -163,6 +167,9 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promocionesPremium/view", array("id"=>$data["id_promo"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Ver', 'style'=>'color:black;'),
+                            'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
 	            			),
 	            	'Confirmar'=>array(
 	            			'label'=>' ',

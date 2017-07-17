@@ -22,7 +22,7 @@ $('.search-form form').submit(function(){
 <?php endif; ?>
 
 <fieldset>
- 
+  
     <legend>Administrar Listas</legend>
 
 <div class="search-form">
@@ -123,7 +123,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'url'=>'Yii::app()->createUrl("lista/update", array("id"=>$data["id_lista"]))',
 	            			//'visible'=>'visibleConfirmar($data)',
 	            			'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Lista', 'style'=>'color:black;'),
-                            ),
+	            			'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
+	            			),
 	            	'Descargar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("lista/descargarLista", array("nombre" => $data["nombre"], "id_lista" => $data["id_lista"]))',

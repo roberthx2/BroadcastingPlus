@@ -14,11 +14,12 @@ $this->widget(
     )
 );
 ?>
-<br>
+<br> 
 <div class="modal-footer">
     <?php $this->widget(
         'booster.widgets.TbButton',
         array(
+            'id' => 'boton_eliminar',
             'context' => 'danger',
             'label' => 'Confirmar',
             'buttonType' =>'link',
@@ -36,3 +37,13 @@ $this->widget(
         )
     ); ?>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#boton_eliminar").click(function(){
+            $("#boton_eliminar i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
+            $("#boton_eliminar").addClass("disabled");
+        });
+    });
+</script>

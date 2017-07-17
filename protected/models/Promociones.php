@@ -24,7 +24,8 @@ class Promociones extends CActiveRecord
 	public $total;
 	public $enviados;
 	public $fecha_limite;
-	public $hora_limite;
+	public $hora_limite; 
+	public $pageSize;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -82,6 +83,7 @@ class Promociones extends CActiveRecord
 			'total_dest_aceptados' => 'Total Dest Aceptados',
 			'total_dest_rechazados' => 'Total Dest Rechazados',
 			'total_dest_cargados' => 'Total Dest Cargados',
+			'pageSize' => 'Mostrar'
 		);
 	}
 
@@ -147,6 +149,10 @@ class Promociones extends CActiveRecord
              		'id_promo', 'nombrePromo', 'u.login', 'hora', 'd_o.hora_limite'
         		),
     		),
+    		'pagination' => array(
+    			'pageSize' =>($this->pageSize == "") ? Yii::app()->params['defaultPageSize'] : $this->pageSize,
+    			'route'=>'home/index',
+			),
 		));
 	}
 

@@ -9,7 +9,7 @@
                 <li class="sidebar-brand">
                     <a href="#" style="padding-top:10px;">
                          
-                    </a>
+                    </a> 
                 </li>
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
@@ -122,14 +122,39 @@
     <!-- Menu Toggle Script -->
     <script>
 
-    $(".boton_menu").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
+        $(".boton_menu").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
 
-    $(".opcion_menu").click(function(){
-        $(".loader_superior").css("display", "block");
-    });
+        $(".opcion_menu").click(function(){
+            $(".loader_superior").css("display", "block");
+        });
+
+        /*$(".collapsed").click(function()
+        {
+            var principal = $(this);
+
+            $(".collapse").each(function ()
+            {
+                if (principal != $(this))
+                    $(this).collapse("hide");
+            });
+        });*/
+
+        $(".collapsed").click(function()
+        {
+            $(this).addClass("in");
+
+            var principal = $(this);
+
+            $(".collapse").each(function ()
+            {
+                if (principal != $(this)) {
+                    $(this).removeClass("in");
+                }
+            });
+        });
 
     </script>
 

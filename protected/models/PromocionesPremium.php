@@ -33,6 +33,7 @@ class PromocionesPremium extends CActiveRecord
 	public $mes;
 	public $ano;
 	public $id;
+	public $pageSize;
 
 	public function tableName()
 	{
@@ -91,6 +92,7 @@ class PromocionesPremium extends CActiveRecord
 			'ano' => 'Año',
 			'total_sms' => 'Total Sms',
 			'id_operadora' => 'Id Operadora',
+			'pageSize' => 'Mostrar'
 		);
 	}
 
@@ -189,12 +191,15 @@ class PromocionesPremium extends CActiveRecord
 			'criteria'=>$criteria,
 			'sort'=>array(
 				'defaultOrder'=>'id_promo DESC',
+				'route'=>'home/index',
         		'attributes'=>array(
              		'id_promo', 'fecha', 'nombrePromo', 'u.login', 'hora', 'd_o.hora_limite'
         		),
     		),
     		'pagination' => array(
-    			'pageSize' =>10,
+    			//'pageSize' =>10,
+    			'pageSize' =>($this->pageSize == "") ? Yii::app()->params['defaultPageSize'] : $this->pageSize,
+    			'route'=>'home/index',
 				//'pageSize' => (isset($_SESSION["pageSize"]) == true) ? $_SESSION["pageSize"] : Yii::app()->params['defaultPageSize']
 				//Yii::app()->user->getState( 'pageSize', Yii::app()->params[ 'defaultPageSize' ] ),
 			),
