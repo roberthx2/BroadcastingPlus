@@ -119,7 +119,10 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/update", array("id"=>$data["id_contacto"]))',
 	            			'options'=>array('class'=>'action glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Editar Contacto', 'style'=>'color:black;'),
-                            ),
+	            			'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
+                            ), 
 	            		'Eliminar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("contactosAdministrativos/viewDelete", array("id" => $data["id_contacto"]))',

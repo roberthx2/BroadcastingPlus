@@ -83,11 +83,12 @@
   	<?php $this->widget(
     'booster.widgets.TbButton',
         array(
+        	'id'=>'boton_conculta',
             'context' => 'primary',
             'label' => 'Consultar',
             'buttonType' =>'submit',
             'icon' => 'glyphicon glyphicon-search',
-            'htmlOptions' => array("style"=>"float:right;"),
+            'htmlOptions' => array("style"=>"float:right;", 'class'=>'boton_conculta'),
         )
     ); ?>
 </div><!-- /.col-lg-6 -->

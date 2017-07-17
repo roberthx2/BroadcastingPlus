@@ -58,8 +58,7 @@
     </div>
     <div class="modal-footer" id="modal_footer_prefijo">
         <?php
-            echo CHtml::submitButton('Crear Prefijo', array('id' => 'bontonCrear', 'class'=>'btn btn-success'));
-
+            echo CHtml::tag('button', array('id'=>'bontonCrear', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Crear Prefijo');
             $this->endWidget();
             unset($form);
         ?>
@@ -80,9 +79,11 @@
                 beforeSend: function()
                 {
                    // $("#bontonCrear").attr("disabled",true);
-                   $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
-                   $("#PrefijoPromocion_prefijo_em_").hide();
-                   $("#respuesta").hide();
+                    $("#bontonCrear i.fa").addClass("fa-spinner").addClass("fa-spin");
+                    $("#bontonCrear").addClass("disabled");
+                    $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
+                    $("#PrefijoPromocion_prefijo_em_").hide();
+                    $("#respuesta").hide();
                 },
                 complete: function()
                 {
@@ -90,6 +91,8 @@
                    // $("#prefijo-promocion-form div.form-group").removeClass("has-error").removeClass("has-success");
                    // $("#PrefijoPromocion_prefijo_em_").hide();
                     //$("#respuesta").hide();
+                    $("#bontonCrear i.fa").removeClass("fa-spinner").removeClass("fa-spin");
+                    $("#bontonCrear").removeClass("disabled");
                 },
                 success: function(data)
                 {
@@ -133,3 +136,4 @@
     }
 </script>
 
+ 

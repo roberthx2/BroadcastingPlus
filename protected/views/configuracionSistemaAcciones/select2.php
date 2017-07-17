@@ -65,9 +65,11 @@
      <?php 
 
      $this->widget('booster.widgets.TbButton', array(
+        'id'=>'boton_guardar',
     	'label'=>'Guardar',
     	'url'=>'#',
     	'htmlOptions'=>array('class'=>'btn btn-success', 'onclick' => 'enviar()'),
+        'icon'=>'fa fa-floppy-o'
 	)); ?>
 
 	<?php $this->widget(

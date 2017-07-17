@@ -95,11 +95,17 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                 'label'=>' ',
                                 'url'=>'Yii::app()->controller->createUrl("/clientesBcp/update", array("id"=>$data["id_cliente_sms"]))',
                                 'options'=>array('class'=>'glyphicon glyphicon-pencil', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Asignar SC', 'style'=>'color:black;'),
+                                'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
                                 ),
                         'Habilitar'=>array(
                                 'label'=>' ',
                                 'url'=>'Yii::app()->controller->createUrl("/clientesBcp/activateCliente", array("id_cliente_sms"=>$data["id_cliente_sms"]))',
                                 'options'=>array('class'=>'glyphicon glyphicon-off', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Estado cliente enviador', 'style'=>'color:black;'),
+                                'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
                                 ),
                         )
                 )

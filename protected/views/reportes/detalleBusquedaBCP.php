@@ -2,7 +2,7 @@
 <div class="panel-group" id="accordionBCPPeriodo">
 	<div class="panel panel-primary">
 	    <div class="panel-heading">
-	      	<h4 class="panel-title">
+	      	<h4 class="panel-title"> 
 	        	<a data-toggle="collapse" data-parent="#accordionBCPPeriodo" href="#collapseBCPPeriodo">
 	          		<span class="glyphicon glyphicon-list-alt"></span> Totales
 	        	</a>
@@ -10,6 +10,7 @@
 	    </div>
 	    <div id="collapseBCPPeriodo" class="panel-collapse collapse in">
 	      	<div class="panel-body">
+	      		<div class="loader" style="display: none;"></div>
 	        	<ul class="list-group">
 		        	<li class="list-group-item">
 		        		<?php $this->widget(

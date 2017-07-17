@@ -145,13 +145,16 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         
         beforeSend: function()
         {
-          // $("#bontonCrear").attr("disabled",true);
+          $("#boton_guardar i.fa").removeClass("fa-floppy-o").addClass("fa-spinner fa-spin");
+          $("#boton_guardar").addClass("disabled");
           $("#configuracion-form div.form-group").removeClass("has-error").removeClass("has-success");
           $("#ConfiguracionSistemaAcciones_valor_em_").hide();
           $("#div_success").hide();
         },
         complete: function()
         {
+          $("#boton_guardar i.fa").removeClass("fa-spinner fa-spin").addClass("fa-floppy-o");
+          $("#boton_guardar").removeClass("disabled");
         },
         success: function(data)
         {

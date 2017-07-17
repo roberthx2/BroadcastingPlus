@@ -83,8 +83,20 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
             url:url_action,
             type:"POST",   
             dataType:'json', 
-            data: datos.serialize(),
+            data: datos.serialize(), 
 
+            beforeSend: function()
+            {
+                $(".boton_conculta i.glyphicon").removeClass("glyphicon glyphicon-search").addClass("fa fa-spinner fa-spin");
+                $(".boton_conculta").addClass("disabled");
+                $(".loader").css("display", "block");
+            },
+            complete: function()
+            {
+                $(".boton_conculta i.fa").removeClass("fa fa-spinner fa-spin").addClass("glyphicon glyphicon-search");
+                $(".boton_conculta").removeClass("disabled");
+                $(".loader").css("display", "none");
+            },
             success: function(data) 
             {
                 var objeto = data.objeto;

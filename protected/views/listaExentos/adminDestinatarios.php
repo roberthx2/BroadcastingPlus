@@ -15,7 +15,7 @@
 ?>
 
 <fieldset>
- 
+  
     <legend>Administrar Lista de Exentos</legend>
 
 
@@ -177,9 +177,15 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                 type:"POST",    
                 data:{id_lista:id_lista, numeros:$("#numeros_eliminar").val()},
                 
+                beforeSend: function()
+                {
+                    $("#confirmar i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
+                    $("#confirmar").addClass("disabled");
+                },
                 complete: function()
                 {
-                    //alert("termine");
+                    $("#confirmar i.fa").removeClass("fa fa-spinner fa-spin").addClass("glyphicon glyphicon-remove");
+                    $("#confirmar").removeClass("disabled");
                 },
                 success: function(data)
                 {

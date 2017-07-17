@@ -28,7 +28,8 @@ class ConfiguracionOperadoraReservacion extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('id_operadora, descripcion, sms_x_seg, porcentaje_permitido', 'required', 'message'=>'{attribute} requerido'),
-			array('sms_x_seg, porcentaje_permitido', 'numerical', 'min'=>0, 'integerOnly'=>true),
+			array('sms_x_seg', 'numerical', 'min'=>0, 'integerOnly'=>true),
+			array('porcentaje_permitido', 'numerical', 'min'=>0, 'max'=>100, 'integerOnly'=>true),
 			array('descripcion', 'length', 'max'=>20),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.

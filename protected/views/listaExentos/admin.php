@@ -68,6 +68,9 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("listaExentos/adminDestinatarios", array("id"=>$data["id_lista"]))',
 	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Ver Lista', 'style'=>'color:black;'),
+	            			'click' => 'function() {
+                                    $(".loader_superior").css("display", "block");
+                                }'
                             ),
 	            ),
 	        ),
@@ -75,7 +78,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     ));
 ?>
 </fieldset>
-
+ 
 <script type="text/javascript">
 	$(document).ready(function()
 	{

@@ -28,7 +28,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'columns'=> array( 
         	array(
               	'name' => 'descripcion',
-              	'header' => 'Descripcion',
+              	'header' => 'Descripción',
                 'sortable' => false,
               	'type' => 'raw',
               	'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),

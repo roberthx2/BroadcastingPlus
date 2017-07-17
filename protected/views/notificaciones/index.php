@@ -32,7 +32,7 @@ $('.search-form form').submit(function(){
             'icon' => 'glyphicon glyphicon-envelope',
             'url' => '#',
             'url' => Yii::app()->createUrl("notificaciones/create"),
-            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'),
+            'htmlOptions' => array('class'=>'col-xs-12 col-sm-6 col-md-6 col-lg-6'), 
         )
     ); 
 ?>
@@ -121,3 +121,12 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
     ));
 ?>
 <div>
+
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#agregar").click(function(){
+            $(".loader_superior").css("display", "block");
+        });
+    });
+</script>

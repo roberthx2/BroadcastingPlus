@@ -167,11 +167,21 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 		$('[data-tooltip="tooltip"]').tooltip();
 
 		$('#confirmar').click(function(){
-		    $.ajax({
+		    $.ajax({ 
                 url:"<?php echo Yii::app()->createUrl('prefijoPromocion/deletePrefijo'); ?>",
                 type:"POST",    
                 data:{id:$("#prefijos_eliminar").val()},
 
+                beforeSend: function()
+                {
+                    $("#confirmar i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
+                    $("#confirmar").addClass("disabled");
+                },
+                complete: function()
+                {
+                    $("#confirmar i.fa").removeClass("fa fa-spinner fa-spin").addClass("glyphicon glyphicon-remove");
+                    $("#confirmar").removeClass("disabled");
+                },
                 success: function(data)
                 {
                 	if (data.salida !== 0)
