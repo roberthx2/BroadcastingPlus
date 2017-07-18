@@ -180,12 +180,21 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'type' => 'raw',
 	            'value' => function($data) {
 	            	
-	            	$bg = Yii::app()->Funciones->getColorValidoInvalido($data["estado"]);
+	            	if ($data["estado_lista"] == 0)
+	            	{
+	            		$label = "Pendiente";
+	            		$bg = "#d9534f"; 
+	            	}
+	            	else
+	            	{
+	            		$label = ($data["estado"] == 1) ? "Valido" : "Invalido";
+	            		$bg = Yii::app()->Funciones->getColorValidoInvalido($data["estado"]);
+	            	}
 
 	            	Controller::widget(
 					    'booster.widgets.TbLabel',
 					    array(
-					        'label' => ($data["estado"] == 1) ? "Valido" : "Invalido",
+					        'label' => $label,
 					        'htmlOptions'=>array('style'=>'background-color: '.$bg.';'),	
 					    )
 					);

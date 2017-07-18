@@ -21,9 +21,11 @@ $('.search-form form').submit(function(){
 	</div>
 <?php endif; ?>
 
+<?php $mensaje = "Las listas pendientes podrán ser usadas una vez sean analizadas por el sistema. Horarios de análisis:  Lun-Juev - 06:00 am / 10:00 am / 01:00 pm / 03:00 pm 	/	Vie-Dom - 06:00 am / 10:00 am / 02:00 pm"; ?>
+
 <fieldset>
   
-    <legend>Administrar Listas</legend>
+    <legend>Administrar Listas <i class="fa fa-commenting" aria-hidden="true" data-toggle="tooltip" data-placement="right" title="<?php echo $mensaje; ?>"></i></legend>
 
 <div class="search-form">
     <?php $this->renderPartial('_search',array('model'=>$model, 'id_usuario'=>$id_usuario)); ?>

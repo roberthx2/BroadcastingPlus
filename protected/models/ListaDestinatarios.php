@@ -19,6 +19,7 @@ class ListaDestinatarios extends CActiveRecord
 
 	public $buscar;
 	public $descripcion_oper;
+	public $estado_lista;
 	//public $id;
 
 	public function tableName()
@@ -112,9 +113,10 @@ class ListaDestinatarios extends CActiveRecord
 	public function searchViewUpdate($id_lista)
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
+		$model_lista = Lista::model()->findByPk($id_lista);
 
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_lista, t.numero, t.id_operadora, t.estado, o.descripcion AS descripcion_oper";
+		$criteria->select = "t.id_lista, t.numero, t.id_operadora, t.estado, o.descripcion AS descripcion_oper, ".$model_lista->estado." AS estado_lista";
 		$criteria->condition = "(t.id_lista = ".$id_lista.") AND ";
 		$criteria->condition .= "(numero LIKE '%". $this->buscar."%' OR ";
 		$criteria->condition .= "o.descripcion LIKE '%". $this->buscar."%')";
