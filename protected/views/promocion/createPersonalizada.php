@@ -45,7 +45,7 @@
 
 	<p class="note">Campos con <span class="required">*</span> son requeridos.</p>
 
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-md-offset-3 col-lg-offset-3">
 		<?php echo $form->dropDownListGroup(
 			$model,
 			'tipo',
@@ -171,8 +171,6 @@
 			<div id="div_sc_oper" style="display:block;">	</div>
 		</div>
 
-		<div class="clearfix visible-xs-block"></div>
-
 		<div id="div_nombre" style="display:none;">
 			<?php echo $form->textFieldGroup(
 				$model,
@@ -188,12 +186,6 @@
 				)
 			); ?>
 		</div>
-
-		<div class="clearfix visible-xs-block"></div>		
-
-	</div> <!--Cierre de la columna #1-->
-
-	<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 
 		<div id="div_fecha" style="display:none;">
 			<?php echo $form->textFieldGroup(
@@ -307,8 +299,6 @@
 					)
 				); ?>
 		</div>
-
-		<div class="clearfix visible-xs-block"></div>
 	</div>
 
 	</fieldset>
