@@ -25,6 +25,7 @@ Class PromocionForm extends CFormModel
 	public $fecha_fin;
 	public $operadoras;
 	public $all_operadoras;
+	public $numeros_btl;
 
 	public $desc_producto; //Solo se usa para saber que productos fueron seleccionados en el formulario
 
@@ -81,6 +82,7 @@ Class PromocionForm extends CFormModel
 			'duracion' => 'Duración',
 			'sc' => 'Short Code',
 			'sc_bcp' => 'Short Code',
+			'numeros_btl' => 'Números Btl',
 		);
 	}
 
@@ -167,24 +169,6 @@ Class PromocionForm extends CFormModel
 		if($model != null)
 			$this->addError($attribute, "El mensaje ya existe para la fecha seleccionada por favor cambie su contenido ya que puede ser considerado como spam");	
 	}
-
-	/*public function palabrasObscenas($attribute, $params)
-	{
-		$sql = "SELECT group_concat(palabra separator '|') AS palabras FROM palabras_obscenas";
-        $sql = Yii::app()->db->createCommand($sql)->queryRow();
-
-        $palabras = strtolower($sql["palabras"]);
-
-        $contenido = strtolower($this->$attribute);
-
-        preg_match_all('('.$palabras.')', $contenido, $palabras_obscenas);
-        
-        if (count($palabras_obscenas[0]) > 0)
-        {
-            $palabras_obscenas = "<br>(".implode(",",$palabras_obscenas[0]).")";
-            $this->addError($attribute, "El mensaje contiene palabras obscenas debe corregirlo para continuar ".$palabras_obscenas);
-        }
-	}*/
 
 	public function palabrasObscenas($attribute, $params)
 	{

@@ -13,10 +13,10 @@
                 </li>
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_promocion) { ?>
-                <li data-toggle="collapse" data-target="#menu_promocion" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_promocion" class="collapsed menu active">
                     <a href="#"> Promociones <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_promocion">
+                    <ul class="sub-menu collapse menu" id="menu_promocion">
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_bcnl || Yii::app()->user->getPermisos()->crear_promo_bcp || Yii::app()->user->getPermisos()->broadcasting_cpei) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('promocion/create');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Crear </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->crear_promo_personalizada_bcnl || Yii::app()->user->getPermisos()->crear_promo_personalizada_bcp) { ?>
@@ -27,10 +27,10 @@
                  <?php } ?>
                 
                 <?php if (Yii::app()->user->getPermisos()->modulo_listas) { ?>
-                <li data-toggle="collapse" data-target="#menu_listas" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_listas" class="collapsed menu active">
                     <a href="#"> Listas <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_listas">
+                    <ul class="sub-menu collapse menu" id="menu_listas">
                         <?php if (Yii::app()->user->getPermisos()->crear_listas) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('lista/create');?>"><span class="glyphicon glyphicon-plus-sign " aria-hidden="true"></span> Crear </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->administrar_listas) { ?>
@@ -39,10 +39,10 @@
                 <?php } ?>    
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_cupo) { ?>
-                <li data-toggle="collapse" data-target="#menu_cupo" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_cupo" class="collapsed menu active">
                     <a href="#"> Cupo <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_cupo">
+                    <ul class="sub-menu collapse menu" id="menu_cupo">
                         <?php if (Yii::app()->user->getPermisos()->recargar_cupo_bcnl || Yii::app()->user->getPermisos()->recargar_cupo_bcp) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/recarga');?>"><span class="glyphicon glyphicon-shopping-cart " aria-hidden="true"></span> Recargar </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->historico_cupo_bcnl || Yii::app()->user->getPermisos()->historico_cupo_bcp) { ?>
@@ -51,10 +51,10 @@
                 <?php } ?>
 
                 <?php /*if (Yii::app()->user->getPermisos()->modulo_reportes) { ?>
-                <li data-toggle="collapse" data-target="#menu_reportes" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_reportes" class="collapsed menu active">
                     <a href="#"> Reportes <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_reportes">
+                    <ul class="sub-menu collapse menu" id="menu_reportes">
                         <?php if (Yii::app()->user->getPermisos()->reporte_mensual_sms_bcnl || Yii::app()->user->getPermisos()->reporte_mensual_sms_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/mensualSms');?>"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> Mensual de SMS </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->reporte_mensual_sms_por_cliente_bcnl || Yii::app()->user->getPermisos()->reporte_mensual_sms_por_cliente_bcp) { ?>
@@ -67,10 +67,10 @@
                 <?php } */?>
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_reportes) { ?>
-                <li data-toggle="collapse" data-target="#menu_reportes" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_reportes" class="collapsed menu active">
                     <a href="#"> Reportes <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_reportes">
+                    <ul class="sub-menu collapse menu" id="menu_reportes">
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_enviados_bcp) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsEnviadosBcp');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS Enviados</a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->reporte_sms_por_cliente_bcp) { ?>
@@ -83,10 +83,10 @@
                 <?php } ?>
 
                 <?php if (Yii::app()->user->getPermisos()->modulo_herramientas) { ?>
-                <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_herramientas" class="collapsed menu active">
                     <a href="#"> Herramientas <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_herramientas">
+                    <ul class="sub-menu collapse menu" id="menu_herramientas">
                         <?php if (Yii::app()->user->getPermisos()->administrar_prefijo) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('prefijoPromocion/admin');?>"><span class="glyphicon glyphicon-tags " aria-hidden="true"></span> Prefijos </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
@@ -95,10 +95,10 @@
                 <?php } ?>
 
                 <?php /*if (Yii::app()->user->getPermisos()->modulo_exentos) { ?>
-                <li data-toggle="collapse" data-target="#menu_exentos" class="collapsed active">
+                <li data-toggle="collapse" data-target="#menu_exentos" class="collapsed menu active">
                     <a href="#"> Exentos <span class="caret brandMenu" aria-hidden="true"></span></a>
                 </li>
-                    <ul class="sub-menu collapse" id="menu_exentos">
+                    <ul class="sub-menu collapse menu" id="menu_exentos">
                         <?php if (Yii::app()->user->getPermisos()->agregar_exentos) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('#');?>"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Agregar </a></li> <?php } ?>
                         <?php if (Yii::app()->user->getPermisos()->administrar_exentos) { ?>
@@ -142,13 +142,13 @@
             });
         });*/
 
-        $(".collapsed").click(function()
+        $(".collapsed.menu").click(function()
         {
             $(this).addClass("in");
 
             var principal = $(this);
 
-            $(".collapse").each(function ()
+            $(".collapse.menu").each(function ()
             {
                 if (principal != $(this)) {
                     $(this).removeClass("in");

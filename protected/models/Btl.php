@@ -6,10 +6,15 @@ Class Btl extends CFormModel
 	public $id_usuario;
 	public $sc;
 	public $productos;
-	public $fecha_inicio;
+	public $anio;
+	public $mes;
+	public $year;
+	public $fecha;
+	public $fecha_inicio; 
 	public $fecha_fin;
 	public $operadoras;
 	public $all_operadoras;
+	public $tipo_busqueda; //1. Periodo / 2. Mes / 3. Año / 4. Dia
 
 	public function rules()
 	{
@@ -25,7 +30,7 @@ Class Btl extends CFormModel
 
 			//Validaciones
 			array('operadoras', 'operadorasSeleccionadas', 'on'=>'validateForm'), //Valida que se seleccione por lo menos una operadora
-			array('fecha_inicio, fecha_fin', 'date', 'format'=>'yyyy-M-d', 'on'=>'validateForm'),
+			array('fecha, fecha_inicio, fecha_fin', 'date', 'format'=>'yyyy-M-d', 'on'=>'validateForm'),
 			array('fecha_inicio, fecha_fin', 'compararFechas', 'on'=>'validateForm'), //Valida que la fecha inicio sea menor que la fecha fin
 		);
 	}
@@ -36,10 +41,15 @@ Class Btl extends CFormModel
 			'password' => 'Contraseña',
 			'sc' => 'Short Code',
 			'productos' => 'Productos',
+			'anio' => 'Año',
+			'year' => 'Año',
+			'mes' => 'Mes',
+			'fecha' => 'Día',
 			'fecha_ini' => 'Fecha Inicio',
 			'fecha_fin' => 'Fecha Fin',
 			'operadoras' => 'Operadoras',
 			'all_operadoras' => 'Todas',
+			'tipo_busqueda' => '',
 		);
 	}
 
@@ -55,10 +65,11 @@ Class Btl extends CFormModel
 
 	public function compararFechas($attribute, $params)
     {
-    	if (strtotime($this->fecha_inicio) > strtotime($this->fecha_fin))
+    	if ($this->tipo_busqueda == 1) //Periodo
     	{
-    		$this->addError($attribute, "La fecha inicio debe ser mayor que la fecha fin");
-    	}
+	    	if (strtotime($this->fecha_inicio) > strtotime($this->fecha_fin))
+	    		$this->addError($attribute, "La fecha inicio debe ser mayor que la fecha fin");
+	    }
     }
 
     public function operadorasSeleccionadas($attribute, $params)

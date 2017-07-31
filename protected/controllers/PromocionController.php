@@ -69,12 +69,10 @@ class PromocionController extends Controller
                         //BTL
                         if (isset($model->sc) && $model->sc != "")
                         {
-                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos);
-
                             //En case de existir numeros obtenidos desde BTL los updateo como validos para que no se aplique ningun filtro
-                            if ($btl_destinatarios != "")
+                            if (isset($_SESSION['numeros_btl']) && $_SESSION['numeros_btl'] != "")
                             {
-                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
+                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $_SESSION['numeros_btl']);
                                 //Marco los numeros que vienen de BTL para no aplicar el filtro segun sea el caso
                                 $sql = "UPDATE tmp_procesamiento SET numero_btl = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
 
@@ -234,12 +232,10 @@ class PromocionController extends Controller
                         //BTL
                         if (isset($model->sc) && $model->sc != "")
                         {
-                            $btl_destinatarios = BtlController::actionGetNumeros($model->sc, $model->operadoras, $model->all_operadoras, $model->fecha_inicio, $model->fecha_fin, $model->productos, 2, $operadorasPermitidasBCP);
-
                             //En case de existir numeros obtenidos desde BTL los updateo como validos para que no se aplique ningun filtro
-                            if ($btl_destinatarios != "")
+                            if (isset($_SESSION['numeros_btl']) && $_SESSION['numeros_btl'] != "")
                             {
-                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $btl_destinatarios);
+                                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $_SESSION['numeros_btl']);
                                 //Marco los numeros que vienen de BTL para no aplicar el filtro segun sea el caso
                                 $sql = "UPDATE tmp_procesamiento SET numero_btl = 1 WHERE id_proceso = :id_proceso AND estado IS NULL";
                                 $sql = Yii::app()->db_masivo_premium->createCommand($sql);
@@ -735,7 +731,7 @@ class PromocionController extends Controller
             //Cantidad de destinatarios validos
             $total_sms = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
             $_SESSION["url_confirmar"] = null;
-            $ids_promo = "";
+            $ids_promo = array();
             $model = clone $_SESSION["model"];
             $model_aux = new PromocionForm;
             $model_aux = clone $model;
@@ -791,7 +787,7 @@ class PromocionController extends Controller
 
                                 $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $key["total"], $value["id_operadora"], $alfanumerico, $i, $personalizada);
 
-                                $ids_promo .= ",".$id_promo; 
+                                $ids_promo[] = $id_promo; 
                                 $i+=$key["total"];
                                 $j++;
                             }
@@ -821,11 +817,11 @@ class PromocionController extends Controller
 
                         $id_promo = $this->actionRegistrarPromocionBCP($id_proceso, $model_aux, $value["total"], $key, $alfanumerico, 0, $personalizada);
 
-                        $ids_promo .= ",".$id_promo; 
+                        $ids_promo[] = $id_promo; 
                     }
                 }
 
-                $id_promo = trim($ids_promo, ",");
+                $id_promo = implode("##", $ids_promo);
                 $_SESSION["url_confirmar"] = Yii::app()->createUrl("promocion/confirmarBCP", array("id_promo"=>$id_promo));
             }
 
@@ -1295,7 +1291,7 @@ class PromocionController extends Controller
 
         try
         {
-            $id_promo = $_GET["id_promo"];
+            $id_promo = str_replace("##", ",", $_GET["id_promo"]);
 
             $sql = "UPDATE promociones_premium SET estado = 2 WHERE id_promo IN(".$id_promo.")";
             $sql = Yii::app()->db_masivo_premium->createCommand($sql)->execute();

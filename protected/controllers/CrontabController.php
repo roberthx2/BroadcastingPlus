@@ -873,6 +873,7 @@ class CrontabController extends Controller
                         $sql_insert = "INSERT INTO tmp_exentos (numero) VALUES ".implode(",", $cadena_numeros);
                         Yii::app()->db_masivo_premium->createCommand($sql_insert)->execute();
                         $cadena_numeros = array();
+                        $i=0;
                     }
                 }
 

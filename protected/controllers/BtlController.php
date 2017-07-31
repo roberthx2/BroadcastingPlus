@@ -15,7 +15,7 @@ class BtlController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm', 'getNumeros', 'getFechaMinSmsin'),
+                'actions' => array('index','authenticate', 'form', 'getProductosAndOperadoras', 'validarDatosForm', 'getNumeros', 'getFechaMinSmsin', 'getNumeros2'),
                 'users' => array('@'),
             ),
 
@@ -99,6 +99,7 @@ class BtlController extends Controller
         $criteria->order = "sc_id DESC ";
 
         $sc = ScId::model()->findAll($criteria);
+        $model->tipo_busqueda = 1;
 
         $this->renderPartial("form", array("model"=>$model, "sc"=>$sc),false,true);
     }
@@ -201,7 +202,7 @@ class BtlController extends Controller
         }
     }
 
-    public function actionGetNumeros($sc, $operadoras, $all_operadoras, $fecha_inicio, $fecha_fin, $productos, $tipo, $operadorasPermitidasBCP)
+    public function actionGetNumeros2($sc, $operadoras, $all_operadoras, $fecha_inicio, $fecha_fin, $productos, $tipo, $operadorasPermitidasBCP)
     {
         $numeros_btl = "";
 
@@ -261,7 +262,7 @@ class BtlController extends Controller
                 $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
 
                 //En caso de existir numeros validos los obtengo de la tabla temporal
-                print_r($total);
+                //print_r($total);
 
                 if ($total > 0)
                 {
@@ -290,6 +291,147 @@ class BtlController extends Controller
         }
 
         return $numeros_btl;
+    }
+
+    public function actionGetRangoFecha($tipo_busqueda, $fecha, $fecha_inicio, $fecha_fin, $year, $anio, $mes)
+    {
+        $objeto = array();
+
+        if ($tipo_busqueda == 1) //Periodo
+        {
+            $objeto["fecha_inicio"] = $fecha_inicio;
+            $objeto["fecha_fin"] = $fecha_fin;
+        }
+        elseif ($tipo_busqueda == 2) //Mes
+        {
+            $objeto["fecha_inicio"] = $anio."-".$mes."-01";
+            $objeto["fecha_fin"] = Yii::app()->Funciones->getUltimoDiaMes($anio, $mes);
+        }
+        elseif ($tipo_busqueda == 3) //Año
+        {
+            $objeto["fecha_inicio"] = $year."-01-01";
+            $objeto["fecha_fin"] = $year."-12-31";
+        }
+        elseif ($tipo_busqueda == 4) //Día
+        {
+            $objeto["fecha_inicio"] = $fecha;
+            $objeto["fecha_fin"] = $fecha;
+        }
+
+        return $objeto;
+    }
+
+    public function actionGetNumeros()
+    {
+        $sc = $_POST["Btl"]["sc"];
+        $all_operadoras = $_POST["Btl"]["all_operadoras"];
+        $productos = $_POST["Btl"]["productos"];
+
+        $fechas = $this->actionGetRangoFecha($_POST["Btl"]["tipo_busqueda"], $_POST["Btl"]["fecha"], $_POST["Btl"]["fecha_inicio"], $_POST["Btl"]["fecha_fin"], $_POST["Btl"]["year"], $_POST["Btl"]["anio"], $_POST["Btl"]["mes"]);
+        
+        $cantidad_x_oper = array();
+        $existe = 'false';
+        $numeros_btl = "";
+        unset($_SESSION["numeros_btl"]);
+
+        if ($all_operadoras == 1)
+            $operadoras_txt = OperadorasRelacion::model()->find(array("select"=>"GROUP_CONCAT(DISTINCT desp_op) AS desp_op"));
+        else 
+        {
+            $operadoras = implode(",", $_POST["Btl"]["operadoras"]);
+            $operadoras_txt = OperadorasRelacion::model()->find(array("select"=>"GROUP_CONCAT(DISTINCT desp_op) AS desp_op", "condition"=>"id_operadora_bcnl IN(".$operadoras.")"));
+        }
+
+        $criteria = new CDbCriteria();
+        $criteria->select = "DISTINCT origen";
+        $criteria->addBetweenCondition("data_arrive", $fechas["fecha_inicio"], $fechas["fecha_fin"]);
+        $criteria->addInCondition("id_producto", $productos);
+        $criteria->compare("sc", $sc);
+        $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
+
+        $numeros = SmsinBtl::model()->findAll($criteria);
+        $numeros_array = array();
+
+        foreach ($numeros as $value)
+        {
+            $aux = Yii::app()->Funciones->formatearNumero($value->origen);
+
+            if ($aux != false)
+                $numeros_array[] = $aux;
+        }
+
+        if (COUNT($numeros_array) > 0)
+        {
+            $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+            try
+            {
+                $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+                $numeros = implode(",", $numeros_array);
+                $id_usuario = Yii::app()->user->id;
+
+                $sql = "SELECT porcentaje_lista FROM control_fe INNER JOIN sc_id ON INSTR(sc_cadena, id_sc) 
+                        WHERE id_usuario = :id_usuario AND sc_id = :sc LIMIT 1";
+
+                $sql = Yii::app()->db_sms->createCommand($sql);
+                $sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
+                $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
+                $porcentaje = $sql->queryRow();
+
+                //Guarda los numeros en la tabla de procesamiento
+                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros);
+                //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+                Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+                //Update en estado 4 todos los numeros exentos
+                Yii::app()->Filtros->filtrarExentos($id_proceso, 1, null);
+                //Update en estado 10 todos los numeros que sobrepasen el porcentaje permitido
+                Yii::app()->Filtros->filtrarPorcentaje($id_proceso, $porcentaje["porcentaje_lista"]);
+                //Updatea a estado = 1 todos los numeros validos 
+                Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+                //Cantidad de destinatarios validos
+                $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+                if ($total > 0)
+                {
+                    $sql = "SELECT numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = :id_proceso AND estado = 1";
+                    $sql = Yii::app()->db_masivo_premium->createCommand($sql);
+                    $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
+                    $sql = $sql->queryAll();
+
+                    $model_oper = OperadorasActivas::model()->findAll();
+
+                    foreach ($model_oper as $value)
+                    {
+                        $array_oper[$value["id_operadora"]] = $value["descripcion"];
+                    }
+
+                    foreach ($sql as $value)
+                    {
+                        $numeros_btl[] = $value["numero"];
+
+                        if (!isset($cantidad_x_oper[$value["id_operadora"]]))
+                            $cantidad_x_oper[$value["id_operadora"]] = array("descripcion"=>ucfirst(strtolower($array_oper[$value["id_operadora"]])), "total"=>1);
+                        else $cantidad_x_oper[$value["id_operadora"]]["total"]++;
+                    }
+
+                    $numeros_btl = implode(",", $numeros_btl);
+                    $_SESSION["numeros_btl"] = $numeros_btl;
+                    $existe = 'true';
+                }
+
+                ProcesosActivos::model()->deleteByPk($id_proceso);
+
+                $transaction->commit();
+            }
+            catch (Exception $e)
+                {
+                    $transaction->rollBack();
+                }
+        }
+
+        header('Content-Type: application/json; charset="UTF-8"');
+        echo CJSON::encode(array('existe' => $existe, 'mensaje' => $cantidad_x_oper, 'numeros_btl'=>$numeros_btl));
     }
 
     public function actionGetFechaMinSmsin()

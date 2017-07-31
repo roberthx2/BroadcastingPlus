@@ -133,18 +133,18 @@
             
             beforeSend: function()
             {
-               //$("#divModalBTL").html("me estoy enviando");
+                $("#modalBTL").find(".modal-dialog").addClass("modal-lg");
+                $("#modalBTL").find(".modal-title").text('Datos de BTL');
+                $("#modal_footer_btl").html("");
+                $("#divModalBTL").html('<div style="width: 200px; height: 200px;"><div class="loader"></div></div>');
             },
             complete: function()
             {
-                //$("#divModalBTL").html("me envie");
+                //$(".loader").css("display", "none");
             },
             success: function(data)
             {
-                $("#modalBTL").find(".modal-dialog").addClass("modal-lg");
-                $("#modalBTL").find(".modal-title").text('Datos de BTL');
-                $("#divModalBTL").html(data);
-                $("#modal_footer_btl").html("");
+                $("#divModalBTL").html('<div class="loader" style="display: none; z-index: 100000 !important;"></div>'+data);
                 //$( "#modal_footer_btl" ).remove();
             },
             error: function()

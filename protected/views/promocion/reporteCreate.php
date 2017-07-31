@@ -4,14 +4,14 @@
 		echo $this->renderPartial("/tmpProcesamiento/resumenGeneralPromocion", array("objeto"=>$objeto, "url_confirmar"=>$url_confirmar, 'personalizada'=>$personalizada), true); 
 	?>
 </div>
-<div class="col-md-7">
+<!-- <div class="col-md-7">
 <?php
 
-	$data = TmpProcesamientoController::actionReporteTortaBCNL($id_proceso);
+	//$data = TmpProcesamientoController::actionReporteTortaBCNL($id_proceso);
 
-	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
+	//echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
-</div>
+</div> -->
 
 <div class="clearfix visible-xs-block"></div>
 

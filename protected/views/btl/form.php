@@ -20,6 +20,9 @@
 	    )
 	);
 ?>
+
+<?php echo $form->hiddenField($model, 'tipo_busqueda', array("value"=>1)); ?>
+
 <fieldset>
  
 	<legend></legend>
@@ -40,6 +43,14 @@
 	                    'dataType' => 'json',
 	                    'url'=>Yii::app()->createUrl('/btl/getProductosAndOperadoras'), //url to call.
 	                    'data' => array('sc' => 'js:$("#Btl_sc").val()'),
+	                    'beforeSend' => 'function(){
+	                    	$("#bontonEnviarBTL").addClass("disabled");
+	                    	$(".loader").show();
+	                    }',
+	                    'complete' => 'function(){
+	                    	$("#bontonEnviarBTL").removeClass("disabled");
+	                    	$(".loader").hide();
+	                    }',
 	                    'success' => 'function(response){
 	                            if (response.error == "false")
 	                            {
@@ -91,57 +102,27 @@
 				)
 			); ?>
 	</div>
+	<div class="col-lg-12 form-group_fechas">
+		<div>
+			<?php echo $form->radioButtonListGroup(
+					$model,
+					'tipo_busqueda',
+					array(
+						'widgetOptions' => array(
+							'data' => array(1=>' Periodo', 2=>' Mes', 3=>' Año', 4=>' Día'),
+						),
+						'inline'=>true
+					)
+				); ?>
+		</div>
+		<div id="div_busqueda_1" class="div_busqueda" style="display: block;"><?php echo $this->renderPartial('busquedaPorPeriodo', array('model'=>$model, "form"=>$form, 'smsinBtl_minDate'=>$smsinBtl_minDate), true); ?></div>
 
-	<div class="col-lg-12 form-group_fecha_inicio">
-		<?php echo $form->datePickerGroup(
-			$model,
-			'fecha_inicio',
-			array(
-				'widgetOptions' => array(
-					'options' => array(
-						'language' => 'es',
-						'format' => 'yyyy-mm-dd',
-						'endDate' => date("Y-m-d"),
-						//'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
-						'startDate' => $smsinBtl_minDate,
-						'autoclose' => true,
-					),
-					'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
-				),
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
-				),
-				//'hint' => 'Click inside! This is a super cool date field.',
-				'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
-			)
-		); ?>
+		<div id="div_busqueda_2" class="div_busqueda" style="display: none;"><?php echo $this->renderPartial('busquedaPorMes', array('model'=>$model, "form"=>$form, 'smsinBtl_minDate'=>$smsinBtl_minDate), true); ?></div>
+
+		<div id="div_busqueda_3" class="div_busqueda" style="display: none;"><?php echo $this->renderPartial('busquedaPorAnio', array('model'=>$model, "form"=>$form, 'smsinBtl_minDate'=>$smsinBtl_minDate), true); ?></div>
+		
+		<div id="div_busqueda_4" class="div_busqueda" style="display: none;"><?php echo $this->renderPartial('busquedaPorDia', array('model'=>$model, "form"=>$form, 'smsinBtl_minDate'=>$smsinBtl_minDate), true); ?></div>
 	</div>
-
-	<div class="col-lg-12 form-group_fecha_fin">
-		<?php echo $form->datePickerGroup(
-			$model,
-			'fecha_fin',
-			array(
-				'widgetOptions' => array(
-					'options' => array(
-						'language' => 'es',
-						'format' => 'yyyy-mm-dd',
-						'endDate' => date("Y-m-d"),
-						//'startDate' => date('Y-m-d' , strtotime('-6 month', strtotime(date("Y-m-d")))),
-						'startDate' => $smsinBtl_minDate,
-						'autoclose' => true,
-					),
-					'htmlOptions' => array('readonly'=>true, 'style'=>'background-color: white;'),
-				),
-				'wrapperHtmlOptions' => array(
-					'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
-				),
-				//'hint' => 'Click inside! This is a super cool date field.',
-				'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
-			)
-		); ?>
-	</div>
-
 </div>
 <div class="row col-lg-6">
 	<div class="col-lg-12 form-group_productos">
@@ -164,7 +145,8 @@
 
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" align="center">	
 <?php
-	echo CHtml::submitButton('Aceptar', array('id' => 'bontonEnviarBTL', 'class'=>'btn btn-success'));
+	//echo CHtml::submitButton('Aceptar', array('id' => 'bontonEnviarBTL', 'class'=>'btn btn-success'));
+	echo CHtml::tag('button', array('id'=>'bontonEnviarBTL', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Consultar');
 	$this->endWidget();
     unset($form);
 ?>
@@ -190,35 +172,15 @@
                 
                 beforeSend: function()
                 {
-                   $("#btl-form div").removeClass("has-error").removeClass("has-success");
-                },
-                complete: function()
-                {
-
+                   	$("#btl-form div").removeClass("has-error").removeClass("has-success");
+                   	$("#bontonEnviarBTL i.fa").addClass("fa-spinner").addClass("fa-spin");
+                    $("#bontonEnviarBTL").addClass("disabled");
                 },
                 success: function(data)
                 {
                 	if (data.salida == 'true')
                     {
-                        $("#PromocionForm_sc").val($("#Btl_sc").val());
-	                	$("#PromocionForm_operadoras").val($("#Btl_operadoras").val());
-	                	$("#PromocionForm_fecha_inicio").val($("#Btl_fecha_inicio").val());
-	                	$("#PromocionForm_fecha_fin").val($("#Btl_fecha_fin").val());
-	                	$("#PromocionForm_productos").val($("#Btl_productos").val());
-
-	                	$("#Btl_productos").children(':selected').each(function()
-                		{
-                			$("#PromocionForm_desc_producto").val($("#PromocionForm_desc_producto").val()+$(this).text()+"#@#");
-                		});
-	                	/*$.each($("#Btl_productos").val(), function(i, value) {
-                            $("#PromocionForm_productos").append($("<option>").text(value).attr("value",value));
-                        });*/
-
-	                	if ($("#Btl_all_operadoras").is(':checked') == true)
-	                		$("#PromocionForm_all_operadoras").val(true);
-	                	else $("#PromocionForm_all_operadoras").val(false);
-
-	                	$("#modalBTL .close").click()
+	                	getNumeros();
 						return;
                     }
                     else (data.salida == 'false')
@@ -229,28 +191,107 @@
                         	$("#btl-form div.form-group_"+i).addClass("has-error");
                             $("#Btl_"+i+"_em_").html(value);
                             $("#Btl_"+i+"_em_").show();
-
-                            $("#PromocionForm_sc").val("");
-		                	$("#PromocionForm_operadoras").val("");
-		                	$("#PromocionForm_fecha_inicio").val("");
-		                	$("#PromocionForm_fecha_fin").val("");
-		                	$("#PromocionForm_productos").val("");
-		                	$("#PromocionForm_desc_producto").val("");
-		                	$("#PromocionForm_all_operadoras").val(false);
                         });
+
+                        $("#bontonEnviarBTL i.fa").removeClass("fa-spinner").removeClass("fa-spin");
+                    	$("#bontonEnviarBTL").removeClass("disabled");
+
                         return;
                     }
-
-                    console.log(data);
                 },
                 error: function()
                 {
-                	
+                	alert("Ocurrio un error al validar los datos");	
                 }
             });
         }
 
         return false;
+    }
+
+    function getNumeros()
+    {
+    	$.ajax({
+            url:"<?php echo Yii::app()->createUrl('btl/getNumeros'); ?>",
+            type:"POST",    
+            data:$("#btl-form").serialize(),
+            
+            beforeSend: function()
+            {
+            	$("#div_destinatarios_btl").hide();
+            	$("#PromocionForm_numeros_btl").val('');
+            },
+            complete: function()
+            {
+            },
+            success: function(data)
+            {
+            	if (data.existe == 'true')
+            	{
+            		//////////// Asignando valores del formulario BTL
+
+            		$("#PromocionForm_sc").val($("#Btl_sc").val());
+                	$("#PromocionForm_operadoras").val($("#Btl_operadoras").val());
+                	$("#PromocionForm_fecha_inicio").val($("#Btl_fecha_inicio").val());
+                	$("#PromocionForm_fecha_fin").val($("#Btl_fecha_fin").val());
+                	$("#PromocionForm_productos").val($("#Btl_productos").val());
+
+                	$("#Btl_productos").children(':selected').each(function()
+            		{
+            			$("#PromocionForm_desc_producto").val($("#PromocionForm_desc_producto").val()+$(this).text()+"#@#");
+            		});
+
+                	if ($("#Btl_all_operadoras").is(':checked') == true)
+                		$("#PromocionForm_all_operadoras").val(true);
+                	else $("#PromocionForm_all_operadoras").val(false);
+
+                	/////////////////////////
+
+            		$("#PromocionForm_numeros_btl").val(data.numeros_btl);
+
+            		var texto = '';
+            		var total = 0;
+
+            		$.each(data.mensaje, function(i, value) {
+            			total += parseInt(value.total);
+            			if (texto == '')
+                        	texto += value.descripcion+': '+value.total;
+                        else texto += ' | '+value.descripcion+': '+value.total;
+                    });
+
+                    if (texto == '')
+                        texto += 'Total: '+total;
+                    else texto += ' | Total: '+total;
+
+                    $("#div_btl_count").html('<strong>'+texto+'</strong>');
+
+            		$("#div_destinatarios_btl").show();
+            		$("#modalBTL .close").click();
+            	}
+            	else
+            	{
+            		////////Vaciando valores del formulario BTL oculto
+            		$("#PromocionForm_sc").val("");
+                	$("#PromocionForm_operadoras").val("");
+                	$("#PromocionForm_fecha_inicio").val("");
+                	$("#PromocionForm_fecha_fin").val("");
+                	$("#PromocionForm_productos").val("");
+                	$("#PromocionForm_desc_producto").val("");
+                	$("#PromocionForm_all_operadoras").val(false);
+                	///////////////////////////////////
+
+            		alert("No hay destinatarios para el rango de fecha seleccionado");
+            	}
+
+            	$("#bontonEnviarBTL i.fa").removeClass("fa-spinner").removeClass("fa-spin");
+                $("#bontonEnviarBTL").removeClass("disabled");
+                //console.log(data);
+            },
+            error: function()
+            {
+            	alert("Ocurrio un error al buscar los destinatarios");
+            }
+        });
     }
 
     $(document).ready(function(){
@@ -314,5 +355,11 @@
 	            }
 	        });
 	    }
+
+	    $("input[name='Btl[tipo_busqueda]']").change(function(){
+	    	var element = $(this).val();
+	    	$(".div_busqueda").hide();
+	    	$("#div_busqueda_"+element).show();
+    	});
     });
 </script>

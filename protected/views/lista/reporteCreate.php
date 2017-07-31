@@ -5,10 +5,9 @@
 	?>
 </div>
 
-<div class="col-md-8">
+<div class="col-md-7 pull-right">
 <?php 
-	$data = TmpProcesamientoController::actionReporteTortaBCNL($id_proceso);
-	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
+	echo $this->renderPartial("mensajeHorario"); 
 ?>
 </div>
 

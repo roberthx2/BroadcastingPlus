@@ -29,8 +29,8 @@
 			'enableClientValidation'=>true,
             'clientOptions' => array(
                 'validateOnSubmit'=>true,
-                'validateOnChange'=>true,
-                'validateOnType'=>true,
+                'validateOnChange'=>false,
+                'validateOnType'=>false,
                 //'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
             ),
 		)
@@ -469,6 +469,24 @@
 				);
 			} ?>
 		</div>
+		
+		<div id="div_destinatarios_btl" style="display:none;">
+			<?php echo $form->textAreaGroup(
+				$model,
+				'numeros_btl',
+				array(
+					'wrapperHtmlOptions' => array(
+						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
+					),
+					'widgetOptions' => array(
+						'htmlOptions' => array('class'=>'numerosTextarea', 'rows' => 5, 'readonly' => true),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
+				)
+			); ?>
+
+			<div id="div_btl_count" style="float: right; font: bold 13px Arial;"></div>
+		</div>
 	</div>
 
 	</fieldset>
@@ -516,6 +534,16 @@
 		//enableFormPromocion($("#PromocionForm_tipo").val());
         hideShowFormPromocion($("#PromocionForm_tipo").val());
         contarCaracterPromocion();
+
+        if ($("#PromocionForm_numeros_btl").val() != "")
+        {
+        	$("#div_destinatarios_btl").show();
+        }
+        else
+        {
+        	$("#div_destinatarios_btl").hide();	
+        }
+        
 		//processKeydown(-1);
 		$('#PromocionForm_fecha').bootstrapMaterialDatePicker
 		({

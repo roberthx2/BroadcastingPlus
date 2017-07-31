@@ -230,6 +230,9 @@ class ListaController extends Controller
 						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
+						$model_lista->estado = 0;
+						$model_lista->update(array('estado'));
+
 						$log = "LISTA EDITADA (AGREGAR) | id_lista: ".$id_lista." | Destinatarios: ".$total;
 	                    Yii::app()->Procedimientos->setLog($log);
 

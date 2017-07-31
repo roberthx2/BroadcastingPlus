@@ -188,6 +188,15 @@ class ConfiguracionSistemaAccionesController extends Controller
 			if ($model->validate())
             {
             	$model_configuracion = ConfiguracionSistema::model()->find("propiedad=:propiedad", array(":propiedad"=>$model->propiedad));
+
+            	if ($model_configuracion->propiedad == 'usuarios_master')
+            	{
+            		$usuarios = Yii::app()->user->id.",".$model->valor;
+            		$usuarios = explode(",", $usuarios);
+            		asort($usuarios);
+            		$model->valor = implode(",", $usuarios);
+            	}
+
             	$model_configuracion->valor = $model->valor;
 
 				if($model_configuracion->save())

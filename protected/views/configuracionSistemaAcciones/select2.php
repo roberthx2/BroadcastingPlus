@@ -39,7 +39,7 @@
             ),
             'widgetOptions' => array(
                 'asDropDownList' => true,
-                'data'=>CHtml::listData(UsuarioSms::model()->findAll(array("condition"=>"id_perfil IN(1,2)", "order"=>"login")), 'id_usuario', 'login'),
+                'data'=>CHtml::listData(UsuarioSms::model()->findAll(array("condition"=>"id_perfil IN(1,2) AND id_usuario != ".Yii::app()->user->id, "order"=>"login")), 'id_usuario', 'login'),
                 
                 'options' => array(
                     //'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
