@@ -89,8 +89,8 @@
 
 <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 <?php 
-	$data = $this->actionReporteTorta($model_lista->id_lista);
-	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
+	//$data = $this->actionReporteTorta($model_lista->id_lista);
+	//echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
 ?>
 </div>
 

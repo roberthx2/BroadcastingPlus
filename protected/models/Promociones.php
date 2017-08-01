@@ -164,10 +164,14 @@ class Promociones extends CActiveRecord
 		$fecha_max = date("Y-m-d");
 
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
-		$criteria->join = "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
-		$criteria->addInCondition("t.cadena_usuarios", explode(",", $cadena_usuarios));
+		//$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
+		$criteria->select = "t.id_promo, u.login, t.cadena_usuarios, t.nombrePromo, t.cliente, t.estado, t.fecha, t.hora, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo) AS total,
+			(SELECT COUNT(id_sms) FROM outgoing WHERE id_promo = t.id_promo AND status = 3) AS enviados";
+		$criteria->join = "INNER JOIN deadline_outgoing d_o ON t.id_promo = d_o.id_promo ";
+		$criteria->join .= "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
 		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);
+		$criteria->addInCondition("t.cadena_usuarios", explode(",", $cadena_usuarios));
 		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";

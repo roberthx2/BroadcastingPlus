@@ -132,7 +132,7 @@ class OutgoingPremium extends CActiveRecord
 		$criteria=new CDbCriteria;
 		$criteria->select = "CONCAT(o.prefijo, t.destinatario) AS destinatario, t.operadora, t.status, e.descripcion AS descripcion_estado, o.descripcion AS descripcion_oper";
 		$criteria->join =  "LEFT JOIN outgoing_premium_estados e ON t.status = e.id_estado ";
-		$criteria->join .= "LEFT JOIN (SELECT id_operadora_bcp, descripcion, prefijo from operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
+		$criteria->join .= "LEFT JOIN (SELECT id_operadora_bcp, descripcion, prefijo FROM operadoras_relacion) AS o ON t.operadora = o.id_operadora_bcp ";
 		//$criteria->join .= "INNER JOIN status_outgoing_premium s ON t.status = s.id_status";
 		$criteria->compare('id_promo',$id_promo);
 		$criteria->condition .= " AND (CONCAT(o.prefijo, t.destinatario) LIKE '%".$this->buscar."%' OR ";
@@ -147,75 +147,6 @@ class OutgoingPremium extends CActiveRecord
         		),
     		),
 		));
-	}
-
-	public function searchMensualSmsPorCliente()
-	{
-		if ($this->mes == "")
-			$this->mes = date("m");
-
-		if ($this->ano == "")
-			$this->ano = date("Y");
-$this->mes = '03';
-$this->ano = '2017';
-		//$sql = "SELECT GROUP_CONCAT(id_promo) AS ids FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
-		$sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente) AS ids_clientes, GROUP_CONCAT(id_promo) AS ids_promos FROM promociones_premium WHERE fecha BETWEEN '".date($this->ano."-".$this->mes."-01")."' AND '".Yii::app()->Funciones->getUltimoDiaMes($this->ano, $this->mes)."'";
-		$sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
-		$ids_clientes = $sql["ids_clientes"];
-		$id_promo = $sql["ids_promos"];
-
-		if ($id_promo == "")
-		{
-			$this->id_promo = "null";
-			$ids_clientes = "null";
-		}
-		else 
-		{
-			$sql = "SELECT id_cliente_sms, GROUP_CONCAT(id) AS ids_clientes FROM cliente WHERE id IN(".$ids_clientes.") GROUP BY id_cliente_sms";
-			$result = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
-
-			$sql = "SELECT * FROM (";
-
-			foreach ($result as $value)
-			{
-				$array[] = "SELECT ".$value["id_cliente_sms"]." AS id, SUM(total_sms) AS total, (SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN (".$id_promo.") AND cliente IN (".$value["ids_clientes"].") AND status = 1) AS enviados FROM promociones_premium WHERE id_promo IN (".$id_promo.") AND id_cliente IN (".$value["ids_clientes"].")";
-			}
-
-			$sql.= implode(" UNION ", $array);
-			$sql .= ") AS tabla WHERE id IS NOT NULL";
-		}
-
-		$model = new CSqlDataProvider($sql, array(
-			'db'=>Yii::app()->db_masivo_premium, 
-			//'totalItemCount'=>$total["total"],
-			'sort'=>array(
-        		'attributes'=>array(
-             		'cliente', 'total',
-        		),
-    		),
-    		'pagination'=>array(
-        		'pageSize'=>10,
-    		),
-    	));
-
-		return $model; /*
-    		
-		$criteria=new CDbCriteria;
-		$criteria->select = "t.cliente, 
-			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$this->id_promo.") AND cliente = t.cliente) AS total, 
-			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo IN(".$this->id_promo.") AND cliente = t.cliente AND status = 1) AS enviados";
-		$criteria->addInCondition("t.id_promo", explode(",", $this->id_promo));
-		$criteria->group = "t.cliente";
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-			'sort'=>array(
-				//'defaultOrder'=>'cliente ASC',
-        		'attributes'=>array(
-             		//'cliente'
-        		),
-    		),
-		));*/
 	}
 
 	private function ultimoDiaMes($ano, $mes)

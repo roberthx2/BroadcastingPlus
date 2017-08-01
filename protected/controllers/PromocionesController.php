@@ -32,7 +32,7 @@ class PromocionesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo'),
+				'actions'=>array('create','update', 'viewInformacion', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -51,18 +51,9 @@ class PromocionesController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.cliente, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing o WHERE o.id_promo = t.id_promo) AS total";
-		$criteria->join = "INNER JOIN deadline_outgoing d ON t.id_promo = d.id_promo ";
-		$criteria->join .= "INNER JOIN usuario u ON t.cadena_usuarios = u.id_usuario";
-		$criteria->compare("t.id_promo", $id);
-		$model_promocion = Promociones::model()->find($criteria);
+		$objeto = $this->actionViewResumen($id);
 
-		$sql = "SELECT Des_cliente FROM cliente WHERE id_cliente = ".$model_promocion->cliente;
-		$sql = Yii::app()->db_sms->createCommand($sql)->queryRow();
-		$cliente = $sql["Des_cliente"];
-
-		$this->render('view',array('model_promocion'=>$model_promocion, 'cliente'=>$cliente));
+		$this->render('view', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
 	public function actionViewResumen($id_promo)
@@ -98,6 +89,13 @@ class PromocionesController extends Controller
 		return array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado);
 	}
 
+	public function actionViewInformacion($id_promo)
+	{
+		$objeto = $this->actionViewResumen($id_promo);
+
+		$this->renderPartial('viewInformacion', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+	
 	public function actionViewConfirmar($id_promo)
 	{
 		$objeto = $this->actionViewResumen($id_promo);

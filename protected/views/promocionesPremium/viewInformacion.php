@@ -1,4 +1,4 @@
-<div class="modal-body trOverFlow" id="divModalEliminar" >
+<div class="modal-body trOverFlow" id="divModalVer" >
 <?php
     echo $this->renderPartial('viewDetalles', array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado));
 ?>
@@ -7,12 +7,12 @@
     <?php $this->widget(
         'booster.widgets.TbButton',
         array(
-            'id' => 'boton_cancelar_bcp',
-            'context' => 'danger',
-            'label' => 'Cancelar',
+            'id' => 'boton_ver_bcp',
+            'context' => 'success',
+            'label' => 'Ver mas...',
             'buttonType' =>'link',
-            'icon' => 'glyphicon glyphicon-remove',
-            'url' => Yii::app()->controller->createUrl("cancelarPromo", array("id_promo" => $model->id_promo)),
+            'icon' => 'glyphicon glyphicon-plus-sign',
+            'url' => Yii::app()->controller->createUrl("view", array("id" => $model->id_promo)),
         )
     ); ?>
     <?php $this->widget(
@@ -28,9 +28,9 @@
 <script type="text/javascript">
     $(document).ready(function()
     {
-        $("#boton_cancelar_bcp").click(function(){
-            $("#boton_cancelar_bcp i.glyphicon").removeClass("glyphicon glyphicon-remove").addClass("fa fa-spinner fa-spin");
-            $("#boton_cancelar_bcp").addClass("disabled");
+        $("#boton_ver_bcp").click(function(){
+            $("#boton_ver_bcp i.glyphicon").removeClass("glyphicon glyphicon-plus-sign").addClass("fa fa-spinner fa-spin");
+            $("#boton_ver_bcp").addClass("disabled");
         });
     });
 </script>

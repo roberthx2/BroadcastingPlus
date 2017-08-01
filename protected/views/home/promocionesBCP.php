@@ -163,14 +163,29 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
-	            	'ver'=>array(
-	            			'label'=>' ',
-	            			'url'=>'Yii::app()->createUrl("promocionesPremium/view", array("id"=>$data["id_promo"]))',
-	            			'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'Ver', 'style'=>'color:black;'),
+                    'ver'=>array(
+                            'label'=>' ',
+                            'url'=>'Yii::app()->createUrl("promocionesPremium/viewInformacion", array("id_promo"=>$data["id_promo"]))',
+                            'options'=>array('class'=>'glyphicon glyphicon-eye-open', 'data-toggle'=>'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalVer', 'title'=>'Ver', 'style'=>'color:black;'),
                             'click' => 'function() {
-                                    $(".loader_superior").css("display", "block");
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalVer").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalVer").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalVer").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar la vista.");
+                                        }
+                                    });
                                 }'
-	            			),
+                            ),
 	            	'Confirmar'=>array(
 	            			'label'=>' ',
 	            			'url'=>'Yii::app()->createUrl("promocionesPremium/viewConfirmar", array("id_promo"=>$data["id_promo"]))',
@@ -262,6 +277,22 @@ function visibleCancelar($data)
 }
 
 ?>
+
+<?php $this->beginWidget(
+    'booster.widgets.TbModal',
+    array('id' => 'modalVer')
+); ?>
+ 
+    <div class="modal-header" style="background-color:#428bca">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Información Promoción</h4>
+    </div>
+ 
+    <div class="modal-body" id="divModalVer">
+       
+    </div>
+ 
+<?php $this->endWidget(); ?>
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',

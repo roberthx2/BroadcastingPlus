@@ -1,14 +1,24 @@
 <div class="col-md-7">
-	<?php 
-		echo $this->renderPartial("informacionPromocion", array("model_promocion"=>$model_promocion, "cliente"=>$cliente), true); 
-	?>
-</div>
-
-<div class="col-md-5">
-<?php 
-	$data = $this->actionReporteTorta($model_promocion->id_promo);
-	echo $this->renderPartial("/tmpProcesamiento/graficoTorta", array("data"=>$data), true); 
-?>
+	<?php $collapse = $this->beginWidget('booster.widgets.TbCollapse'); ?>
+	<div class="panel-group" id="accordion">
+		<div class="panel panel-primary">
+		    <div class="panel-heading">
+		      	<h4 class="panel-title">
+		        	<a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+		          		<span class="glyphicon glyphicon-list-alt"></span> Información
+		        	</a>
+		      	</h4>
+		    </div>
+		    <div id="collapseOne" class="panel-collapse collapse in">
+		      	<div class="panel-body">
+		      	<?php 
+					echo $this->renderPartial('viewDetalles', array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado));
+				?>
+				</div>
+	    	</div>
+		</div>
+	</div>
+	<?php $this->endWidget(); ?>
 </div>
 
 <div class="clearfix visible-xs-block"></div>
@@ -21,5 +31,5 @@
 	if(isset($_GET['OutgoingPremium']))
 		$model_outgoing->buscar = $_GET['OutgoingPremium']["buscar"];
 
-	echo $this->renderPartial("informacionDestinatarios", array("model_promocion"=>$model_promocion, 'model_outgoing'=>$model_outgoing), true); 
+	echo $this->renderPartial("informacionDestinatarios", array("model_promocion"=>$model, 'model_outgoing'=>$model_outgoing), true); 
 ?>

@@ -217,10 +217,13 @@ class PromocionesPremium extends CActiveRecord
 		$id_clientes = Yii::app()->Procedimientos->getClienteBCPHostgator();
 
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, total_sms";
-		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
-		$criteria->addInCondition("t.id_cliente", explode(",", $id_clientes));
+		//$criteria->select = "t.id_promo, t.nombrePromo, t.fecha, u.login AS login, total_sms";
+		$criteria->select = "t.id_promo, u.login, t.loaded_by, t.nombrePromo, t.id_cliente, t.estado, t.fecha, t.hora, t.total_sms, d_o.fecha_limite, d_o.hora_limite,
+			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
+		$criteria->join = "INNER JOIN deadline_outgoing_premium d_o ON t.id_promo = d_o.id_promo ";
+		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
 		$criteria->addBetweenCondition("t.fecha", $fecha_min, $fecha_max);
+		$criteria->addInCondition("t.id_cliente", explode(",", $id_clientes));
 		$criteria->condition .= " AND (t.id_promo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.nombrePromo LIKE '%".$this->buscar."%' OR ";
 		$criteria->condition .= "t.fecha LIKE '%".$this->buscar."%' OR ";

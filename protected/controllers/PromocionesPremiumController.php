@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo', 'getPromociones'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewInformacion', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo', 'getPromociones'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -51,18 +51,9 @@ class PromocionesPremiumController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, t.id_cliente, t.nombrePromo, t.contenido, t.fecha, t.hora, d.hora_limite, u.login AS login, (SELECT COUNT(*) FROM outgoing_premium o WHERE o.id_promo = t.id_promo) AS total";
-		$criteria->join = "INNER JOIN deadline_outgoing_premium d ON t.id_promo = d.id_promo ";
-		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
-		$criteria->compare("t.id_promo", $id);
-		$model_promocion = PromocionesPremium::model()->find($criteria);
+		$objeto = $this->actionGetInformation($id);
 
-		$sql = "SELECT descripcion FROM cliente WHERE id = ".$model_promocion->id_cliente;
-		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-		$cliente = str_replace("@", "", $sql["descripcion"]);
-
-		$this->render('view',array('model_promocion'=>$model_promocion, 'cliente'=>$cliente));
+		$this->render('view', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
 	public function loadModel($id)
@@ -98,11 +89,10 @@ class PromocionesPremiumController extends Controller
 		));
 	}
 
-	public function actionViewResumen($id_promo)
+	public function actionGetInformation($id_promo)
 	{
 		$criteria=new CDbCriteria;
-		$criteria->select = "t.id_promo, u.login, t.loaded_by, t.nombrePromo, t.id_cliente, t.estado, t.fecha, t.hora, t.contenido, d_o.fecha_limite, d_o.hora_limite,
-			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo) AS total,
+		$criteria->select = "t.id_promo, u.login, t.loaded_by, t.nombrePromo, t.id_cliente, t.estado, t.fecha, t.hora, t.contenido, t.total_sms, d_o.fecha_limite, d_o.hora_limite,
 			(SELECT COUNT(id) FROM outgoing_premium WHERE id_promo = t.id_promo AND status = 1) AS enviados";
 		$criteria->join = "INNER JOIN deadline_outgoing_premium d_o ON t.id_promo = d_o.id_promo ";
 		$criteria->join .= "INNER JOIN insignia_masivo.usuario u ON t.loaded_by = u.id_usuario";
@@ -111,9 +101,9 @@ class PromocionesPremiumController extends Controller
 
 		$model = PromocionesPremium::model()->find($criteria);
 
-		$sql = "SELECT descripcion FROM cliente WHERE id = ".$model->id_cliente;
-		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-		$cliente = $sql["descripcion"];
+		$cliente_bcp = ClienteAlarmas::model()->find("id=".$model->id_cliente);
+		$cliente_sms = ClienteSms::model()->find("id_cliente=".$cliente_bcp->id_cliente_sms);
+		$cliente = $cliente_sms->Des_cliente;
 
 		$array = array(
 		    "estado"=>$model->estado, 
@@ -121,9 +111,9 @@ class PromocionesPremiumController extends Controller
 		    "hora"=>$model->hora, 
 		    "fecha_limite"=>$model->fecha_limite, 
 		    "hora_limite"=>$model->hora_limite, 
-		    "total"=>$model->total, 
+		    "total"=>$model->total_sms, 
 		    "enviados"=>$model->enviados, 
-		    "no_enviados"=>($model->total - $model->enviados)
+		    "no_enviados"=>($model->total_sms - $model->enviados)
 		);
 
 		$estado = $this->actionGetStatusPromocionRapida($array);
@@ -131,16 +121,23 @@ class PromocionesPremiumController extends Controller
 		return array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado);
 	}
 
+	public function actionViewInformacion($id_promo)
+	{
+		$objeto = $this->actionGetInformation($id_promo);
+
+		$this->renderPartial('viewInformacion', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+
 	public function actionViewConfirmar($id_promo)
 	{
-		$objeto = $this->actionViewResumen($id_promo);
+		$objeto = $this->actionGetInformation($id_promo);
 
 		$this->renderPartial('viewConfirmar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
 	public function actionViewCancelar($id_promo)
 	{
-		$objeto = $this->actionViewResumen($id_promo);
+		$objeto = $this->actionGetInformation($id_promo);
 
 		$this->renderPartial('viewCancelar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}

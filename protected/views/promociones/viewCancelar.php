@@ -1,28 +1,8 @@
 <div class="modal-body trOverFlow" id="divModalEliminarBCNL" >
 <?php
-
-$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCNL($estado);
-
-$this->widget(
-    'booster.widgets.TbDetailView',
-    array(
-        'data' => $model,
-        'type' => 'striped',
-        'attributes' => array(
-            array('name'=>'id_promo', 'label'=>'ID Promo', "visible"=>Yii::app()->user->isAdmin()),
-            array('name'=>'login', 'label'=>'Usuario', "visible"=>Yii::app()->user->isAdmin()),
-            array('value'=>$cliente, 'label'=>'Cliente', "visible"=>Yii::app()->user->isAdmin()),
-            array('name'=>'nombrePromo', 'label'=>'Nombre'),
-            array('name'=>'hora', 'label'=>'Hora Inicio', 'type'=>'time'),
-            array('name'=>'hora_limite', 'label'=>'Hora Limite', 'type'=>'time'),
-            array('value'=>$objeto["label"], 'label'=>'Estado'),
-            array('value'=>$model->enviados." / ".$model->total, 'label'=>'Enviados/Total'),
-        )
-    )
-);
+    echo $this->renderPartial('viewDetalles', array("model"=>$model, 'cliente'=>$cliente, 'estado'=>$estado));
 ?>
 </div>
-<br>
 <div class="modal-footer">
     <?php $this->widget(
         'booster.widgets.TbButton',

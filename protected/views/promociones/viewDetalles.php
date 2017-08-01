@@ -1,6 +1,6 @@
 <?php
 
-$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
+$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCNL($estado);
 
 $this->widget(
     'booster.widgets.TbDetailView',
@@ -19,7 +19,7 @@ $this->widget(
             array('name'=>'hora', 'label'=>'Hora Inicio', 'type'=>'time'),
             array('name'=>'hora_limite', 'label'=>'Hora Limite', 'type'=>'time'),
             array('value'=>$objeto["label"], 'label'=>'Estado'),
-            array('value'=>$model->enviados." / ".$model->total_sms, 'label'=>'Enviados/Total'),
+            array('value'=>$model->enviados." / ".$model->total, 'label'=>'Enviados/Total'),
         )
     )
 );

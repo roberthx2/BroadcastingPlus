@@ -64,9 +64,18 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'header' => 'Estado',
 	            'type' => 'raw',
 	            'value' => function($data){
-	            	$label = "";
-	            	$clase = "";
-	            	$estado = PromocionesPremiumController::actionGetStatusPromocion($data["id_promo"]);
+                    $array = array(
+                        "estado"=>$data["estado"], 
+                        "fecha"=>$data["fecha"], 
+                        "hora"=>$data["hora"], 
+                        "fecha_limite"=>$data["fecha_limite"], 
+                        "hora_limite"=>$data["hora_limite"], 
+                        "total"=>$data["total_sms"], 
+                        "enviados"=>$data["enviados"], 
+                        "no_enviados"=>($data["total_sms"] - $data["enviados"])
+                    );
+
+                    $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
 
 	            	$objeto = Yii::app()->Funciones->getColorLabelEstadoPromocionesBCP($estado);
 
