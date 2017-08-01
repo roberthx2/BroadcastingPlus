@@ -109,7 +109,7 @@
 					'tipo_busqueda',
 					array(
 						'widgetOptions' => array(
-							'data' => array(1=>' Periodo', 2=>' Mes', 3=>' Año', 4=>' Día'),
+							'data' => array(1=>' Periodo', 2=>' Mes', 3=>' A&ntilde;o', 4=>' D&iacute;a'),
 						),
 						'inline'=>true
 					)
@@ -220,9 +220,11 @@
             {
             	$("#div_destinatarios_btl").hide();
             	$("#PromocionForm_numeros_btl").val('');
+            	$("#boton_close").hide();
             },
             complete: function()
             {
+            	$("#boton_close").show();
             },
             success: function(data)
             {

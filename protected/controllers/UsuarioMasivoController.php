@@ -307,7 +307,7 @@ class UsuarioMasivoController extends Controller
 							AND sc IN (".$cadena_sc.") 
 							AND sc NOT REGEXP '[a-zA-Z]+' 
 							AND c.onoff = 1";
-							print_r($sql);
+							//print_r($sql);
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 

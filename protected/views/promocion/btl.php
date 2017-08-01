@@ -7,18 +7,21 @@
             'context' => 'dafault',
             'label' => 'Números BTL',
             'icon' => 'glyphicon glyphicon-plus',
-            'htmlOptions' => array('class'=>'col-xs-6 col-sm-6 col-md-6 col-lg-6', 'data-toggle' => 'modal', 'data-target' => '#modalBTL'),
+            'htmlOptions' => array('class'=>'col-xs-6 col-sm-6 col-md-6 col-lg-6', 'data-toggle' => 'modal', 'data-target' => '#modalBTL', 'data-backdrop'=>'static'),
         )
     ); 
 ?>
 
 <?php $this->beginWidget(
     'booster.widgets.TbModal',
-    array('id' => 'modalBTL')
+    array(
+        'id' => 'modalBTL', 
+        'htmlOptions' => array( 'data-backdrop'=>'static')
+        )
 ); ?>
  
     <div align="left" class="modal-header" style="background-color:#428bca">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button id="boton_close" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Clave de transacciones</h4>
     </div>
     

@@ -349,7 +349,7 @@ class BtlController extends Controller
         $criteria->compare("sc", $sc);
         $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
 
-        $numeros = SmsinBtl::model()->findAll($criteria);
+        $numeros = Smsin::model()->findAll($criteria);
         $numeros_array = array();
 
         foreach ($numeros as $value)
