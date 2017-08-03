@@ -25,12 +25,26 @@
 			'type' => 'vertical',
 			'enableAjaxValidation'=>true,
 			'enableClientValidation'=>true,
-            'clientOptions' => array(
-                'validateOnSubmit'=>true,
-                'validateOnChange'=>true,
-                'validateOnType'=>true,
-                //'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
-            ),
+	        'clientOptions' => array(
+	            'validateOnSubmit'=>true,
+	            'validateOnChange'=>false,
+	            'validateOnType'=>false,
+	            'afterValidate' => 'js:function(form, data, hasError){
+	                $.each(data, function(index, value) { 
+	                    if(index != "__proto"){
+	                        var temp = data[index][0];   
+	                        $("#"+index+"_em_").html("<li>"+temp+"</li>");
+	                    }
+	                });
+
+		            if(!hasError)
+		            {
+		            	$("#boton_enviar i.fa").addClass("fa-spinner").addClass("fa-spin");
+	        			$("#boton_enviar").addClass("disabled");
+		                return true;    
+		            }
+	            }'   
+	        ),
 		)
 	); 
 ?>
@@ -94,15 +108,8 @@
 
 <div class="form-actions col-xs-12 col-sm-12 col-md-12 col-lg-12">
 	<center>
-	<?php $this->widget(
-		'booster.widgets.TbButton',
-		array(
-			'buttonType' => 'submit',
-			'context' => 'success',
-			'label' => 'Crear',
-			'htmlOptions' => array(),
-		)
-	); ?>
+	<?php 
+		echo CHtml::tag('button', array('id'=>'boton_enviar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Crear'); ?>
 
 	<?php
 		$this->endWidget();

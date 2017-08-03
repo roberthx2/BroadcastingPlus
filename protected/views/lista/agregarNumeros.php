@@ -31,7 +31,28 @@ $form = $this->beginWidget(
 	array(
 		'id' => 'lista-form',
 		'type' => 'horizontal',
-		'enableAjaxValidation'=>false,
+		'enableAjaxValidation'=>true,
+		'enableClientValidation'=>true,
+        'clientOptions' => array(
+            'validateOnSubmit'=>true,
+            'validateOnChange'=>false,
+            'validateOnType'=>false,
+            'afterValidate' => 'js:function(form, data, hasError){
+                $.each(data, function(index, value) { 
+                    if(index != "__proto"){
+                        var temp = data[index][0];   
+                        $("#"+index+"_em_").html("<li>"+temp+"</li>");
+                    }
+                });
+
+	            if(!hasError)
+	            {
+	            	$("#boton_enviar i.fa").addClass("fa-spinner").addClass("fa-spin");
+        			$("#boton_enviar").addClass("disabled");
+	                return true;    
+	            }
+            }'   
+        ),
 	)
 ); ?>
 
@@ -62,15 +83,8 @@ $form = $this->beginWidget(
 	<br><br>
 	<div>
 		<div class="col-xs-offset-4 col-sm-offset-10 col-md-offset-10 col-lg-offset-10">
-		<?php //echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
-			<?php $this->widget(
-					'booster.widgets.TbButton',
-					array(
-						'buttonType' => 'submit',
-						'context' => 'success',
-						'label' => 'Agregar',
-					)
-				); ?>
+		<?php 
+		echo CHtml::tag('button', array('id'=>'boton_enviar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Agregar'); ?>
 		</div>
 	</div>
 

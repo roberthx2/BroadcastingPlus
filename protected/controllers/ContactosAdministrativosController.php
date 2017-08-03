@@ -62,25 +62,28 @@ class ContactosAdministrativosController extends Controller
 		if(isset($_POST['ContactosAdministrativos']))
 		{
 			$model->attributes=$_POST['ContactosAdministrativos'];
-
-			$model_oper = OperadorasRelacion::model()->find("prefijo REGEXP '^".substr($model->numero, 0, 3)."' AND alfanumerico = 0");
-
-			$model->id_operadora = $model_oper->id_operadora_bcnl;
-
-			if($model->save())
+			
+			if ($model->validate())
 			{
-				$login = UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
-				$log = "Contactos Administrativos (Crear) | contacto: ".$model->nombre." | Ejecutado por: ".$login;
-				Yii::app()->Procedimientos->setLog($log);
+				$model_oper = OperadorasRelacion::model()->find("prefijo REGEXP '^".substr($model->numero, 0, 3)."' AND alfanumerico = 0");
 
-				$msj = "Contacto creado correctamente";
-				Yii::app()->user->setFlash("success", $msj);
-				$this->redirect(array('admin'));
-			}
-			else
-			{
-				$error = "Ocurrio un error al guardar el contacto. Intente nuevamente";
-				Yii::app()->user->setFlash("danger", $error);
+				$model->id_operadora = $model_oper->id_operadora_bcnl;
+
+				if($model->save())
+				{
+					$login = UsuarioSmsController::actionGetLogin(Yii::app()->user->id);
+					$log = "Contactos Administrativos (Crear) | contacto: ".$model->nombre." | Ejecutado por: ".$login;
+					Yii::app()->Procedimientos->setLog($log);
+
+					$msj = "Contacto creado correctamente";
+					Yii::app()->user->setFlash("success", $msj);
+					$this->redirect(array('admin'));
+				}
+				else
+				{
+					$error = "Ocurrio un error al guardar el contacto. Intente nuevamente";
+					Yii::app()->user->setFlash("danger", $error);
+				}
 			}
 		}
 

@@ -67,7 +67,7 @@ class ListaController extends Controller
 		//$model_user=new usersMasivo;
 
 		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+		$this->performAjaxValidation($model);
 
 		if(isset($_POST['ListaForm']))
 		{
@@ -194,6 +194,8 @@ class ListaController extends Controller
 		$model->scenario = "agregarNumeros";
 		//$model->id_lista = $id_lista;
 
+		$this->performAjaxValidation($model);
+		
 		if(isset($_POST['ListaForm']))
 		{
 			$model->attributes=$_POST['ListaForm'];

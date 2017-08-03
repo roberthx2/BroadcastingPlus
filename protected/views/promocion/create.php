@@ -8,7 +8,7 @@
 <script src="./js/material.min.js"></script>
 <script type="text/javascript" src="./js/moment-with-locales.min.js"></script>
 <script type="text/javascript" src="./js/bootstrap-material-datetimepicker.js"></script>
-
+<div class="loader" style="display: none;"></div>
 <?php if(Yii::app()->user->hasFlash('danger')):?>
 	<br>
     <div class="container-fluid">
@@ -31,7 +31,22 @@
                 'validateOnSubmit'=>true,
                 'validateOnChange'=>false,
                 'validateOnType'=>false,
-                //'beforeValidateAttribute'=>'js:function(form, attribute){alert("working");}',   
+                'afterValidate' => 'js:function(form, data, hasError){
+                    $.each(data, function(index, value) { 
+                        if(index != "__proto"){
+                            var temp = data[index][0];   
+                            $("#"+index+"_em_").html("<li>"+temp+"</li>");
+                        }
+                    });
+
+		            if(!hasError)
+		            {
+		            	$("#boton_enviar i.fa").addClass("fa-spinner").addClass("fa-spin");
+		            	$("#botonBTL").addClass("disabled");
+            			$("#boton_enviar").addClass("disabled");
+		                return true;    
+		            }
+                }'   
             ),
 		)
 	); 
@@ -54,7 +69,7 @@
 					'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 				),
 				'widgetOptions' => array(
-					'data' => $dataTipo,//CHtml::listData(BroadcastingModulos::model()->findAll(array("condition"=>"estado = 1","order"=>"id_modulo")), 'id_modulo', 'descripcion_corta'),
+					'data' => $dataTipo,
 					'htmlOptions' => array('prompt' => 'Seleccionar...', /*'onchange'=>'js:test();'*/
 					'ajax' => array(
                         'type'=>'POST', //request type
@@ -83,7 +98,7 @@
                                 }
                             }'
                 		),
-                    ), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+                    ), 
 				),
 				'prepend' => '<i class="glyphicon glyphicon-check"></i>',
 			)
@@ -99,8 +114,6 @@
 						'style'=>'display: none;',
 					),
 					'widgetOptions' => array(
-						//'data' => test(),
-						//'value' => 'null',
 						'htmlOptions' => array('prompt' => 'Seleccionar...',
 						'ajax' => array(
 	                        'type'=>'POST', //request type
@@ -143,8 +156,6 @@
 						'style'=>'display: none;',
 					),
 					'widgetOptions' => array(
-						//'data' => test(),
-						//'value' => 'null',
 						'htmlOptions' => array('prompt' => 'Seleccionar...',
 						'ajax' => array(
 	                        'type'=>'POST', //request type
@@ -165,7 +176,7 @@
 	                                }
 	                            }'
 	                		),
-	                	), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+	                	),
 					),
 					'hint' => 'Short Code desde el cual será enviado el SMS por operadora',
 					'prepend' => '<i class="glyphicon glyphicon-tags"></i>',
@@ -184,7 +195,7 @@
 						'class' => 'col-xs-12 col-sm-12 col-md-12 col-lg-12',
 					),
 					'widgetOptions' => array(
-						'htmlOptions' => array('maxlength' => 25, 'autocomplete' => 'off'), //col-xs-12 col-sm-4 col-md-4 col-lg-4
+						'htmlOptions' => array('maxlength' => 25, 'autocomplete' => 'off'),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-pencil"></i>'
 				)
@@ -387,22 +398,16 @@
 					),
 					'widgetOptions' => array(
 						'asDropDownList' => true,
-						//'data'=>CHtml::listData(UsuarioMasivo::model()->find(array("condition"=>"id_usuario = ".Yii::app()->user->id)), 'puertos', 'puertos'),
 						'data'=> $puertos,
-						//'data'=>array("1"=>"1", "2"=>"2", "3"=>"3"),
 						'options' => array(
-							//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
 							'placeholder' => 'Seleccione sus puertos...',
 							'allowClear'=>true,
-							/* 'width' => '40%', */
 							'tokenSeparators' => array(',', ' ')
 						),
 						'htmlOptions'=>array(
 							'multiple'=>'multiple',
-							//'disabled'=>true,
 						),
 					),
-					//'prepend' => '<i class="glyphicon glyphicon-random"></i>',
 					'prepend' =>  '<strong>Todos</strong> '.$form->CheckBox($model, 'all_puertos', array('title'=>'Seleccionar todos', 'onclick'=>'js:disabledPuertos();')),
 				)
 			);?>
@@ -442,13 +447,10 @@
 						),
 						'widgetOptions' => array(
 							'asDropDownList' => true,
-							//'data'=>CHtml::listData(Lista::model()->findAll("id_usuario = ".Yii::app()->user->id), 'id_lista','nombre'),
 							'data'=>$listas,
 							'options' => array(
-								//'tags' => $model_lista,//array('clever', 'is', 'better', 'clevertech'),
 								'placeholder' => 'Seleccione sus listas...',
 								'allowClear'=>true,
-								/* 'width' => '40%', */
 								'tokenSeparators' => array(',', ' ')
 							),
 							'htmlOptions'=>array(
@@ -494,15 +496,8 @@
 
 	<div id="div_botones" class="form-actions col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none;">
 
-		<?php $this->widget(
-			'booster.widgets.TbButton',
-			array(
-				'buttonType' => 'submit',
-				'context' => 'success',
-				'label' => 'Crear Promoción',
-				'htmlOptions' => array(),
-			)
-		); ?>
+		<?php 
+			echo CHtml::tag('button', array('id'=>'boton_enviar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Crear Promoción'); ?>
 
 		<?php
 			$this->endWidget();
@@ -522,7 +517,6 @@
 <script type="text/javascript">
 	$(document).ready(function() 
     {
-		//enableFormPromocion($("#PromocionForm_tipo").val());
         hideShowFormPromocion($("#PromocionForm_tipo").val());
         contarCaracterPromocion();
 
@@ -535,7 +529,6 @@
         	$("#div_destinatarios_btl").hide();	
         }
         
-		//processKeydown(-1);
 		$('#PromocionForm_fecha').bootstrapMaterialDatePicker
 		({
 			lang : 'es',
