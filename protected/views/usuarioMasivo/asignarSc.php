@@ -45,13 +45,24 @@
         }
     ?>
 	<br>
-    <div class="container-fluid alert alert-danger" id="div_error" style="display:none;">
-        <span class="glyphicon glyphicon-ban-circle"></span> El SC no posee operadoras asociadas.
-	</div>
+    <div class="container-fluid alert alert-danger" id="div_error" style="display:none;"></div>
 	<?php echo $form->hiddenField($model, 'id_usuario'); ?>
-	<?php echo $form->hiddenField($model, 'id_cliente_sms'); ?>
 
 	<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+			<?php echo $form->dropDownListGroup(
+				$model,
+				'id_cliente_sms',
+				array(
+					'wrapperHtmlOptions' => array(
+					),
+					'widgetOptions' => array(
+						'data' => CHtml::listData(Yii::app()->Procedimientos->getClientesBCP($model->id_usuario, true), 'id_cliente', 'descripcion'),
+						'htmlOptions' => array('multiple' => false, 'onChange'=>'js:getScBcp()'),
+					),
+					'prepend' => '<i class="glyphicon glyphicon-tags"></i>',
+				)
+			); ?>
+
 			<?php echo $form->dropDownListGroup(
 				$model,
 				'sc',
@@ -59,41 +70,9 @@
 					'wrapperHtmlOptions' => array(
 					),
 					'widgetOptions' => array(
-						'data' => $sc,
-						'htmlOptions' => array('multiple' => false, 
-							'ajax' => array(
-		                        'type'=>'POST', //request type
-		                        'dataType' => 'json',
-		                        'url'=>Yii::app()->createUrl('/usuarioMasivo/getInfUsuario'), //url to call.
-		                        'data' => array('id_usuario' => 'js:$("#UsuarioMasivoScForm_id_usuario").val()', 'sc' => 'js:$("#UsuarioMasivoScForm_sc").val()'),
-		                        'beforeSend' => 'function(){
-		                        	$("#div_operadoras").hide();
-		                        	$("#div_error").hide();
-		                        }',
-		                        'success' => 'function(response){
-		                                if (response.error == "false")
-		                                {
-		                                    var oper_usuario = response.operadoras_usuario;
-		                                    var oper_cliente = response.operadoras_cliente;
-
-		                                    $("#div_operadoras").html("<center>"+oper_cliente+"</center>");
-		                                    $(".operadora").bootstrapSwitch("onColor", "success");
-		                                    $(".operadora").bootstrapSwitch("offColor", "danger");
-		                                    $("#div_operadoras").show();
-		                                    activarOperadoras(oper_usuario);
-		                                }
-		                                else
-		                                {
-		                                    $("#div_error").show();
-		                                    $("#div_operadoras").hide();
-		                                    console.log(response.status);
-		                                }
-		                            }'
-		                		),	
-						),
+						'htmlOptions' => array('multiple' => false, 'onChange'=>'js:getInfUsuario()'),
 					),
 					'prepend' => '<i class="glyphicon glyphicon-tags"></i>',
-					//'hint' => 'Haz clic <a href="'.Yii::app()->createUrl("/clientesBcp/activateCliente", array("id_cliente_sms"=>$model->id_cliente)).'">aqui</a> para habilitar los SC que no aparecen en esta lista',
 				)
 			); ?>
 	</div>
@@ -139,15 +118,58 @@
         });
 	}
 
-	$(document).ready(function() 
-    {
-    	if ($("#UsuarioMasivoScForm_sc").val() != "")
+	function getScBcp()
+	{
+		if ($("#UsuarioMasivoScForm_id_cliente_sms").val() != "")
+		{
+			$.ajax({
+	            url: "<?php echo Yii::app()->createUrl('/usuarioMasivo/getScBcp'); ?>",
+	            type: "POST",
+	            dataType: 'json',    
+	            data:{id_usuario:$("#UsuarioMasivoScForm_id_usuario").val(), sc:$("#UsuarioMasivoScForm_sc").val(), id_cliente_sms:$("#UsuarioMasivoScForm_id_cliente_sms").val()},
+	            
+	            beforeSend: function(){
+                    $("#div_operadoras").hide();
+		            $("#div_error").hide();
+                },
+	            success: function(response)
+	            {
+	            	if (response.error == "false")
+		           	{
+		            	var sc = response.data;;
+
+	                    $("#UsuarioMasivoScForm_sc").empty();
+	                    var sc = response.data;
+	                    $.each(sc, function(i, value) {
+	                        $("#UsuarioMasivoScForm_sc").append($("<option>").text(value.sc).attr("value",value.sc));
+	                    });
+
+	                    getInfUsuario();
+                	}
+                	else
+                	{
+                		$("#UsuarioMasivoScForm_sc").empty();
+                         $("#div_error").html('<span class="glyphicon glyphicon-ban-circle"></span> '+response.status).show();
+                        $("#div_operadoras").hide();
+                	}
+	            },
+	            error: function()
+	            {
+	                alert("Ocurrio un error al cargar los short codes del cliente");
+	            }
+	        });
+		}
+	}
+
+	function getInfUsuario()
+	{
+		if ($("#UsuarioMasivoScForm_sc").val() != "")
 		{
 			$.ajax({
 	            url: "<?php echo Yii::app()->createUrl('/usuarioMasivo/getInfUsuario'); ?>",
 	            type: "POST",
 	            dataType: 'json',    
-	            data:{id_usuario:$("#UsuarioMasivoScForm_id_usuario").val(), sc:$("#UsuarioMasivoScForm_sc").val()},
+	            data:{id_usuario:$("#UsuarioMasivoScForm_id_usuario").val(), sc:$("#UsuarioMasivoScForm_sc").val(), id_cliente_sms:$("#UsuarioMasivoScForm_id_cliente_sms").val()},
 	            
 	            beforeSend: function(){
                     $("#div_operadoras").hide();
@@ -168,9 +190,8 @@
                     }
                     else
                     {
-                        $("#div_error").show();
+                        $("#div_error").html('<span class="glyphicon glyphicon-ban-circle"></span> '+response.status).show();
 		                $("#div_operadoras").hide();
-                        //console.log(response.status);
                     }
 	            },
 	            error: function()
@@ -179,6 +200,11 @@
 	            }
 	        });
 		}
+	}
+
+	$(document).ready(function() 
+    {
+    	getScBcp();
     });
 
 </script>

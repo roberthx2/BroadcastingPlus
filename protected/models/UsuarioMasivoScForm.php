@@ -24,7 +24,7 @@ class UsuarioMasivoScForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'id_cliente' => 'Cliente',
+			'id_cliente_sms' => 'Cliente',
 			'sc' => 'Short Code',
 			//'operadoras' => 'Operadoras',
 		);

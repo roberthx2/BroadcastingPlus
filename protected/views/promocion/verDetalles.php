@@ -40,3 +40,9 @@ $this->widget(
 );
 ?>
 </fieldset>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".paginacion").hide();
+    });
+</script>

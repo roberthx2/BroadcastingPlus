@@ -14,9 +14,9 @@
 	      </span>
 	    </div><!-- /input-group -->
 	</div>
-	<div class="col-xs-4 col-sm-5 col-md-5 col-lg-4" style="padding-top: 5px; padding-right: 0px;"> <p align="right"><?php echo $form->labelEx($model,'pageSize'); ?> </p> </div>
+	<div class="col-xs-4 col-sm-5 col-md-5 col-lg-4 paginacion" style="padding-top: 5px; padding-right: 0px;"> <p align="right"><?php echo $form->labelEx($model,'pageSize'); ?> </p> </div>
 
-	<div class="col-xs-2 col-sm-1 col-md-1 col-lg-2">
+	<div class="col-xs-2 col-sm-1 col-md-1 col-lg-2 paginacion">
 
 	    <div class="input-group">
 	    	<?php

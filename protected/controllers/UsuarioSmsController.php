@@ -28,7 +28,7 @@ class UsuarioSmsController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('index','view', 'admin','delete', 'create','update','getLogin','isAdmin'),
+				'actions'=>array('index','view', 'admin','delete', 'create','update','getLogin','isAdmin', 'getCadenaSc'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -174,4 +174,10 @@ class UsuarioSmsController extends Controller
 		$model=UsuarioSms::model()->COUNT("id_usuario=:id_usuario AND id_perfil IN (1,2)", array(":id_usuario"=>$id_usuario));
 		return ($model == 0) ? false : true; 
 	}
+
+	public function actionGetCadenaSc($id_usuario)
+    {
+        $model=UsuarioSms::model()->findByPk($id_usuario);
+        return Yii::app()->Funciones->limpiarNumerosTexarea($model->cadena_sc);
+    }
 }

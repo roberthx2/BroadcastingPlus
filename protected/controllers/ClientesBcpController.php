@@ -488,7 +488,7 @@ class ClientesBcpController extends Controller
 
 				if ($value["alfanumerico"] == 1)
 				{
-					$operadoras .= '<td><input type="text" readonly class="form-control sc_alf sc_alf_'.$value["id_operadora"].'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value["id_operadora"].'] style="text-transform:uppercase;"></td>';
+					$operadoras .= '<td><input type="text" readonly value="'.$value["sc"].'" class="form-control sc_alf sc_alf_'.$value["id_operadora"].'" autocomplete="off" maxlength="9" onkeypress="return validarScAlf(event);" placeholder="SC Alf" name=sc_alf['.$value["id_operadora"].'] style="text-transform:uppercase;"></td>';
 				}
 				else
 					$operadoras .= '<td></td>';

@@ -78,10 +78,12 @@ class Procedimientos extends CApplicationComponent
         return $model;
 	}
 
-	public function getClientesBCP($id_usuario)
+	public function getClientesBCP($id_usuario, $configuracion=null)
 	{   
+		$configuracion = ($configuracion==null) ? false : true;
+
         $sql = "SELECT GROUP_CONCAT(DISTINCT id_cliente_sms) AS ids_clientes FROM clientes_bcp "
-        		. "WHERE id_cliente_sms IN (".$this->getClienteBCNLHerencia($id_usuario).")";
+        		. "WHERE id_cliente_sms IN (".$this->getClienteBCPHerencia($id_usuario, $configuracion).")";
        	$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
        	$ids_clientes = ($sql["ids_clientes"] == "") ? "null" : $sql["ids_clientes"];
@@ -173,6 +175,43 @@ class Procedimientos extends CApplicationComponent
         else return "null";
 	}
 
+	public function getClienteBCPHerencia($id_usuario, $configuracion)
+	{
+		$usuario = UsuarioSms::model()->findByPk($id_usuario);
+
+		$cadena_serv = Yii::app()->Funciones->limpiarNumerosTexarea($usuario->cadena_serv);
+		$cadena_serv = ($cadena_serv == "") ? "null" : $cadena_serv;
+
+		$criteria = new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(DISTINCT cliente) AS cliente";
+		$criteria->addInCondition("id_producto", explode(",", $cadena_serv));
+		$clientes = Producto::model()->find($criteria);
+
+		$cadena_clientes = Yii::app()->Funciones->limpiarNumerosTexarea($clientes->cliente);
+		$cadena_clientes = ($cadena_clientes == "") ? "null" : $cadena_clientes;
+
+		if ($configuracion || (!$configuracion && UsuarioSmsController::actionIsAdmin($id_usuario) ) )
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT cb.id_cliente_sms) AS cliente FROM clientes_bcp cb 
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+				WHERE cb.id_cliente_sms IN (".$cadena_clientes.") AND cb.alfanumerico = 0 AND c.onoff = 1"; 
+		}
+		else
+		{
+			$sql = "SELECT GROUP_CONCAT(DISTINCT cb.id_cliente_sms) AS cliente FROM usuario_clientes_bcp uc
+				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+				WHERE uc.id_usuario = ".$id_usuario." AND cb.id_cliente_sms IN (".$cadena_clientes.") AND cb.alfanumerico = 0 AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+		$cadena_clientes = Yii::app()->Funciones->limpiarNumerosTexarea($sql["cliente"]);
+		$cadena_clientes = ($cadena_clientes == "") ? "null" : $cadena_clientes;
+
+        return $cadena_clientes;
+	}
+
 	public function getUsuariosBCNLHerencia($id_usuario)
 	{
 		$model_sms = UsuarioSms::model()->findByPk($id_usuario);
@@ -219,9 +258,11 @@ class Procedimientos extends CApplicationComponent
         return implode(",", $ids_usuarios);
 	}
 
-	public function getScClienteBCP($id_cliente_sms)
+	public function getScClienteBCP($id_cliente_sms, $id_usuario=null)
 	{
-		if (Yii::app()->user->isAdmin())
+		$id_usuario = ($id_usuario==null) ? Yii::app()->user->id : $id_usuario;
+
+		if (UsuarioSmsController::actionIsAdmin($id_usuario))
 		{
 			$sql = "SELECT DISTINCT c.sc FROM clientes_bcp cb 
 				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
@@ -229,7 +270,7 @@ class Procedimientos extends CApplicationComponent
 		}
 		else
 		{
-			$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea(Yii::app()->user->getCadenaSc());
+			$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea(UsuarioSmsController::actionGetCadenaSc($id_usuario));
 			$cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
 
 			$criteria = new CDbCriteria;
@@ -241,7 +282,40 @@ class Procedimientos extends CApplicationComponent
 			$sql = "SELECT DISTINCT c.sc FROM usuario_clientes_bcp uc
 				INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
 				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
-				WHERE uc.id_usuario = ".Yii::app()->user->id." AND cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.sc IN (".$cadena_sc.") AND c.onoff = 1";
+				WHERE uc.id_usuario = ".$id_usuario." AND cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.sc IN (".$cadena_sc.") AND c.onoff = 1";
+		}
+
+		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+        $sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
+        $sql = $sql->queryAll();
+
+        return $sql;
+	}
+
+	public function getScClienteBCPConfiguracion($id_cliente_sms, $id_usuario=null)
+	{
+		$id_usuario = ($id_usuario==null) ? Yii::app()->user->id : $id_usuario;
+
+		if (UsuarioSmsController::actionIsAdmin($id_usuario))
+		{
+			$sql = "SELECT DISTINCT c.sc FROM clientes_bcp cb 
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id 
+				WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.onoff = 1"; 
+		}
+		else
+		{
+			$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea(UsuarioSmsController::actionGetCadenaSc($id_usuario));
+			$cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
+
+			$criteria = new CDbCriteria;
+			$criteria->select = "GROUP_CONCAT(DISTINCT sc_id) AS sc_id";
+			$criteria->addInCondition("id_sc", explode(",", $cadena_sc));
+			$sc_id = ScId::model()->find($criteria);
+			$cadena_sc = ($sc_id->sc_id == "") ? "null" : $sc_id->sc_id;
+
+			$sql = "SELECT DISTINCT c.sc FROM clientes_bcp cb 
+				INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
+				WHERE cb.id_cliente_sms = :id_cliente_sms AND cb.alfanumerico = 0 AND c.sc IN (".$cadena_sc.") AND c.onoff = 1";
 		}
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
@@ -283,7 +357,7 @@ class Procedimientos extends CApplicationComponent
 		}
 
 		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
-        $sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
+		$sql->bindParam(":id_cliente_sms", $id_cliente_sms, PDO::PARAM_INT);
         $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
         $sql = $sql->queryAll();
 

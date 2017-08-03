@@ -28,7 +28,7 @@ class UsuarioMasivoController extends Controller
 	{
 		return array(
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'accesoBcplus', 'updateAccesoBcplus', 'asignarSc', 'getInfUsuario'),
+				'actions'=>array('create','update', 'index', 'view', 'admin', 'delete', 'accesoBcplus', 'updateAccesoBcplus', 'asignarSc', 'getScBcp', 'getInfUsuario'),
 				'users'=>array('@'),
 			),
 			array('deny',  // deny all users
@@ -272,90 +272,65 @@ class UsuarioMasivoController extends Controller
                     Yii::app()->user->setFlash("danger", $sms);
                     $transaction->rollBack();
                     $transaction2->rollBack();
-                    //print_r($e);
                 }
 		}
 
-		$criteria = new CDbCriteria;
-		$criteria->select = "cadena_sc, cadena_serv";
-		$criteria->compare("id_usuario", $id);
-		$usuario = UsuarioSms::model()->find($criteria);
-
-		$cadena_sc = Yii::app()->Funciones->limpiarNumerosTexarea($usuario->cadena_sc);
-		$cadena_sc = ($cadena_sc == "") ? "null" : $cadena_sc;
-
-		$cadena_serv = Yii::app()->Funciones->limpiarNumerosTexarea($usuario->cadena_serv);
-		$cadena_serv = ($cadena_serv == "") ? "null" : $cadena_serv;
-
-		$criteria = new CDbCriteria;
-		$criteria->select = "GROUP_CONCAT(DISTINCT sc_id) AS sc_id";
-		$criteria->addInCondition("id_sc", explode(",", $cadena_sc));
-		$sc_id = ScId::model()->find($criteria);
-
-		$cadena_sc = ($sc_id->sc_id == "") ? "null" : $sc_id->sc_id;
-
-		$criteria = new CDbCriteria;
-		$criteria->select = "GROUP_CONCAT(DISTINCT cliente) AS cliente";
-		$criteria->addInCondition("id_producto", explode(",", $cadena_serv));
-		$clientes = Producto::model()->find($criteria);
-
-		$clientes_sms = ($clientes->cliente == "") ? "null" : $clientes->cliente;
-
-		$sql = "SELECT GROUP_CONCAT(DISTINCT c.sc) AS sc FROM cliente c 
-						WHERE c.id_cliente_sms IN (".$clientes_sms.")  
-							AND c.id_cliente_sc_numerico = 0 
-							AND sc IN (".$cadena_sc.") 
-							AND sc NOT REGEXP '[a-zA-Z]+' 
-							AND c.onoff = 1";
-							//print_r($sql);
-
-		$sql = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-
-        if ($sql["sc"] != "")
-        {
-	        $sc_aux = array_unique(explode(",", $sql["sc"]));
-
-	        foreach ($sc_aux as $value)
-	        {
-	        	$sc[$value] = $value;
-	        }
-
-	        asort($sc);
-	    }
-	    else $sc = array();
-
 		$model->id_usuario = $id;
-		$model->id_cliente_sms = $usuario->id_cliente;
 
 		$this->render('asignarSc', array( 
 			'model'=>$model,
-			'sc'=>$sc,
 		));
+	}
+
+	public function actionGetScBcp()
+	{
+		$id_cliente = Yii::app()->request->getParam('id_cliente_sms');
+		$id_usuario = Yii::app()->request->getParam('id_usuario');
+
+		if (Yii::app()->request->isAjaxRequest)
+        {
+
+            $data = Yii::app()->Procedimientos->getScClienteBCPConfiguracion($id_cliente, $id_usuario);
+
+            if($data)
+            {
+                echo CJSON::encode(array(
+                                        'error' => 'false',
+                                        'status' => 'SC obtenidos correctamente',
+                                        'data' => $data
+                                   )                                
+                     );
+                Yii::app()->end();
+            } else {
+                echo CJSON::encode(array(
+                    'error' => 'true',
+                    'status' => 'El cliente no posee sc asociados'
+                ));
+                Yii::app()->end();
+            }
+        }
 	}
 
 	public function actionGetInfUsuario()
 	{
 		$id_usuario = Yii::app()->request->getParam('id_usuario');
+		$id_cliente = Yii::app()->request->getParam('id_cliente_sms');
 		$sc = Yii::app()->request->getParam('sc');
         
         if (Yii::app()->request->isAjaxRequest)
         {
-        	$criteria = new CDbCriteria;
-			$criteria->select = "id_cliente";
-			$criteria->compare("id_usuario", $id_usuario);
-			$usuario = UsuarioSms::model()->find($criteria);
-
-			$operadoras_cliente = ClientesBcpController::actionGetOperadorasCliente($usuario->id_cliente, $sc);
+			$operadoras_cliente = ClientesBcpController::actionGetOperadorasCliente($id_cliente, $sc);
 
 			$sql = "SELECT t.* FROM (
 					SELECT c.id, c.sc, cb.id_operadora, alfanumerico FROM usuario_clientes_bcp uc
 					INNER JOIN clientes_bcp cb ON uc.id_cliente_bcp = cb.id
 					INNER JOIN cliente c ON cb.id_cliente_bcp = c.id
-					WHERE uc.id_usuario = :id_usuario AND cb.id_cliente_sms = ".$usuario->id_cliente." AND cb.sc = :sc AND c.onoff = 1) AS t
+					WHERE uc.id_usuario = :id_usuario AND cb.id_cliente_sms = :id_cliente_sms AND cb.sc = :sc AND c.onoff = 1) AS t
 					INNER JOIN operadora_cliente oc ON t.id = oc.id_cliente AND t.id_operadora = oc.id_op
 					GROUP BY oc.id_op, alfanumerico";
 
 			$sql = Yii::app()->db_insignia_alarmas->createCommand($sql);
+			$sql->bindParam(":id_cliente_sms", $id_cliente, PDO::PARAM_INT);
 			$sql->bindParam(":id_usuario", $id_usuario, PDO::PARAM_INT);
 	        $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
 	        $operadoras_usuario = $sql->queryAll();

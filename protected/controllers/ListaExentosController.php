@@ -47,11 +47,12 @@ class ListaExentosController extends Controller
 		$existe = ListaExentos::model()->find("id_usuario = ".$id_usuario);
 
 		if ($existe===null)
-			$this->actionCreate($id_usuario);
+			$id_lista=$this->actionCreate($id_usuario);
+		else $id_lista = $existe->id_lista;
 
 		if (UsuarioSmsController::actionIsAdmin($id_usuario))
 			$this->redirect(Yii::app()->createUrl("listaExentos/admin"));
-		else $this->redirect(Yii::app()->createUrl("listaExentos/adminDestinatarios", array("id"=>$existe->id_lista)));
+		else $this->redirect(Yii::app()->createUrl("listaExentos/adminDestinatarios", array("id"=>$id_lista)));
 
 		//$this->render('index');
 	}
@@ -68,6 +69,8 @@ class ListaExentosController extends Controller
 
 		$log = "LISTA DE EXENTOS (CREAR) | id_lista: ".$model->primarykey." | usuario: ".$login;
 		Yii::app()->Procedimientos->setLog($log);
+
+		return $model->primarykey;
 	}
 
 	public function actionAdmin()
