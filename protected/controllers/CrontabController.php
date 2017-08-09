@@ -1290,6 +1290,168 @@ class CrontabController extends Controller
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public function actionMigrarListas()
+    {
+        $hora_inio = date("Y-m-d H:i:s");
+        $log = "Migrar listas: Hora de inicio ".$hora_inio;
+        Yii::app()->Procedimientos->setLog($log);
+
+        printf("Hora inicio: ".$hora_inio.".<br>");
+
+        print_r("Buscando usuarios con acceso al sistema....<br>");
+        $criteria = new CDbCriteria;
+        $criteria->select = "GROUP_CONCAT(p.id_usuario) AS id_usuario";
+        $criteria->join = "INNER JOIN insignia_masivo_premium.permisos p ON t.id_usuario = p.id_usuario";
+        $criteria->compare("p.acceso_sistema", 1);
+        $criteria->compare("p.broadcasting", 1);
+        print_r($criteria);
+        print_r(".<br>");
+        $usuarios_masivos = UsuarioMasivo::model()->find($criteria);
+
+        if ($usuarios_masivos->id_usuario != "")
+        {
+            print_r("Obteniendo listas de usuarios con acceso al sistema que no hayan sido analizadas...<br>");
+
+            $sql = "SELECT * FROM listas WHERE usuario IN (".$usuarios_masivos->id_usuario.") AND migrada = 0";
+            print_r($sql."<br>");
+            $listas = Yii::app()->db->createCommand($sql)->queryAll();
+
+            if ($sql)
+            {
+                foreach ($listas as $value)
+                {
+                    $sql = "SELECT COUNT(id_destinatario) AS total FROM destinatarios_lista WHERE id_lista = ".$value["id_lista"];
+                    print_r($sql."<br>");
+                    $count = Yii::app()->db->createCommand($sql)->queryRow();
+
+                    if ($count["total"] > 0)
+                    {
+                        $sql = "SELECT  SUBSTRING(destinatario, 2) AS destinatario, estado FROM destinatarios_lista WHERE id_lista = ".$value["id_lista"];
+                        print_r($sql."<br>");
+                        $destinatatios = Yii::app()->db->createCommand($sql)->queryAll();
+
+                        $destinatatios_array = array();
+
+                        foreach ($destinatatios as $key)
+                        {
+                            $destinatatios_array[] = "(#id_proceso#, '".$key["destinatario"]."', ".$key["estado"].")";
+                        }
+
+                        /*Obteniendo nombre*/
+
+                        print_r("Limpiando nombre de la lista...<br>");
+                        $nombre = substr($value["nombre"], 0, 30);
+                        $nombre = Yii::app()->Funciones->limpiarNombre($nombre);
+                        $nombre = Yii::app()->Funciones->limpiarMensaje($nombre);
+                        $existe = false;
+                        $i = 1;
+
+                        do
+                        {
+                            $sql = "SELECT COUNT(id_lista) AS total FROM lista WHERE id_usuario = ".$value["usuario"]." AND nombre = '".$nombre."'";
+                            print_r($sql."<br>");
+                            $count = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+                            if ($count["total"] > 0)
+                            {
+                                $existe = true;
+                                $i++;
+                                $nombre .= "_".$i;
+                            }
+                            else
+                                $existe = false;
+
+                        } while ($existe);
+
+                        print_r($nombre."<br>");
+                        /**************** FIN DE NOMBRE ********************/
+
+                        print_r("Inicia la transaccion...<br>");
+                        $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+                        try
+                        {
+                            $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
+
+                            //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+                            Yii::app()->Procedimientos->setNumerosPersonalizadosTmpProcesamiento($id_proceso, $destinatatios_array);
+
+                            //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
+                            Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
+
+                            //Updatea en estado 3 todos los numeros duplicados
+                            Yii::app()->Filtros->filtrarDuplicados($id_proceso);
+
+                            //Updatea a estado = 1 todos los numeros validos 
+                            Yii::app()->Filtros->filtrarAceptados($id_proceso);
+
+                            //Cantidad de destinatarios validos
+                            $total = Yii::app()->Procedimientos->getNumerosValidos($id_proceso);
+
+                            if ($total > 0)
+                            {
+                                $model_lista = new Lista;
+                                $model_lista->id_usuario = $value["usuario"];
+                                $model_lista->nombre = $nombre;
+                                $model_lista->fecha = $value["fecha"];
+                                $model_lista->estado = $value["prefiltrada"];
+                                $model_lista->save();
+                                $id_lista = $model_lista->primaryKey;
+
+                                $sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora, estado) SELECT ".$id_lista.", numero, id_operadora, mensaje FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
+                                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                                $sql = "INSERT INTO lista_migracion_relacion (id_lista_antigua, id_lista_nueva) VALUES (".$value["id_lista"].", ".$id_lista.")";
+                                print_r($sql."<br>");
+                                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                                $log = "LISTA CREADA | id_lista: ".$id_lista." | Destinatarios: ".$total;
+                                Yii::app()->Procedimientos->setLog($log);
+
+                                print_r("Lista creada...<br>");
+
+                                $transaction->commit();
+                            }
+                            else
+                            {
+                                print_r("La lista no fue creada ya que no contiene destinatarios validos...<br>");
+                                $transaction->rollBack();
+                            }
+                        
+                        } catch (Exception $e) {
+                            print_r("Aplicando rollBack...<br>");
+                            $transaction->rollBack();
+                        }
+                    }
+                    else
+                    {
+                        print_r("La lista no posee destinatatios asociados... Eliminando lista...<br>");
+                        $sql = "DELETE FROM listas WHERE id_lista = ".$value["id_lista"];
+                        print_r($sql."<br>");
+                        Yii::app()->db->createCommand($sql)->execute();
+                    }
+                }
+            }
+            else
+            {
+                print_r("No hay listas pendientes por migrar...<br>");
+            }
+        }
+        else
+        {
+            print_r("No existen usuarios con acceso al sistema .<br>");
+        }
+
+
+        $hora_finalizacion = date("Y-m-d H:i:s");
+        $log = "Migrar listas: Hora de finalizacion ".$hora_finalizacion;
+        Yii::app()->Procedimientos->setLog($log);
+
+        print_r("Hora de finalización: ".$hora_finalizacion);
+
+        print_r(".<br>----------------------------------------------------------------------------------------------------------------------.<br>");   
+    }
 }
 
 ?>
