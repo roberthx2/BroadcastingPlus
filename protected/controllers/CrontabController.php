@@ -1,5 +1,6 @@
 <?php
 ini_set("max_execution_time",0);
+ini_set('memory_limit', '-1');
 class CrontabController extends Controller
 {
     //public $layout="//layouts/menuApp";
@@ -1332,10 +1333,19 @@ class CrontabController extends Controller
                         $destinatatios = Yii::app()->db->createCommand($sql)->queryAll();
 
                         $destinatatios_array = array();
+                        $i = 0;
+                        $j = 0;
 
                         foreach ($destinatatios as $key)
                         {
-                            $destinatatios_array[] = "(#id_proceso#, '".$key["destinatario"]."', ".$key["estado"].")";
+                            if ($i == 5000)
+                            {
+                                $j++;
+                                $i = 0;
+                            }
+
+                            $destinatatios_array[$j][] = "(#id_proceso#, '".$key["destinatario"]."', ".$key["estado"].")";
+                            $i++;
                         }
 
                         /*Obteniendo nombre*/
@@ -1374,8 +1384,11 @@ class CrontabController extends Controller
                         {
                             $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
 
-                            //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
-                            Yii::app()->Procedimientos->setNumerosPersonalizadosTmpProcesamiento($id_proceso, $destinatatios_array);
+                            foreach ($destinatatios_array as $i)
+                            {
+                                //Guarda los numeros ingresados en el textarea en la tabla de procesamiento
+                               Yii::app()->Procedimientos->setNumerosPersonalizadosTmpProcesamiento($id_proceso, $i);
+                            }
 
                             //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
                             Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
@@ -1405,6 +1418,10 @@ class CrontabController extends Controller
                                 $sql = "INSERT INTO lista_migracion_relacion (id_lista_antigua, id_lista_nueva) VALUES (".$value["id_lista"].", ".$id_lista.")";
                                 print_r($sql."<br>");
                                 Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                                $sql = "UPDATE listas SET migrada = 1 WHERE id_lista = ".$value["id_lista"];
+                                print_r($sql."<br>");
+                                Yii::app()->db->createCommand($sql)->execute();
 
                                 $log = "LISTA CREADA | id_lista: ".$id_lista." | Destinatarios: ".$total;
                                 Yii::app()->Procedimientos->setLog($log);
