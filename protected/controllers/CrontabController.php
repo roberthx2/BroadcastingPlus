@@ -1404,13 +1404,13 @@ class CrontabController extends Controller
 
                             if ($total > 0)
                             {
-                                $model_lista = new Lista;
-                                $model_lista->id_usuario = $value["usuario"];
-                                $model_lista->nombre = $nombre;
-                                $model_lista->fecha = $value["fecha"];
-                                $model_lista->estado = $value["prefiltrada"];
-                                $model_lista->save();
-                                $id_lista = $model_lista->primaryKey;
+                                $sql = "INSERT INTO lista (id_usuario, nombre, fecha, estado) VALUES (".$value["usuario"].", '".$nombre."', '".$value["fecha"]."', ".$value["prefiltrada"].")";
+                                Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+                                $sql = "SELECT DISTINCT LAST_INSERT_ID() AS id_lista FROM lista";
+                                $sql = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
+
+                                $id_lista = $sql["id_lista"];
 
                                 $sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora, estado) SELECT ".$id_lista.", numero, id_operadora, mensaje FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
                                 Yii::app()->db_masivo_premium->createCommand($sql)->execute();
@@ -1435,7 +1435,6 @@ class CrontabController extends Controller
                                 print_r("La lista no fue creada ya que no contiene destinatarios validos...<br>");
                                 $transaction->rollBack();
                             }
-                        
                         } catch (Exception $e) {
                             print_r("Aplicando rollBack...<br>");
                             $transaction->rollBack();
