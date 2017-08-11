@@ -1298,24 +1298,24 @@ class CrontabController extends Controller
         $log = "Migrar listas: Hora de inicio ".$hora_inio;
         Yii::app()->Procedimientos->setLog($log);
 
-        printf("Hora inicio: ".$hora_inio.".<br>");
+        printf("Hora inicio: ".$hora_inio.".\n");
 
-        print_r("Buscando usuarios con acceso al sistema....<br>");
+        print_r("Buscando usuarios con acceso al sistema....\n");
         $criteria = new CDbCriteria;
         $criteria->select = "GROUP_CONCAT(p.id_usuario) AS id_usuario";
         $criteria->join = "INNER JOIN insignia_masivo_premium.permisos p ON t.id_usuario = p.id_usuario";
         $criteria->compare("p.acceso_sistema", 1);
         $criteria->compare("p.broadcasting", 1);
         print_r($criteria);
-        print_r(".<br>");
+        print_r(".\n");
         $usuarios_masivos = UsuarioMasivo::model()->find($criteria);
 
         if ($usuarios_masivos->id_usuario != "")
         {
-            print_r("Obteniendo listas de usuarios con acceso al sistema que no hayan sido analizadas...<br>");
+            print_r("Obteniendo listas de usuarios con acceso al sistema que no hayan sido analizadas...\n");
 
             $sql = "SELECT * FROM listas WHERE usuario IN (".$usuarios_masivos->id_usuario.") AND migrada = 0";
-            print_r($sql."<br>");
+            print_r($sql."\n");
             $listas = Yii::app()->db->createCommand($sql)->queryAll();
 
             if ($sql)
@@ -1323,13 +1323,13 @@ class CrontabController extends Controller
                 foreach ($listas as $value)
                 {
                     $sql = "SELECT COUNT(id_destinatario) AS total FROM destinatarios_lista WHERE id_lista = ".$value["id_lista"];
-                    print_r($sql."<br>");
+                    print_r($sql."\n");
                     $count = Yii::app()->db->createCommand($sql)->queryRow();
 
                     if ($count["total"] > 0)
                     {
                         $sql = "SELECT  SUBSTRING(destinatario, 2) AS destinatario, estado FROM destinatarios_lista WHERE id_lista = ".$value["id_lista"];
-                        print_r($sql."<br>");
+                        print_r($sql."\n");
                         $destinatatios = Yii::app()->db->createCommand($sql)->queryAll();
 
                         $destinatatios_array = array();
@@ -1350,7 +1350,7 @@ class CrontabController extends Controller
 
                         /*Obteniendo nombre*/
 
-                        print_r("Limpiando nombre de la lista...<br>");
+                        print_r("Limpiando nombre de la lista...\n");
                         $nombre = substr($value["nombre"], 0, 30);
                         $nombre = Yii::app()->Funciones->limpiarNombre($nombre);
                         $nombre = Yii::app()->Funciones->limpiarMensaje($nombre);
@@ -1360,7 +1360,7 @@ class CrontabController extends Controller
                         do
                         {
                             $sql = "SELECT COUNT(id_lista) AS total FROM lista WHERE id_usuario = ".$value["usuario"]." AND nombre = '".$nombre."'";
-                            print_r($sql."<br>");
+                            print_r($sql."\n");
                             $count = Yii::app()->db_masivo_premium->createCommand($sql)->queryRow();
 
                             if ($count["total"] > 0)
@@ -1374,10 +1374,10 @@ class CrontabController extends Controller
 
                         } while ($existe);
 
-                        print_r($nombre."<br>");
+                        print_r($nombre."\n");
                         /**************** FIN DE NOMBRE ********************/
 
-                        print_r("Inicia la transaccion...<br>");
+                        print_r("Inicia la transaccion...\n");
                         $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
                         try
@@ -1416,47 +1416,47 @@ class CrontabController extends Controller
                                 Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                                 $sql = "INSERT INTO lista_migracion_relacion (id_lista_antigua, id_lista_nueva) VALUES (".$value["id_lista"].", ".$id_lista.")";
-                                print_r($sql."<br>");
+                                print_r($sql."\n");
                                 Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                                 $sql = "UPDATE listas SET migrada = 1 WHERE id_lista = ".$value["id_lista"];
-                                print_r($sql."<br>");
+                                print_r($sql."\n");
                                 Yii::app()->db->createCommand($sql)->execute();
 
                                 $log = "LISTA CREADA | id_lista: ".$id_lista." | Destinatarios: ".$total;
                                 Yii::app()->Procedimientos->setLog($log);
 
-                                print_r("Lista creada...<br>");
+                                print_r("Lista creada...\n");
 
                                 $transaction->commit();
                             }
                             else
                             {
-                                print_r("La lista no fue creada ya que no contiene destinatarios validos...<br>");
+                                print_r("La lista no fue creada ya que no contiene destinatarios validos...\n");
                                 $transaction->rollBack();
                             }
                         } catch (Exception $e) {
-                            print_r("Aplicando rollBack...<br>");
+                            print_r("Aplicando rollBack...\n");
                             $transaction->rollBack();
                         }
                     }
                     else
                     {
-                        print_r("La lista no posee destinatatios asociados... Eliminando lista...<br>");
+                        print_r("La lista no posee destinatatios asociados... Eliminando lista...\n");
                         $sql = "DELETE FROM listas WHERE id_lista = ".$value["id_lista"];
-                        print_r($sql."<br>");
+                        print_r($sql."\n");
                         Yii::app()->db->createCommand($sql)->execute();
                     }
                 }
             }
             else
             {
-                print_r("No hay listas pendientes por migrar...<br>");
+                print_r("No hay listas pendientes por migrar...\n");
             }
         }
         else
         {
-            print_r("No existen usuarios con acceso al sistema .<br>");
+            print_r("No existen usuarios con acceso al sistema .\n");
         }
 
 
@@ -1466,7 +1466,7 @@ class CrontabController extends Controller
 
         print_r("Hora de finalización: ".$hora_finalizacion);
 
-        print_r(".<br>----------------------------------------------------------------------------------------------------------------------.<br>");   
+        print_r(".\n----------------------------------------------------------------------------------------------------------------------.\n");   
     }
 }
 
