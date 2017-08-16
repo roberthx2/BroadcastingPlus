@@ -325,7 +325,7 @@ class BtlController extends Controller
     {
         $sc = $_POST["Btl"]["sc"];
         $all_operadoras = $_POST["Btl"]["all_operadoras"];
-        $productos = $_POST["Btl"]["productos"];
+        $productos = implode(",", $_POST["Btl"]["productos"]);
 
         $fechas = $this->actionGetRangoFecha($_POST["Btl"]["tipo_busqueda"], $_POST["Btl"]["fecha"], $_POST["Btl"]["fecha_inicio"], $_POST["Btl"]["fecha_fin"], $_POST["Btl"]["year"], $_POST["Btl"]["anio"], $_POST["Btl"]["mes"]);
         
@@ -345,29 +345,42 @@ class BtlController extends Controller
         $criteria = new CDbCriteria();
         $criteria->select = "DISTINCT origen";
         $criteria->addBetweenCondition("data_arrive", $fechas["fecha_inicio"], $fechas["fecha_fin"]);
-        $criteria->addInCondition("id_producto", $productos);
+        $criteria->addInCondition("id_producto", explode(",", $productos));
         $criteria->compare("sc", $sc);
         $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
 
         $numeros = Smsin::model()->findAll($criteria);
         $numeros_array = array();
-
+        $i = 0;
+        $j = 0;
+        $bandera = false;
+        
         foreach ($numeros as $value)
         {
+            if ($i == 5000)
+            {
+                $j++;
+                $i = 0;
+            }
+
             $aux = Yii::app()->Funciones->formatearNumero($value->origen);
 
             if ($aux != false)
-                $numeros_array[] = $aux;
+            {
+                $numeros_array[$j][] = $aux;
+                $i++;
+                $bandera = true;
+            }
         }
 
-        if (COUNT($numeros_array) > 0)
+        if ($bandera)
         {
             $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
             try
             {
                 $id_proceso = Yii::app()->Procedimientos->getNumeroProceso();
-                $numeros = implode(",", $numeros_array);
+                //$numeros = implode(",", $numeros_array);
                 $id_usuario = Yii::app()->user->id;
 
                 $sql = "SELECT porcentaje_lista FROM control_fe INNER JOIN sc_id ON INSTR(sc_cadena, id_sc) 
@@ -378,10 +391,15 @@ class BtlController extends Controller
                 $sql->bindParam(":sc", $sc, PDO::PARAM_INT);
                 $porcentaje = $sql->queryRow();
 
-                //Guarda los numeros en la tabla de procesamiento
-                Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros);
+                foreach ($numeros_array as $i)
+                {
+                    $numeros = implode(",", $i);
+                    //Guarda los numeros en la tabla de procesamiento
+                    Yii::app()->Procedimientos->setNumerosTmpProcesamiento($id_proceso, $numeros);
+                }
+                
                 //Updatea los id_operadora de los numeros validos, para los invalidos updatea el estado = 2
-                Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso, 1, false);
+                Yii::app()->Filtros->filtrarInvalidosPorOperadora($id_proceso);
                 //Update en estado 4 todos los numeros exentos
                 Yii::app()->Filtros->filtrarExentos($id_proceso, 1, null);
                 //Update en estado 10 todos los numeros que sobrepasen el porcentaje permitido
