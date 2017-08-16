@@ -32,9 +32,9 @@ class Procedimientos extends CApplicationComponent
 		$sql = "CALL split_numeros('".$numeros."', ',', ".$id_proceso.")";
 		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
-		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) SELECT id_proceso, numero FROM splitvalues_numeros WHERE id_proceso = :id_proceso";
+		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) SELECT ".$id_proceso.", numero FROM splitvalues_numeros WHERE id_proceso = :id_proceso";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
-        $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_STR);
+        $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
         $sql->execute();
 	}
 
