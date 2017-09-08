@@ -1,3 +1,4 @@
+<?php header('Content-Type: text/html; charset=UTF-8'); ?>
 <?php 
 	$baseUrl = Yii::app()->baseUrl; 
 	Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/funciones.js');

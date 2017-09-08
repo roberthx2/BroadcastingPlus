@@ -119,13 +119,13 @@ class BtlController extends Controller
             }
             else
             {
-                $criteria = new CDbCriteria();
+                /*$criteria = new CDbCriteria();
                 $criteria->select = "ver_invalido";
                 $criteria->compare("id_usuario", Yii::app()->user->id);
                 $criteria->addCondition("sc_id = :sc");
                 $criteria->params[':sc'] = (int)$sc;
                 
-                $permiso = HabilitaInvalidos::model()->find($criteria);
+                $permiso = HabilitaInvalidos::model()->find($criteria);*/
 
                 $data = Yii::app()->db_sms->createCommand()
                             ->select("GROUP_CONCAT(CAST(id_producto AS CHAR(6))) AS id_producto, desc_producto")
@@ -136,8 +136,8 @@ class BtlController extends Controller
                             ->group("desc_producto")
                             ->order("desc_producto ASC");
 
-                if ($permiso->ver_invalido == "Y")
-                    $data = $data->union("SELECT '0', 'Comentarios Generales'");
+                /*if ($permiso->ver_invalido == "Y")
+                    $data = $data->union("SELECT '0', 'Comentarios Generales'");*/
                             
                 $productos = $data->query();
 
