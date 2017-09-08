@@ -98,14 +98,19 @@
 	<?php echo $content; ?>
 	<div class="clear"></div>
 </div>
-<!--<div class="footer img-responsive" style="background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg')"></div>-->
-<div style="position:fixed; right:0; left:0; z-index:1030; bottom:0; margin-bottom: 0; border-width:1px 0 0; border-radius: 0;">
-	<img class="img-responsive" src="<?php echo Yii::app()->request->baseUrl; ?>/img/footer.jpg">
-</div>
+<!--<div class="footer img-responsive" style="background-image: url('<?php //echo Yii::app()->request->baseUrl; ?>/img/footer.jpg')"></div>-->
+<!--<div style="position:fixed; right:0; left:0; z-index:1030; bottom:0; margin-bottom: 0; border-width:1px 0 0; border-radius: 0;">
+	<img class="img-responsive" src="<?php //echo Yii::app()->request->baseUrl; ?>/img/footer.jpg">
+</div>-->
 
 <!--<div id="footer" class=" visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png'); background-repeat: no-repeat">
 </div>-->
 
+<div id="footer_new">
+   <img src="<?php echo Yii::app()->request->baseUrl; ?>/img/logo_imc_red.png" width="150px" height="40px">
+   <br><strong>Copyright &copy; <?php echo date('Y'); ?> by <a href="http://insignia.com.ve/">Insignia Mobile Communications C.A.</strong></a>.<br/>
+   <strong>All Rights Reserved.</strong><br/>
+</div><!-- footer -->
 
 </body>
 </html>
@@ -143,6 +148,21 @@ body {
   background-repeat: no-repeat;
   /* background-color: #3F3E3E; */
 }
+
+#footer_new
+{
+    position:fixed;
+    right:0;
+    left:0;
+    z-index:1030;
+    bottom:0;
+    margin: 0px 0px;
+    font-size: 0.8em;
+    text-align: center;
+    border-top: 1px solid grey;
+    background: white;
+}
+
 
 /*************************************************/
 
