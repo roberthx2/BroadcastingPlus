@@ -107,6 +107,6 @@ $(document).ready(function()
 	
 	setInterval(function() {
 		updateNotifations();
-	}, 2000);
+	}, 30000);
 });
 </script>
