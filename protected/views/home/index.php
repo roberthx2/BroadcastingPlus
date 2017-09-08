@@ -28,7 +28,7 @@ if (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermis
             $_SESSION["buscarBcnl"] = $_GET['Promociones']["buscar"];
             $_SESSION["pageSizeBcnl"] = $_GET['Promociones']["pageSize"];
         }
-        else if($_GET["ajax"] == "detallesBCNLToday")
+        else if($_GET["ajax"] == "detallesBCNLToday" && isset($_SESSION["buscarBcnl"]))
         {
             $modelBCNL->buscar = $_SESSION["buscarBcnl"];
             $modelBCNL->pageSize = $_SESSION["pageSizeBcnl"];
@@ -56,7 +56,7 @@ if (Yii::app()->user->getPermisos()->broadcasting_premium)
             $_SESSION["buscarBcp"] = $_GET['PromocionesPremium']["buscar"];
             $_SESSION["pageSizeBcp"] = $_GET['PromocionesPremium']["pageSize"];
         }
-        else if($_GET["ajax"] == "detallesBCPToday")
+        else if($_GET["ajax"] == "detallesBCPToday" && isset($_SESSION["buscarBcp"]))
         {
             $modelBCP->buscar = $_SESSION["buscarBcp"];
             $modelBCP->pageSize = $_SESSION["pageSizeBcp"];
