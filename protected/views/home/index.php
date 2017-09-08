@@ -106,7 +106,7 @@ $(document).ready(function()
         quitarFrame();
 	
 	setInterval(function() {
-		updateNotifations();
-	}, 30000);
+		updateStatus();
+	}, 2000);
 });
 </script>
