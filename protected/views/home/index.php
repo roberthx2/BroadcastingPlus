@@ -87,11 +87,26 @@ function quitarFrame()
         self.parent.location='../../../../broadcasting/testVersion/Broadcasting/secure.php';
 }
 
+function updateStatus()
+{
+	$('#detallesBCPToday').yiiGridView('update', {
+        data: $(this).serialize()
+    });
+	
+	$('#detallesBCNLToday').yiiGridView('update', {
+        data: $(this).serialize()
+    });
+}
+
 $(document).ready(function() 
 {
     var aux = '<?php echo (isset($_SESSION["redireccionar"]) == true) ? $_SESSION["redireccionar"] : 1; ?>';
 
     if(aux == 0)
         quitarFrame();
+	
+	setInterval(function() {
+		updateNotifations();
+	}, 2000);
 });
 </script>
