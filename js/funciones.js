@@ -128,6 +128,7 @@ function countNumber() {
         var num = nats.length;
     }
     $("#total").val(num);
+	updateCantTotal();
     //countSpan.html(num);
 
 }
@@ -358,4 +359,10 @@ function defaultOperadoraBTL()
 function checkedOperadoraBTL()
 {
     $("#Btl_operadoras").prop('disabled', function(i, v) { return !v; });
+}
+
+function updateCantTotal()
+{
+	var total = parseInt($("#total").val()) + parseInt($("#cant_btl").val());
+	$("#cant_total").val(total);
 }

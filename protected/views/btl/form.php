@@ -267,7 +267,8 @@
                     else texto += ' | Total: '+total;
 
                     $("#div_btl_count").html('<strong>'+texto+'</strong>');
-
+					$("#cant_btl").val(total);
+					updateCantTotal();
             		$("#div_destinatarios_btl").show();
             		$("#modalBTL .close").click();
             	}

@@ -477,8 +477,13 @@
 					'prepend' => '<i class="glyphicon glyphicon-phone"></i>'
 				)
 			); ?>
-
+			<?php echo CHtml::hiddenField('cant_btl', 0, array('id'=>'cant_btl')); ?>
 			<div id="div_btl_count" style="float: right; font: bold 13px Arial;"></div>
+		</div>
+		<div class="clearfix visible-xs-block"></div>
+		<hr>
+		<div style="float: right; font: bold 13px Arial;"><strong>Cantidad total de sms: </strong>
+				<?php echo CHTML::textField('cant_total',0,array('size'=>2 ,'style'=>'margin-left:10px; border:0;', 'readonly' => true)); ?>
 		</div>
 	</div>
 
