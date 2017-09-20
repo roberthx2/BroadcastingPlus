@@ -106,7 +106,7 @@
 <!--<div id="footer" class=" visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png'); background-repeat: no-repeat">
 </div>-->
 
-<div id="footer_new">
+<div class="hidden-xs" id="footer_new">
    <img src="<?php echo Yii::app()->request->baseUrl; ?>/img/logo_imc_red.png" width="150px" height="40px">
    <br><strong>Copyright &copy; <?php echo date('Y'); ?> by <a href="http://insignia.com.ve/">Insignia Mobile Communications C.A.</strong></a>.<br/>
    <strong>All Rights Reserved.</strong><br/>

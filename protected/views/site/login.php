@@ -20,7 +20,7 @@
 $this->pageTitle=Yii::app()->name . ' - Login';
 ?>
 	<div class="form col-xs-12 col-sm-4 col-md-4 col-lg-3" >
-		<h2>Log in</h2>
+		<h2>Iniciar Sesi&oacute;n</h2>
 		<?php 
 
 		$form = $this->beginWidget(
