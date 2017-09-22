@@ -342,14 +342,33 @@ class BtlController extends Controller
             $operadoras_txt = OperadorasRelacion::model()->find(array("select"=>"GROUP_CONCAT(DISTINCT desp_op) AS desp_op", "condition"=>"id_operadora_bcnl IN(".$operadoras.")"));
         }
 
-        $criteria = new CDbCriteria();
+        if ($operadoras_txt->desp_op)
+        {
+            $oper_query = "'".str_replace(",", "','", $operadoras_txt->desp_op)."'";
+        }
+        else
+        {
+            $oper_query = "null";
+        }
+
+        $sql = "SELECT origen FROM smsin_btl FORCE INDEX (indice_web3) 
+                WHERE id_producto IN (".$productos.") AND 
+                        sc = ".$sc." AND 
+                        data_arrive BETWEEN '".$fechas["fecha_inicio"]."' AND '".$fechas["fecha_fin"]."' AND 
+                        desp_op IN (".$oper_query.") 
+                GROUP BY origen";
+                
+        $numeros = Yii::app()->db_sms->createCommand($sql)->queryAll();
+
+
+        /*$criteria = new CDbCriteria();
         $criteria->select = "DISTINCT origen";
         $criteria->addBetweenCondition("data_arrive", $fechas["fecha_inicio"], $fechas["fecha_fin"]);
         $criteria->addInCondition("id_producto", explode(",", $productos));
         $criteria->compare("sc", $sc);
         $criteria->addInCondition("desp_op", explode(",", $operadoras_txt->desp_op));
 
-        $numeros = Smsin::model()->findAll($criteria);
+        $numeros = Smsin::model()->findAll($criteria);*/
         $numeros_array = array();
         $i = 0;
         $j = 0;
@@ -363,7 +382,7 @@ class BtlController extends Controller
                 $i = 0;
             }
 
-            $aux = Yii::app()->Funciones->formatearNumero($value->origen);
+            $aux = Yii::app()->Funciones->formatearNumero($value["origen"]);
 
             if ($aux != false)
             {
