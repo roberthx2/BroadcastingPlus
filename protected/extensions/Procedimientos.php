@@ -29,13 +29,24 @@ class Procedimientos extends CApplicationComponent
 
 	public function setNumerosTmpProcesamiento($id_proceso, $numeros)
 	{
-		$sql = "CALL split_numeros('".$numeros."', ',', ".$id_proceso.")";
+		$arr_num = explode(",", $numeros);
+		$insert_num = array();
+
+		foreach ($arr_num as $value) 
+		{
+			$insert_num[] = "(".$id_proceso.", '".$value."')";
+		}
+
+		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) VALUES ".implode(",", $insert_num);		
+		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+		/*$sql = "CALL split_numeros('".$numeros."', ',', ".$id_proceso.")";
 		Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
 		$sql = "INSERT INTO tmp_procesamiento (id_proceso, numero) SELECT ".$id_proceso.", numero FROM splitvalues_numeros WHERE id_proceso = :id_proceso";
 		$sql = Yii::app()->db_masivo_premium->createCommand($sql);
         $sql->bindParam(":id_proceso", $id_proceso, PDO::PARAM_INT);
-        $sql->execute();
+        $sql->execute();*/
 	}
 
 	public function setNumerosPersonalizadosTmpProcesamiento($id_proceso, $numeros)
