@@ -117,8 +117,8 @@
         caracter = new String(objeto.val());
 
         $("#caracteres").val(tam-caracter.length);
-        $("ul.wysihtml5-toolbar").find("a[title='Insert image']").hide();
-        $("ul.wysihtml5-toolbar").find("a[title='Insert image']").addClass("disabled");
+        //$("ul.wysihtml5-toolbar").find("a[title='Insert image']").hide();
+        //$("ul.wysihtml5-toolbar").find("a[title='Insert image']").addClass("disabled");
     }
 
 

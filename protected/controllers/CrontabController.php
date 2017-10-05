@@ -1305,7 +1305,7 @@ class CrontabController extends Controller
         $criteria->select = "GROUP_CONCAT(p.id_usuario) AS id_usuario";
         $criteria->join = "INNER JOIN insignia_masivo_premium.permisos p ON t.id_usuario = p.id_usuario";
         $criteria->compare("p.acceso_sistema", 1);
-        $criteria->compare("p.broadcasting", 1);
+        //$criteria->compare("p.broadcasting", 1);
         print_r($criteria);
         print_r(".\n");
         $usuarios_masivos = UsuarioMasivo::model()->find($criteria);
