@@ -15,7 +15,7 @@
 				'htmlOptions' => array('value'=>date("Y-m-d"), 'readonly'=>true, 'style'=>'background-color: white;'),
 			),
 			'wrapperHtmlOptions' => array(
-				'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+				//'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
 			),
 			//'hint' => 'Click inside! This is a super cool date field.',
 			'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'

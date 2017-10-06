@@ -4,17 +4,18 @@
 /* @var $form CActiveForm */
 ?>
 
-<?php if(Yii::app()->user->hasFlash('danger')):?>
-	<br>
-    <div class="container-fluid">
-	      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-	        <div class="alert alert-danger">
-	          <button type="button" class="close" data-dismiss="alert">&times;</button>
-	          <span class="glyphicon glyphicon-ban-circle"></span> <?php echo Yii::app()->user->getFlash('danger'); ?>
-	        </div>
-	      </div>
-	    </div>
-<?php endif; ?>
+<?php
+        $flashMessages = Yii::app()->user->getFlashes();
+        if ($flashMessages) {
+            echo '<br><div class="container-fluid">';
+            foreach($flashMessages as $key => $message) {
+                echo '<div class="alert alert-'.$key.'">';
+                echo '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+                echo '<span class="glyphicon glyphicon-'. (($key == "success") ? "ok":"ban-circle").'"></span> '.$message;
+            }
+            echo '</div></div>';
+        }
+    ?>
 
 <div class="form col-xs-12 col-sm-12 col-md-10 col-lg-8" >
 

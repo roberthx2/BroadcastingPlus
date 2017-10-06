@@ -35,9 +35,9 @@ class Notificaciones extends CActiveRecord
 		return array(
 			array('mensaje', 'required', 'message'=>'{attribute} requerido'),
 			array('id_usuario, id_usuario_creador', 'numerical', 'integerOnly'=>true),
-			array('mensaje', 'length', 'max'=>1000),
-			array("mensaje","filter","filter"=>array($this, "limpiarMensaje")),
-			array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas
+			//array('mensaje', 'length', 'max'=>1000),
+			//array("mensaje","filter","filter"=>array($this, "limpiarMensaje")),
+			//array("mensaje", "palabrasObscenas"), //Valida si el mensaje contiuene palabras obscenas
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id_notificacion, id_usuario, id_usuario_creador, asunto, mensaje, fecha, hora, estado', 'safe', 'on'=>'search'),

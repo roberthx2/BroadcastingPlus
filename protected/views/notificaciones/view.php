@@ -17,7 +17,28 @@ $this->widget(
             'mensaje:html',
         ),
     )
-);
-?>
+); ?>
+
+<div class="container"> <?php echo $model->mensaje; ?> </div>
+
+<div class="container">
+    <center>
+        <?php 
+            $this->widget(
+                'booster.widgets.TbButton',
+                array(
+                    'id'=>'botonCrearPrefijo',
+                    'buttonType' => 'link',
+                    'context' => 'success',
+                    'label' => 'Responder',
+                    'url' => Yii::app()->controller->createUrl("notificaciones/create"),
+                    //'icon' => 'glyphicon glyphicon-plus',
+                    //'htmlOptions' => array(),
+                )
+            ); 
+            //echo CHtml::tag('button', array('type'=>'link', 'class'=>'btn btn-success'), '<i class="fa"></i> Responder');
+        ?>
+    </center>
+</div>
 
 </div>

@@ -23,8 +23,29 @@
         array(
             'id' => 'lista-form',
             'type' => 'vertical',
-            'enableAjaxValidation'=>false,
             'htmlOptions' => array('class' => 'well'),
+            'enableAjaxValidation'=>true,
+            'enableClientValidation'=>true,
+            'clientOptions' => array(
+                'validateOnSubmit'=>true,
+                'validateOnChange'=>false,
+                'validateOnType'=>false,
+                'afterValidate' => 'js:function(form, data, hasError){
+                    $.each(data, function(index, value) { 
+                        if(index != "__proto"){
+                            var temp = data[index][0];   
+                            $("#"+index+"_em_").html("<li>"+temp+"</li>");
+                        }
+                    });
+
+                    if(!hasError)
+                    {
+                        $("#boton_enviar i.fa").addClass("fa-spinner").addClass("fa-spin");
+                        $("#boton_enviar").addClass("disabled");
+                        return true;    
+                    }
+                }' 
+            )
         )
     ); ?>
 
@@ -58,43 +79,43 @@
         }
     ?>
 
-    <?php 
+    <div>
+        <?php echo $form->labelEx($model,'mensaje'); ?>
+        <?php 
 
-    echo $form->html5EditorGroup(
-            $model,
-            'mensaje',
-             array(
-                'widgetOptions' => array(
-                    'editorOptions' => array(
-                        'class' => 'span4',
-                        'rows' => 5,
-                        'options' => array('color' => true, 'id'=>'mensaje'),
+        /*echo $form->html5EditorGroup(
+                $model,
+                'mensaje',
+                 array(
+                    'widgetOptions' => array(
+                        'editorOptions' => array(
+                            'class' => 'span4',
+                            'rows' => 5,
+                            'options' => array('color' => true, 'id'=>'mensaje'),
+                        ),
+                        'height' => '50%',
+                        'width' => '100%',
+                        'htmlOptions'=>array('id'=>'mensaje'),
                     ),
-                    'height' => '50%',
-                    'width' => '100%',
-                    'htmlOptions'=>array('id'=>'mensaje'),
-                ),
-            )
-        ); 
-    ?>
+                )
+            ); */
 
-    <div style="float: right; font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
-                <?php echo CHTML::textField('caracteres',1000,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>
+        echo $form->textArea($model, 'mensaje', array('id'=>'mensaje', 'maxlength' => 300, 'rows' => 5));
+        echo $form->error($model,'mensaje');
+        ?>
+    </div>
+
+    <!--<div style="float: right; font: bold 13px Arial;"><strong>Caracteres restantes:</strong>
+                <?php //echo CHTML::textField('caracteres',1000,array('size'=>2 ,'style'=>'align:right; margin-left:10px; border:0;', 'readonly' => true)); ?></div>-->
 
     </fieldset>
         <br><br>
         <div>
             <div class="col-xs-offset-4 col-sm-offset-10 col-md-offset-10 col-lg-offset-10">
             <?php //echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
-                <?php $this->widget(
-                        'booster.widgets.TbButton',
-                        array(
-                            'buttonType' => 'submit',
-                            'context' => 'success',
-                            'label' => 'Enviar notificación',
-                            'icon' => 'glyphicon glyphicon-send',
-                        )
-                    ); ?>
+                <?php 
+                    echo CHtml::tag('button', array('id'=>'boton_enviar', 'type'=>'submit', 'class'=>'btn btn-success'), '<i class="fa"></i> Enviar notificación');
+                    ?>
             </div>
         </div>
     </div><!-- form -->
@@ -104,19 +125,24 @@
 <script type="text/javascript">
     $(document).ready(function() 
     {
-        setInterval(function() {
+        $('#mensaje').summernote({
+            theme: 'default',
+            height: 200,
+            placeholder: 'Description...',
+        });
+       /* setInterval(function() {
             contarCaracterRestantesSinLimite($("#mensaje"), 1000)
-        }, 1);
+        }, 1);*/
     });
 
     function contarCaracterRestantesSinLimite(objeto, tam)
     {
         //alert(objeto);
-        var caracter;
+       /* var caracter;
 
         caracter = new String(objeto.val());
 
-        $("#caracteres").val(tam-caracter.length);
+        $("#caracteres").val(tam-caracter.length);*/
         //$("ul.wysihtml5-toolbar").find("a[title='Insert image']").hide();
         //$("ul.wysihtml5-toolbar").find("a[title='Insert image']").addClass("disabled");
     }

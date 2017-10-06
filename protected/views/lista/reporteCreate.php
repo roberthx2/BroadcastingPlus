@@ -7,7 +7,8 @@
 
 <div class="col-md-7 pull-right">
 <?php 
-	echo $this->renderPartial("mensajeHorario"); 
+	if ($show_horario == 'true')
+		echo $this->renderPartial("mensajeHorario"); 
 ?>
 </div>
 

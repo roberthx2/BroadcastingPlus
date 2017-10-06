@@ -313,6 +313,11 @@
 						),
 					)
 				); ?>
+			<center>
+				<b>Ejemplo de formato de archivo:</b><br><br>
+            	<textarea style="resize: none;" cols="30" rows="4" disabled>4240000000#MENSAJE_1 4160000000#MENSAJE_2 4260000000#MENSAJE_3
+            	</textarea>
+            </center>
 		</div>
 	</div>
 

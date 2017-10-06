@@ -23,9 +23,11 @@
 	<?php  
 	 $baseUrl = Yii::app()->baseUrl; 
 	  Yii::app()->clientScript->registerCssFile($baseUrl.'/css/estilos.css'); 
-	  Yii::app()->clientScript->registerCssFile($baseUrl.'/plugins/font-awesome-4.7.0/css/font-awesome.min.css'); 
+	  Yii::app()->clientScript->registerCssFile($baseUrl.'/plugins/font-awesome-4.7.0/css/font-awesome.min.css');
+	  Yii::app()->clientScript->registerCssFile($baseUrl.'/plugins/summernote/summernote.css');  
 	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/funciones.js');
-	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/bootstrap-notify/bootstrap-notify.min.js');/*
+	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/js/bootstrap-notify/bootstrap-notify.min.js');
+	  Yii::app()->clientScript->registerScriptFile($baseUrl.'/plugins/summernote/summernote.min.js');/*
 	  $cs = Yii::app()->getClientScript();
 	  $cs->registerScriptFile($baseUrl.'/js/bootstrap-editable.js');
 	  $cs->registerCssFile($baseUrl.'/css/bootstrap-editable.css');*/
@@ -75,7 +77,7 @@
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest, 'itemOptions'=>array('id'=>'boton_home')),
 		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocion/create'), 'visible'=>!Yii::app()->user->isGuest && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei)),
 		                    array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('ConfiguracionSistemaAcciones/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getPermisos()->modulo_administracion),
-		                    array('label'=>'Notificaciones '.$badge, 'encodeLabel'=> false, 'icon'=>'glyphicon glyphicon-bell', 'url'=>Yii::app()->createUrl('/notificaciones/index')),
+		                    array('label'=>'Notificaciones '.$badge, 'encodeLabel'=> false, 'icon'=>'glyphicon glyphicon-bell', 'url'=>Yii::app()->createUrl('/notificaciones/index'), 'visible'=>!Yii::app()->user->isGuest),
 		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
 		                    array(
@@ -106,6 +108,7 @@
 <!--<div id="footer" class=" visible-sm visible-md visible-lg" onclick="window.location = 'http://insignia.com.ve/';" style="cursor: pointer; background-image: url('<?php echo Yii::app()->request->baseUrl; ?>/img/footer-lg.png'); background-repeat: no-repeat">
 </div>-->
 
+<br><br>
 <div class="hidden-xs" id="footer_new">
    <img src="<?php echo Yii::app()->request->baseUrl; ?>/img/logo_imc_red.png" width="150px" height="40px">
    <br><strong>Copyright &copy; <?php echo date('Y'); ?> by <a href="http://insignia.com.ve/">Insignia Mobile Communications C.A.</strong></a>.<br/>

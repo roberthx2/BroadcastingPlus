@@ -128,6 +128,8 @@ class ListaExentosController extends Controller
 		$model=new ListaForm;
 		$model->scenario = "agregarNumeros";
 
+		$this->performAjaxValidation($model);
+
 		if(isset($_POST['ListaForm']))
 		{
 			$model->attributes=$_POST['ListaForm'];
@@ -175,7 +177,7 @@ class ListaExentosController extends Controller
 
 						$transaction->commit();
 
-						$url = Yii::app()->createUrl("lista/reporteCrearLista", array("id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre));
+						$url = Yii::app()->createUrl("lista/reporteCrearLista", array("id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre, 'show_horario'=>'false'));
 
 						$this->redirect($url);
 					}
@@ -214,5 +216,14 @@ class ListaExentosController extends Controller
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
+	}
+
+	protected function performAjaxValidation($model)
+	{
+		if(isset($_POST['ajax']) && $_POST['ajax']==='lista-form')
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
 	}
 }

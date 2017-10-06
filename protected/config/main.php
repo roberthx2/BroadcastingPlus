@@ -81,6 +81,7 @@ return array(
 		'application.components.*',
 		'application.controllers.*',
 		'editable.*',
+		'ext.YiiMailer.YiiMailer',
 		//'Ext.EDataTables.*',
 	),
 

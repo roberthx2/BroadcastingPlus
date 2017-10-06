@@ -129,6 +129,8 @@ class NotificacionesController extends Controller
 
                     $model = new Notificaciones;
 
+                    $this->actionEnviarCorreo();
+                    
                     $transaction->commit();
 
                     $sms = "Notificación enviada correctamente";
@@ -168,6 +170,31 @@ class NotificacionesController extends Controller
                 Yii::app()->end();
             }
         }
+    }
 
+    public function actionEnviarCorreo()
+    {
+        $model_user = Yii::app()->user->modelSMS();
+
+        if ($model_user->email_u != "")
+        {
+            $model_contactos = ContactosAdministrativos::model()->findAll("estado = 1");
+
+            if ($model_contactos)
+            {
+                $asunto = "Acuse de recibo";
+                $body = "Estimado Cliente, el equipo de Insignia Mobile ha recibido su notificaci&oacute;n; en la brevedad posible le estará dando respuesta a su caso";
+
+                $destinatario[] = array("correo"=>$model_user->email_u, "nombre"=>$model_user->login);
+                $destinatarios_copia = array();
+
+                foreach ($model_contactos as $value)
+                {
+                    $destinatarios_copia[] = array("correo"=>$value["correo"], "nombre"=>$value["nombre"]);
+                }
+
+                EmailController::actionSendMail($asunto, $body, $destinatario, $destinatarios_copia);
+            }
+        }
     }
 }
