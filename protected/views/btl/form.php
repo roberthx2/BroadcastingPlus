@@ -299,6 +299,11 @@
     }
 
     $(document).ready(function(){
+
+    	$('.datepicker').on('open', function() {
+		    $('.datepicker').appendTo('body');
+		});
+		
         if ($("#PromocionForm_sc").val() != "")
 		{
 	        $.ajax({
