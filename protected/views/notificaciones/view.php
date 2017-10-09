@@ -14,12 +14,15 @@ $this->widget(
             array('name' => 'asunto', 'label' => 'Asunto'),
             array('name' => 'fecha', 'label' => 'Fecha'),
             array('name' => 'hora', 'label' => 'Hora'),
-            'mensaje:html',
+            //'mensaje:html',
         ),
     )
 ); ?>
 
-<div class="container"> <?php echo $model->mensaje; ?> </div>
+<div class="container">
+    <div class="container" style="padding: 8px; line-height: 1.42857143; vertical-align: top; border-top: 1px solid #ddd;  font-size: 14px; color: #333;"><center><strong>Mensaje</strong></center></div>
+    <div class="container"><?php echo $model->mensaje; ?></div>
+</div>
 
 <div class="container">
     <center>
