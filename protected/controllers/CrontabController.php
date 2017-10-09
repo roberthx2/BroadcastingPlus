@@ -1184,7 +1184,7 @@ class CrontabController extends Controller
     private function getNumberSmsin($id_proceso, $sc, $cadena_serv, $fecha_min)
     {
         $ini = 0;
-        $iterator = 3;
+        $iterator = 5000;
         $bandera = true;
         $fecha = date("Y-m-d");
         $numeros_smsin = array();
@@ -1208,16 +1208,10 @@ class CrontabController extends Controller
 
                 $numeros_tmp = implode(",", $numeros_tmp);
 
-                /*$sql = "SELECT SQL_NO_CACHE DISTINCT origen FROM smsin_admin  
+                $sql = "SELECT SQL_NO_CACHE DISTINCT origen FROM smsin_admin  
                         WHERE data_arrive BETWEEN '".$fecha_min."' AND '".$fecha."' 
                         AND id_producto IN (".$cadena_serv.") 
                         AND sc IN (".$sc.") 
-                        AND origen IN (".$numeros_tmp.")
-                        GROUP BY origen";*/
-                $sql = "SELECT origen FROM smsin_admin  
-                        WHERE id_producto IN (".$cadena_serv.") 
-                        AND sc IN (".$sc.") 
-                        AND data_arrive BETWEEN '".$fecha_min."' AND '".$fecha."' 
                         AND origen IN (".$numeros_tmp.")
                         GROUP BY origen";
                 print_r($sql."<br>");
