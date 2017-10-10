@@ -158,32 +158,49 @@ class CupoController extends Controller
         
         if ($cliente_nuevo)
         {
-            $criteria = new CDbcriteria;
-            $criteria->select = "COUNT(id_sms) AS id_sms";
-            $criteria->condition = "data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND ";
-            $criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
-            $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
-            $criteria->condition .= "desp_op IN (".$oper_activas.")";
-            $total = Smsin::model()->find($criteria);
+            //$criteria = new CDbcriteria;
+            //$criteria->select = "COUNT(id_sms) AS id_sms";
+            //$criteria->condition = "data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND ";
+            //$criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
+            //$criteria->condition .= "sc IN (".$cadena_sc.") AND ";
+            //$criteria->condition .= "desp_op IN (".$oper_activas.")";
+            //$total = Smsin::model()->find($criteria);
+
+            $sql = "SELECT COUNT(id_sms) AS id_sms FROM smsin_btl FORCE INDEX (indice_web3) 
+                WHERE id_producto IN (".$cadena_serv.") AND 
+                        sc IN (".$cadena_sc.") AND 
+                        data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND 
+                        desp_op IN (".$oper_activas.")";
+                
+            $total = Yii::app()->db_sms->createCommand($sql)->queryRow();
             
             if ($tipo_consulta == 1)
-                $maximo = round(($total->id_sms / $cantidad_meses_consulta) * $multiplicacion_base);
+                $maximo = round(($total["id_sms"] / $cantidad_meses_consulta) * $multiplicacion_base);
             else
-                $maximo = $total->id_sms * $multiplicacion_base;
+                $maximo = $total["id_sms"] * $multiplicacion_base;
         }
         else
         {
             //No hay recargas para el dia actual
             if (strtotime($fecha_inicial) < strtotime(date("Y-m-d")) )
             {
-                $criteria = new CDbcriteria;
-                $criteria->select = "COUNT(id_sms) AS id_sms";
-                $criteria->condition = "data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND ";
-                $criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
-                $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
-                $criteria->condition .= "desp_op IN (".$oper_activas.")";
-                $total = Smsin::model()->find($criteria);
-                $maximo = $total->id_sms * $multiplicacion_base;
+                //$criteria = new CDbcriteria;
+                //$criteria->select = "COUNT(id_sms) AS id_sms";
+                //$criteria->condition = "data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND ";
+                //$criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
+                //$criteria->condition .= "sc IN (".$cadena_sc.") AND ";
+                //$criteria->condition .= "desp_op IN (".$oper_activas.")";
+                //$total = Smsin::model()->find($criteria);
+
+                $sql = "SELECT COUNT(id_sms) AS id_sms FROM smsin_btl FORCE INDEX (indice_web3) 
+                    WHERE id_producto IN (".$cadena_serv.") AND 
+                        sc IN (".$cadena_sc.") AND 
+                        data_arrive BETWEEN '".$fecha_inicial."' AND '".date("Y-m-d")."' AND 
+                        desp_op IN (".$oper_activas.")";
+                
+                $total = Yii::app()->db_sms->createCommand($sql)->queryRow();
+
+                $maximo = $total["id_sms"] * $multiplicacion_base;
             }
             else //Existe una o más recargas para el dia actual
             {
@@ -193,15 +210,25 @@ class CupoController extends Controller
                 $criteria->compare("fecha", date("Y-m-d"));
                 $cupo_tmp = CupoDisponibleTmp::model()->find($criteria);
 
-                $criteria = new CDbcriteria;
-                $criteria->select = "COUNT(id_sms) AS id_sms";
-                $criteria->condition = "data_arrive = '".date("Y-m-d")."' AND ";
-                $criteria->condition .= "time_arrive > '".$cupo_tmp->hora."' AND ";
-                $criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
-                $criteria->condition .= "sc IN (".$cadena_sc.") AND ";
-                $criteria->condition .= "desp_op IN (".$oper_activas.")";
-                $total = Smsin::model()->find($criteria);
-                $maximo = ($total->id_sms * $multiplicacion_base) + $cupo_tmp->disponible;
+                //$criteria = new CDbcriteria;
+                //$criteria->select = "COUNT(id_sms) AS id_sms";
+                //$criteria->condition = "data_arrive = '".date("Y-m-d")."' AND ";
+                //$criteria->condition .= "time_arrive > '".$cupo_tmp->hora."' AND ";
+                //$criteria->condition .= "id_producto IN (".$cadena_serv.") AND ";
+                //$criteria->condition .= "sc IN (".$cadena_sc.") AND ";
+                //$criteria->condition .= "desp_op IN (".$oper_activas.")";
+                //$total = Smsin::model()->find($criteria);
+
+                $sql = "SELECT COUNT(id_sms) AS id_sms FROM smsin_btl FORCE INDEX (indice_web3) 
+                    WHERE id_producto IN (".$cadena_serv.") AND 
+                        sc IN (".$cadena_sc.") AND 
+                        data_arrive = '".date("Y-m-d")."' AND 
+                        time_arrive > '".$cupo_tmp->hora."' AND 
+                        desp_op IN (".$oper_activas.")";
+                
+                $total = Yii::app()->db_sms->createCommand($sql)->queryRow();
+
+                $maximo = ($total["id_sms"] * $multiplicacion_base) + $cupo_tmp->disponible;
             }
         }
         
