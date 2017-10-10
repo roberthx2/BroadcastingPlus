@@ -219,7 +219,7 @@ class CupoController extends Controller
                 //$criteria->condition .= "desp_op IN (".$oper_activas.")";
                 //$total = Smsin::model()->find($criteria);
 
-                $sql = "SELECT COUNT(id_sms) AS id_sms FROM smsin_btl FORCE INDEX (indice_web3) 
+                $sql = "SELECT COUNT(id_sms) AS id_sms FROM smsin FORCE INDEX (indice_web3) 
                     WHERE id_producto IN (".$cadena_serv.") AND 
                         sc IN (".$cadena_sc.") AND 
                         data_arrive = '".date("Y-m-d")."' AND 
