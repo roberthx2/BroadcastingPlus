@@ -204,7 +204,7 @@
 
 		<div id="div_prefijo" style="display:none;">
 			<?php //Visible si tiene permisos al modulo de prefijos
-			if (Yii::app()->user->getPermisos()->modulo_btl)
+			if ($permisos->modulo_btl)
 			{
 				echo $form->dropDownListGroup(
 					$model,
@@ -436,7 +436,7 @@
 		<div id="div_listas" style="display:none;">
 			<?php 
 			//Visible si tiene permisos al modulo de listas
-			if (Yii::app()->user->getPermisos()->modulo_listas)
+			if ($permisos->modulo_listas)
 			{
 				echo $form->select2Group(
 					$model,
@@ -511,7 +511,7 @@
 
 		<?php
 			//Visible si tiene permisos al modulo de btl
-			if (Yii::app()->user->getPermisos()->modulo_btl)
+			if ($permisos->modulo_btl)
 			{
 				$model_btl = new Btl;
 	           	$this->renderPartial('btl', array("model"=>$model_btl));

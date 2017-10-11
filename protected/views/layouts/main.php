@@ -54,6 +54,8 @@
         // 'default', 'success', 'info', 'warning', 'danger'
         'label' => $label,
     ), true);
+
+    $permisos = Yii::app()->user->getPermisos();
 ?>
 
 <div class="container-fluid">
@@ -75,8 +77,8 @@
 	                'htmlOptions' => array('class' => 'menu_superior'),
 	                'items' =>  array(
 		                    array('label' => 'Inicio', 'icon'=>'glyphicon glyphicon-home','url' => Yii::app()->createUrl('home/index'), 'visible'=>!Yii::app()->user->isGuest, 'itemOptions'=>array('id'=>'boton_home')),
-		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocion/create'), 'visible'=>!Yii::app()->user->isGuest && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei)),
-		                    array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('ConfiguracionSistemaAcciones/admin'), 'visible'=>!Yii::app()->user->isGuest && Yii::app()->user->getPermisos()->modulo_administracion),
+		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocion/create'), 'visible'=>!Yii::app()->user->isGuest && $permisos && ($permisos->broadcasting || $permisos->broadcasting_premium || $permisos->broadcasting_cpei)),
+		                    array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('ConfiguracionSistemaAcciones/admin'), 'visible'=>!Yii::app()->user->isGuest && $permisos && $permisos->modulo_administracion),
 		                    array('label'=>'Notificaciones '.$badge, 'encodeLabel'=> false, 'icon'=>'glyphicon glyphicon-bell', 'url'=>Yii::app()->createUrl('/notificaciones/index'), 'visible'=>!Yii::app()->user->isGuest),
 		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),

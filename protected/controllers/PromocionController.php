@@ -327,14 +327,16 @@ class PromocionController extends Controller
             }
         }
 
-        if (Yii::app()->user->getPermisos()->broadcasting && Yii::app()->user->getPermisos()->crear_promo_bcnl)
+        $permisos = Yii::app()->user->getPermisos();
+ 
+        if ($permisos->broadcasting && $permisos->crear_promo_bcnl)
             $dataTipo[1] = "BCNL";
-        if (Yii::app()->user->getPermisos()->broadcasting_cpei)
+        if ($permisos->broadcasting_cpei)
             $dataTipo[2] = "CPEI";
-        if (Yii::app()->user->getPermisos()->broadcasting_premium && Yii::app()->user->getPermisos()->crear_promo_bcp)
+        if ($permisos->broadcasting_premium && $permisos->crear_promo_bcp)
             $dataTipo[3] = "BCP";
 
-        if (Yii::app()->user->getPermisos()->modulo_listas)
+        if ($permisos->modulo_listas)
         {
             $model_lista = Lista::model()->findAll("id_usuario = ".Yii::app()->user->id." AND estado = 1");
             
@@ -344,7 +346,7 @@ class PromocionController extends Controller
             }
         }
 
-        $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas, 'operadoras_bcp'=>$operadoras_bcp));
+        $this->render("create", array('model'=>$model, 'dataTipo'=>$dataTipo, 'listas'=>$listas, 'operadoras_bcp'=>$operadoras_bcp, 'permisos'=>$permisos));
     }
 
     public function actionCreatePersonalizada()
