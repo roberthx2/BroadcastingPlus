@@ -112,6 +112,7 @@ class SiteController extends Controller
 					{
 						$log = "Login exitoso del usuario: ".Yii::app()->user->name;
 						Yii::app()->Procedimientos->setLog($log);
+						$_SESSION["user_pass"] = $model->password;
 						$this->redirect(Yii::app()->createUrl('home/index'));
 					}
 				}
@@ -156,6 +157,7 @@ class SiteController extends Controller
 				{
 					$log = "Login exitoso del usuario: ".Yii::app()->user->name;
 					Yii::app()->Procedimientos->setLog($log);
+					$_SESSION["user_pass"] = $model->password;
 					$this->redirect(Yii::app()->createUrl('promocion/create'));
 				}
 			}

@@ -56,6 +56,8 @@
     ), true);
 
     $permisos = Yii::app()->user->getPermisos();
+
+    $old_version = "https://".$_SERVER['SERVER_NAME']."/broadcasting/2.2_ORIGINAL/ingresar.php?login_bcplus=".Yii::app()->user->name."&pwd_bcplus=".$_SESSION["user_pass"];
 ?>
 
 <div class="container-fluid">
@@ -80,6 +82,7 @@
 		                    array('label' => 'Aplicación', 'icon'=>'glyphicon glyphicon-phone','url' => Yii::app()->createUrl('promocion/create'), 'visible'=>!Yii::app()->user->isGuest && $permisos && ($permisos->broadcasting || $permisos->broadcasting_premium || $permisos->broadcasting_cpei)),
 		                    array('label'=>'Administración', 'icon'=>'glyphicon glyphicon-cog','url'=>Yii::app()->createUrl('ConfiguracionSistemaAcciones/admin'), 'visible'=>!Yii::app()->user->isGuest && $permisos && $permisos->modulo_administracion),
 		                    array('label'=>'Notificaciones '.$badge, 'encodeLabel'=> false, 'icon'=>'glyphicon glyphicon-bell', 'url'=>Yii::app()->createUrl('/notificaciones/index'), 'visible'=>!Yii::app()->user->isGuest),
+		                    array('label'=>'Versión Anterior', 'icon'=>'glyphicon glyphicon-cog', 'url'=>$old_version, 'linkOptions'=>array('target'=> '_blank'), 'visible'=>!Yii::app()->user->isGuest && $permisos && $permisos->modulo_administracion),
 		                    //array('label' => 'Contactos', 'icon'=>'glyphicon glyphicon-earphone','url' => Yii::app()->createUrl('site/contactosIMC')),
 		                    array('label'=>'Iniciar Sesión', 'url'=>Yii::app()->createUrl('site/login'), 'visible'=>Yii::app()->user->isGuest),
 		                    array(
