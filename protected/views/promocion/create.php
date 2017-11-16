@@ -533,6 +533,12 @@
         {
         	$("#div_destinatarios_btl").hide();	
         }
+
+        var maxDate = "<?php echo date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))); ?>"
+        var admin = "<?php echo $permisos->modulo_administracion; ?>"
+
+        if (admin == 1)
+        	maxDate = "<?php echo date('Y-m-d' , strtotime('+6 day', strtotime(date("Y-m-d")))); ?>"
         
 		$('#PromocionForm_fecha').bootstrapMaterialDatePicker
 		({
@@ -545,7 +551,7 @@
 			year: false,
 			currentDate: "<?php echo date('Y-m-d'); ?>",
 			minDate: "<?php echo date('Y-m-d'); ?>",
-			maxDate: "<?php echo date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))); ?>",
+			maxDate: maxDate
 
 		});
 
