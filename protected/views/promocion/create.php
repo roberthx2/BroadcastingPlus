@@ -535,7 +535,7 @@
         }
 
         var maxDate = "<?php echo date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))); ?>"
-        var admin = "<?php echo $permisos->modulo_administracion; ?>"
+        var admin = "<?php echo Yii::app()->user->isAdmin(); ?>"
 
         if (admin == 1)
         	maxDate = "<?php echo date('Y-m-d' , strtotime('+6 day', strtotime(date("Y-m-d")))); ?>"
