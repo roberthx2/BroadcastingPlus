@@ -35,6 +35,10 @@
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('clientesBcp/admin');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Clientes </a></li>  <?php } ?>
                         <?php if ($permisos->administrar_usuarios) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('usuarioSms/admin');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Usuarios </a></li>  <?php } ?>
+                        <?php if (true) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('palabrasObscenas/admin');?>"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Palabras Obscenas </a></li>  <?php } ?>
+                        <?php if (true) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('operadorasActivas/admin');?>"><span class="glyphicon glyphicon-phone" aria-hidden="true"></span> Operadoras Activas </a></li>  <?php } ?>
                         <?php /*if ($permisos->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioMasivo/accesoBcplus');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Acceso de Usuarios </a></li>  <?php } */ ?>
                     </ul>
@@ -45,6 +49,7 @@
                         <?php if ($permisos->supervisar_log) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('log/admin');?>"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Supervisar log </a></li>  <?php } ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('contactosAdministrativos/admin');?>"><span class="glyphicon glyphicon-earphone" aria-hidden="true"></span> Contactos Administrativos </a></li>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('mensajesBroadcasting/admin');?>"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Suspender Broadcasting </a></li>
                     </ul>
             </ul>
         </div>

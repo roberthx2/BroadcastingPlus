@@ -27,7 +27,7 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen'),
+                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen', 'smsPorCodigoCliente', 'smsPorCodigoCliente', 'reporteMTMO'),
                 'users' => array('@'),
             ),
 
@@ -410,6 +410,76 @@ class ReportesController extends Controller
         if ($sql)
             return $sql["Des_cliente"];
         else return "NO EXISTE";
+    }
+
+    public function actionSmsPorCodigoCliente()
+    {
+        if (Yii::app()->request->isAjaxRequest)
+        {
+            if(isset($_GET['Reportes']))
+            {
+                if ($_GET['Reportes']["tipo_busqueda"] == 1) //Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_GET['Reportes']["year"];
+                    $model->month=$_GET['Reportes']["month"];
+
+                    $_SESSION["objeto"]["year"]=$_GET['Reportes']["year"];
+                    $_SESSION["objeto"]["month"]=$_GET['Reportes']["month"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_GET['Reportes']["fecha_ini"];
+                    $model->fecha_fin=$_GET['Reportes']["fecha_fin"];
+
+                    $_SESSION["objeto"]["fecha_ini"]=$_GET['Reportes']["fecha_ini"];
+                    $_SESSION["objeto"]["fecha_fin"]=$_GET['Reportes']["fecha_fin"];
+                }
+                else if ($_GET['Reportes']["tipo_busqueda"] == 3) //Dia
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_GET['Reportes']["fecha"];
+
+                    $_SESSION["objeto"]["fecha"]=$_GET['Reportes']["fecha"];
+                }
+
+                $_SESSION["objeto"]["tipo_busqueda"]=$_GET['Reportes']["tipo_busqueda"]; 
+            }
+            else
+            {
+                if ($_SESSION["objeto"]["tipo_busqueda"] == 1)//Mes
+                {
+                    $model = new ResumenBcpMensual();
+                    $model->year=$_SESSION["objeto"]["year"];
+                    $model->month=$_SESSION["objeto"]["month"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha_ini=$_SESSION["objeto"]["fecha_ini"];
+                    $model->fecha_fin=$_SESSION["objeto"]["fecha_fin"];
+                }
+                else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
+                {
+                    $model = new ResumenBcpDiario();
+                    $model->fecha=$_SESSION["objeto"]["fecha"];
+                }
+            }
+        }
+        else
+        {
+            unset($_SESSION["objeto"]);
+            $model = new Reportes();
+            $model->unsetAttributes();
+        }
+
+        $this->render('smsPorCodigoClienteBCP', array('model'=>$model));
+    }
+
+    public function actionReporteMTMO()
+    {
+        
     }
 }
 

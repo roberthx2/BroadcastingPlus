@@ -28,7 +28,7 @@ class PromocionesPremiumController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view', 'indexPromociones', 'viewInformacion', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo', 'getPromociones'),
+				'actions'=>array('index','view', 'indexPromociones', 'viewInformacion', 'viewConfirmar', 'confirmarPromo','viewCancelar', 'cancelarPromo', 'reporteMensualSms' , 'reporteMensualSmsPorCliente', 'reporteMensualSmsPorCodigo', 'getPromociones', 'viewReactivar', 'reactivarPromo'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -140,6 +140,13 @@ class PromocionesPremiumController extends Controller
 		$objeto = $this->actionGetInformation($id_promo);
 
 		$this->renderPartial('viewCancelar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
+	}
+
+	public function actionViewReactivar($id_promo)
+	{
+		$objeto = $this->actionGetInformation($id_promo);
+
+		$this->renderPartial('viewReactivar', array("model"=>$objeto["model"], 'cliente'=>$objeto["cliente"], 'estado'=>$objeto["estado"]));
 	}
 
 	public function actionConfirmarPromo($id_promo)
@@ -634,4 +641,39 @@ class PromocionesPremiumController extends Controller
             }   
         }
     }
+
+    public function actionReactivarPromo($id_promo)
+	{
+		$transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+        try
+        {
+			$model = $this->loadModel($id_promo);
+			$model->estado = 2;
+			$model->save();
+
+			$nueva_hora_fin = date("H:i:00", strtotime ( '+60 minute' , strtotime ( date("H:i:00") ) ));
+
+			$sql = "UPDATE deadline_outgoing_premium SET hora_limite = '".$nueva_hora_fin."' WHERE id_promo = ".$id_promo;
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+			//Todo lo que sea distinto de enviado
+			$sql = "UPDATE outgoing_premium_diario SET status = 2 WHERE id_promo = ".$id_promo." AND status <> 1"; 
+			Yii::app()->db_masivo_premium->createCommand($sql)->execute();
+
+			$log = "PROMOCION REACTIVADA BCP | id_promo: ".$id_promo." | id_cliente_bcp: ".$model->id_cliente;
+            Yii::app()->Procedimientos->setLog($log);
+
+            Yii::app()->user->setFlash("success", "La promoción fue reactivada correctamente");
+			$transaction->commit();
+		} catch (Exception $e)
+			{
+				//print_r($e);
+				$error = "Ocurrio un error al procesar los datos, intente nuevamente.";
+				Yii::app()->user->setFlash("danger", $error);
+        		$transaction->rollBack();
+    		}
+    	
+    	$this->redirect(Yii::app()->createUrl("home/index"));
+	}
 }

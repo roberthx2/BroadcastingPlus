@@ -389,6 +389,28 @@
 							);
 					?></div>
 				</li>
+				<?php if (UsuarioSmsController::actionIsAdmin($model->id_usuario)) { ?>
+				<li class="list-group-item">Administrar Cupo BCP
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'administrar_cupo_bcp',
+								    'value' => $model->administrar_cupo_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_cupo");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<?php } ?>
     		</ul>
    		</div>	
   	</div>
@@ -453,6 +475,50 @@
 							    array(
 							        'name' => 'reporte_sms_por_codigo_bcp',
 								    'value' => $model->reporte_sms_por_codigo_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_reportes");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<?php } ?>
+				<?php if (UsuarioSmsController::actionIsAdmin($model->id_usuario)) { ?>
+				<li class="list-group-item">SMS por código / cliente
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'reporte_sms_por_codigo_cliente_bcp',
+								    'value' => $model->reporte_sms_por_codigo_cliente_bcp,
+								    'events' => array(
+								        'switchChange' => 'js:function(event, state){
+											unCheckModulo("modulo_reportes");
+								        }'
+								    ),
+								    'options' => array(
+								    	'onColor'=>'success', 
+										'offColor'=>'danger',
+								    )
+							    )
+							);
+					?></div>
+				</li>
+				<?php } ?>
+				<?php if (UsuarioSmsController::actionIsAdmin($model->id_usuario)) { ?>
+				<li class="list-group-item">Generar Reporte MT/MO
+	  				<div style="float: right;"><?php
+						Controller::widget(
+							    'booster.widgets.TbSwitch',
+							    array(
+							        'name' => 'reporte_generar_mt_mo',
+								    'value' => $model->reporte_generar_mt_mo,
 								    'events' => array(
 								        'switchChange' => 'js:function(event, state){
 											unCheckModulo("modulo_reportes");

@@ -242,6 +242,61 @@ class ResumenBcpDiario extends CActiveRecord
 		return $data;
 	}
 
+	public function searchSmsPorCodigoCliente()
+	{
+		if ($_SESSION["objeto"]["tipo_busqueda"] == 2) //Periodo
+		{
+			$condicion = "fecha BETWEEN '".$this->fecha_ini."' AND '".$this->fecha_fin."'";
+			//$condicion = "fecha BETWEEN '".$_SESSION["objeto"]["fecha_ini"]."' AND '".$_SESSION["objeto"]["fecha_fin"]."'";
+		}
+		else if ($_SESSION["objeto"]["tipo_busqueda"] == 3) //Dia
+		{
+			$condicion = "fecha = '".$this->fecha."'";
+		}
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
+		$cond_oper = OperadorasActivas::model()->find($criteria);
+
+		$sql = "SELECT id_cliente_bcnl AS id, sc, $cond_oper->descripcion FROM (
+					SELECT r.id_cliente_bcnl, r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_diario r 
+						WHERE ".$condicion." GROUP BY r.id_cliente_bcnl, r.sc, r.operadora) AS t 
+				GROUP BY id_cliente_bcnl, sc";
+
+		/*$criteria=Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+
+		return new CArrayDataProvider($criteria, array(
+			'id'=>'t.sc',
+			'pagination'=>array(
+				'pageSize'=>10,
+		        'route'=>'reportes/mensualSmsPorCodigo',
+		    ),
+			'sort'=>array(
+				'defaultOrder'=>'sc DESC',
+        		'attributes'=>array(
+             		'sc',
+        		),
+    		),
+		));*/
+
+		$count=Yii::app()->db_masivo_premium->createCommand("SELECT COUNT(*) FROM (".$sql.") AS tabla")->queryScalar();
+		//$sql='SELECT * FROM tbl_user';
+		return new CSqlDataProvider($sql, array(
+			'db'=>Yii::app()->db_masivo_premium,
+		    'totalItemCount'=>$count,
+		    'sort'=>array(
+				'defaultOrder'=>'id DESC',
+        		'attributes'=>array(
+             		'id',
+        		),
+    		),
+		    'pagination'=>array(
+		        'pageSize'=>10,
+		        'route'=>'reportes/smsPorCodigoCliente',
+		    ),
+		));
+	}
+
 	/**
 	 * @return CDbConnection the database connection used for this class
 	 */

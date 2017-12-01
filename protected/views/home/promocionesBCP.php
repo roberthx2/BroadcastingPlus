@@ -159,7 +159,7 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         	array(
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
-	            'template' => '{ver}&#09;{Confirmar}&#09;{Cancelar}',
+	            'template' => '{ver}&#09;{Confirmar}&#09;{Cancelar}&#09;{Reactivar}',
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
 	            'htmlOptions' => array('style' => 'text-align: center;'),
 	            'buttons' => array(
@@ -233,7 +233,31 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
                                         }
                                     });
                                 }'
-	            			)
+	            			),
+                    'Reactivar'=>array(
+                            'label'=>' ',
+                            'url'=>'Yii::app()->createUrl("promocionesPremium/viewReactivar", array("id_promo"=>$data["id_promo"]))',
+                            'visible'=>'visibleReactivar($data)',
+                            'options'=>array('class'=>'glyphicon glyphicon-retweet', 'title'=>'Reactivar', 'style'=>'color:black;', 'data-toggle' => 'modal', 'data-tooltip'=>'tooltip', 'data-target' => '#modalReactivar'),
+                            'click' => 'function(){
+                                    $.ajax({
+                                        beforeSend: function(){
+                                           $("#divModalReactivar").addClass("loading");
+                                        },
+                                        complete: function(){
+                                           $("#divModalReactivar").removeClass("loading");
+                                        },
+                                        type: "POST",
+                                        url: $(this).attr("href"),
+                                        success: function(data) { 
+                                            $("#divModalReactivar").html(data);
+                                        },
+                                        error: function() { 
+                                            alert("No se puede cargar la vista.");
+                                        }
+                                    });
+                                }'
+                            )
 	            ),
 	        ),
         ),
@@ -274,6 +298,32 @@ function visibleCancelar($data)
 		return true;
 	else 
 		return false;
+}
+
+function visibleReactivar($data)
+{
+    $array = array(
+        "estado"=>$data["estado"], 
+        "fecha"=>$data["fecha"], 
+        "hora"=>$data["hora"], 
+        "fecha_limite"=>$data["fecha_limite"], 
+        "hora_limite"=>$data["hora_limite"], 
+        "total"=>$data["total"], 
+        "enviados"=>$data["enviados"], 
+        "no_enviados"=>($data["total"] - $data["enviados"])
+    );
+
+    $estado = PromocionesPremiumController::actionGetStatusPromocionRapida($array);
+    $hora_actual = time();
+    $hora_inicio = strtotime($data["fecha_limite"] . " " . $data["hora"]);
+
+    //Confirmada / En transito
+    if ($estado == 2 || $estado == 6)
+        return false;
+    else if (($data["total"] - $data["enviados"]) > 0 && ($hora_actual > $hora_inicio) )
+    {
+        return true;
+    }
 }
 
 ?>
@@ -321,6 +371,22 @@ function visibleCancelar($data)
     </div>
  
     <div class="modal-body" id="divModalEliminar">
+       
+    </div>
+
+<?php $this->endWidget(); ?>
+
+<?php $this->beginWidget(
+    'booster.widgets.TbModal',
+    array('id' => 'modalReactivar')
+); ?>
+ 
+    <div class="modal-header" style="background-color:#428bca">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" style="color:#fff;"><span class="glyphicon glyphicon-retweet" aria-hidden="true"></span> Reactivar Promoción</h4>
+    </div>
+ 
+    <div class="modal-body" id="divModalReactivar">
        
     </div>
 

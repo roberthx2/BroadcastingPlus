@@ -15,7 +15,7 @@ class CupoController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('historico', 'recarga', 'getInfoCupoBcp', 'recargarCupoBcp'),
+                'actions' => array('historico', 'recarga', 'getInfoCupoBcp', 'recargarCupoBcp', 'admin', 'formulario', 'update'),
                 'users' => array('@'),
             ),
 
@@ -33,6 +33,11 @@ class CupoController extends Controller
     public function actionRecarga()
     {
         $this->render("recarga");
+    }
+
+    public function actionAdmin()
+    {
+        $this->render("admin");
     }
 
     public function actionGetInfoCupoBcp()
@@ -318,6 +323,49 @@ class CupoController extends Controller
         {
             echo CActiveForm::validate($model);
             Yii::app()->end();
+        }
+    }
+
+    public function actionFormulario()
+    {
+        $model = UsuarioCupoPremium::model()->find("id_usuario=:id_usuario", array(":id_usuario"=>$_GET["id"]));
+        $this->renderPartial('formBcp', array("model"=>$model));
+    }
+
+    public function actionUpdate()
+    {
+        if(isset($_POST['UsuarioCupoPremium']))
+        {
+            $model = UsuarioCupoPremium::model()->findByPk($_POST['UsuarioCupoPremium']['id_usuario']);
+            $valido = 'false';
+            
+            $this->performAjaxValidation($model);
+
+            $model->attributes=$_POST['UsuarioCupoPremium'];
+
+
+            if ($model->validate())
+            {
+                if($model->save())
+                {
+                    $log = "CUPO BCP - El usuario '".UsuarioSmsController::actionGetLogin(Yii::app()->user->id)."' edito cupo al usuario '".UsuarioSmsController::actionGetLogin($model->id_usuario)."'";
+                    Yii::app()->Procedimientos->setLog($log);
+                    
+                    $valido = "true";
+                    header('Content-Type: application/json; charset="UTF-8"');
+                    echo CJSON::encode(array('salida' => $valido, 'error'=>array()));
+                }
+                else
+                {
+                    header('Content-Type: application/json; charset="UTF-8"');
+                    echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
+                }
+            }
+            else
+            {
+                header('Content-Type: application/json; charset="UTF-8"');
+                echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
+            }
         }
     }
 }

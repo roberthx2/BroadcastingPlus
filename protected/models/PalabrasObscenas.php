@@ -1,22 +1,21 @@
 <?php
 
 /**
- * This is the model class for table "usuario_cupo_premium".
+ * This is the model class for table "palabras_obscenas".
  *
- * The followings are the available columns in table 'usuario_cupo_premium':
- * @property integer $id_usuario
- * @property integer $disponible
+ * The followings are the available columns in table 'palabras_obscenas':
+ * @property string $id
+ * @property string $palabra
  */
-class UsuarioCupoPremium extends CActiveRecord
+class PalabrasObscenas extends CActiveRecord
 {
 	public $buscar;
-	public $login;
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'usuario_cupo_premium';
+		return 'palabras_obscenas';
 	}
 
 	/**
@@ -27,12 +26,31 @@ class UsuarioCupoPremium extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario', 'required'),
-			array('id_usuario, disponible', 'numerical', 'integerOnly'=>true),
+			array('palabra', 'required','message'=>'{attribute} requerido'),
+			array('palabra', 'length', 'max'=>45),
+
+			array("palabra","filter","filter"=>array($this, "limpiarPalabra")),
+			array("palabra", "ext.validator.Nombre"), //Valida los caracteres
+			array("palabra", "existe"), //Valida si existe el nombre de la promoción segun su tipo
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_usuario, disponible', 'safe', 'on'=>'search'),
+			array('id, palabra', 'safe', 'on'=>'search'),
 		);
+	}
+
+	public function limpiarPalabra($cadena)
+	{
+		return Yii::app()->Funciones->limpiarNombre($cadena);
+	}
+
+	public function existe($attribute, $params)
+	{
+		$model = PalabrasObscenas::model()->find("palabra =?", array($this->$attribute));
+
+		if ($model)
+		{
+			$this->addError($attribute, "La palabra ya existe");
+		}
 	}
 
 	/**
@@ -52,8 +70,8 @@ class UsuarioCupoPremium extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_usuario' => 'Id Usuario',
-			'disponible' => 'Disponible',
+			'id' => 'ID',
+			'palabra' => 'Palabra',
 		);
 	}
 
@@ -69,40 +87,44 @@ class UsuarioCupoPremium extends CActiveRecord
 	 * @return CActiveDataProvider the data provider that can return the models
 	 * based on the search/filter conditions.
 	 */
-	public function search()
+	/*public function search()
 	{
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
 
-		$criteria->select = "t.id_usuario, t.disponible, u.login AS login";
-		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario";
-		$criteria->condition = "login LIKE '%".$this->buscar."%'";
+		$criteria->compare('id',$this->id,true);
+		$criteria->compare('palabra',$this->palabra,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}*/
+
+	public function search()
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		//$criteria->select = "t.id, t.prefijo, t.id_usuario, u.login";
+		$criteria->condition = "palabra LIKE '%".$this->buscar."%'";
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 			'sort'=>array(
-				'defaultOrder'=>'login ASC',
+				'defaultOrder'=>'palabra ASC',
         		'attributes'=>array(
-             		'login'
+             		'palabra'
         		),
     		),
 		));
 	}
 
 	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->db_masivo_premium;
-	}
-
-	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return UsuarioCupoPremium the static model class
+	 * @return PalabrasObscenas the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

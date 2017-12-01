@@ -48,6 +48,8 @@
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/recarga');?>"><span class="glyphicon glyphicon-shopping-cart " aria-hidden="true"></span> Recargar </a></li> <?php } ?>
                         <?php if ($permisos->historico_cupo_bcnl || $permisos->historico_cupo_bcp) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/historico');?>"><span class="glyphicon glyphicon-list-alt " aria-hidden="true"></span> Histórico </a></li> <?php } ?>
+                        <?php if ($permisos->administrar_cupo_bcp) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('cupo/admin');?>"><span class="glyphicon glyphicon glyphicon-wrench " aria-hidden="true"></span> Administrar Cupo </a></li> <?php } ?>
                     </ul>
                 <?php } ?>
 
@@ -78,6 +80,10 @@
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorClienteBcp');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por Cliente </a></li> <?php } ?>
                         <?php if ($permisos->reporte_sms_por_codigo_bcp) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorCodigo');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por código </a></li> <?php } ?>
+                        <?php if ($permisos->reporte_sms_por_codigo_cliente_bcp) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorCodigoCliente');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por código/cliente </a></li> <?php } ?>
+                        <?php if ($permisos->reporte_generar_mt_mo) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/reporteMTMO');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> Reporte MT/MO </a></li> <?php } ?>
                         <?php /*if ($permisos->reporte_sms_recibidos_bcnl || $permisos->reporte_sms_recibidos_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsRecibidos');?>"><span class="glyphicon glyphicon-import" aria-hidden="true"></span> SMS Recibidos </a></li> <?php } */?>
                     </ul>

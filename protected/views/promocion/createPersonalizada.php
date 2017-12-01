@@ -343,8 +343,9 @@
 
         var maxDate = "<?php echo date('Y-m-d' , strtotime('+1 day', strtotime(date("Y-m-d")))); ?>"
         var admin = "<?php echo Yii::app()->user->isAdmin(); ?>"
+        var hipico = "<?php echo Yii::app()->Procedimientos->clienteIsHipicoLotero(Yii::app()->user->modelSMS()->id_cliente); ?>"
 
-        if (admin == 1)
+        if (admin == 1 || hipico == 0)
         	maxDate = "<?php echo date('Y-m-d' , strtotime('+6 day', strtotime(date("Y-m-d")))); ?>"
 
 		$('#PromocionPersonalizadaForm_fecha').bootstrapMaterialDatePicker

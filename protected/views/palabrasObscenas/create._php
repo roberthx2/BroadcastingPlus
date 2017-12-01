@@ -1,0 +1,18 @@
+<?php
+/* @var $this PalabrasObscenasController */
+/* @var $model PalabrasObscenas */
+
+$this->breadcrumbs=array(
+	'Palabras Obscenases'=>array('index'),
+	'Create',
+);
+
+$this->menu=array(
+	array('label'=>'List PalabrasObscenas', 'url'=>array('index')),
+	array('label'=>'Manage PalabrasObscenas', 'url'=>array('admin')),
+);
+?>
+
+<h1>Create PalabrasObscenas</h1>
+
+<?php $this->renderPartial('_form', array('model'=>$model)); ?>
