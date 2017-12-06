@@ -110,6 +110,11 @@ class SiteController extends Controller
 				{
 					if(Yii::app()->user->getPermisos()->acceso_sistema == 1 && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei))
 					{
+						if (!Yii::app()->user->isAdmin())
+			            {
+			                $this->actionEstatusBroadcasting(); //Verificar si el broadcasting est suspendido
+			            }
+
 						$log = "Login exitoso del usuario: ".Yii::app()->user->name;
 						Yii::app()->Procedimientos->setLog($log);
 						$_SESSION["user_pass"] = $model->password;
@@ -155,6 +160,11 @@ class SiteController extends Controller
 			{
 				if(Yii::app()->user->getPermisos()->acceso_sistema == 1 && (Yii::app()->user->getPermisos()->broadcasting || Yii::app()->user->getPermisos()->broadcasting_premium || Yii::app()->user->getPermisos()->broadcasting_cpei))
 				{
+					if (!Yii::app()->user->isAdmin())
+		            {
+		                $this->actionEstatusBroadcasting(); //Verificar si el broadcasting est suspendido
+		            }
+			            
 					$log = "Login exitoso del usuario: ".Yii::app()->user->name;
 					Yii::app()->Procedimientos->setLog($log);
 					$_SESSION["user_pass"] = $model->password;
@@ -171,5 +181,69 @@ class SiteController extends Controller
 
 		// display the login form
 		$this->render('login',array('model'=>$model, 'error'=>$error));
+	}
+
+	private function actionEstatusBroadcasting()
+	{
+	    $fecha_actual = date('Y-m-d');
+	    $hora_actual = date('H:i:s');
+	    $suspender = false;
+	    
+	    //Periodo
+	    $fecha_periodo = $fecha_actual." ".$hora_actual;
+	    $sql = "SELECT id_mensaje FROM mensajes_broadcasting WHERE tipo_mensaje = 1 AND '".$fecha_periodo."' BETWEEN concat(fecha_inicio,' ', hora_inicio) AND concat(fecha_fin,' ', hora_fin)";
+	    $total_msj = Yii::app()->db->createCommand($sql)->queryRow();
+
+	    if ($total_msj)
+	    {
+	        $suspender = true;
+	    }
+	    else //Diario
+	    {
+	        $sql = "SELECT id_mensaje FROM mensajes_broadcasting WHERE tipo_mensaje = 2 AND '".$hora_actual."' BETWEEN hora_inicio AND hora_fin";
+	        $total_msj = Yii::app()->db->createCommand($sql)->queryRow();
+	        
+	        if ($total_msj)
+	        {
+	            $suspender = true;
+	        }
+	        else
+	        {
+	            //Personalizado
+	            $dia_semana = date("w")+1;//Se le suma un dia porque en BD va desde 1 hasta 7 y en PHP va desde 0 hasta 6 (Domingo-Sabado)
+	            $sql = "SELECT m.id_mensaje FROM mensajes_broadcasting m
+	                    INNER JOIN mensajes_broadcasting_dias d ON m.id_mensaje = d.id_mensaje
+	                    WHERE m.tipo_mensaje = 3 AND '".$hora_actual."' BETWEEN hora_inicio AND hora_fin AND d.dia_semana = ".$dia_semana;
+	            $total_msj = Yii::app()->db->createCommand($sql)->queryRow();
+
+	            if ($total_msj)
+	            {
+	                $suspender = true;
+	            }
+	        }
+	    }
+	    
+	    if ($suspender)
+	    {
+	        $id_mensaje = $total_msj["id_mensaje"];
+	        $url = Yii::app()->createUrl("site/suspender", array("id_mensaje"=>$id_mensaje));
+	        $this->redirect($url);
+	    }
+	}
+
+	public function actionSuspender($id_mensaje)
+	{
+		$model = MensajesBroadcasting::model()->find($id_mensaje);
+
+		if ($model->fecha_inicio == '0000-00-00')
+		{
+		    $model->fecha_fin = date('Y-m-d');
+		}
+
+		$usuario = Yii::app()->user->name;
+
+		Yii::app()->user->logout();
+
+		$this->render('suspendido', array('model'=>$model, 'usuario'=>$usuario));
 	}
 }

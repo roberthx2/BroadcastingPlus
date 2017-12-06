@@ -72,20 +72,35 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
 	            'name' => 'mensaje',
 	            'header' => 'Mensaje',
 	            'type' => 'raw',
-	            'htmlOptions' => array('style' => 'text-align: letf;', 'class'=>'trOverFlow'),
+	            'htmlOptions' => array('style' => 'text-align: letf; width: 50%;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
+            array(
+                'header' => 'Tipo',
+                'type' => 'text',
+                'value' => function($data)
+                {
+                    if ($data["tipo_mensaje"] == 1)
+                        return 'Periodo';
+                    else if ($data["tipo_mensaje"] == 2)
+                        return 'Diario';
+                    else if ($data["tipo_mensaje"] == 3)
+                        return 'Personalizado';
+                },
+                'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+                'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+            ),
         	array(
 	            'name' => 'fecha_inicio',
 	            'header' => 'Fecha Inicio',
-	            'type' => 'date',
+	            'type' => 'text',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
         	array(
 	            'name' => 'fecha_fin',
 	            'header' => 'Fecha Fin',
-	            'type' => 'date',
+	            'type' => 'text',
 	            'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
 	            'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
         	),
