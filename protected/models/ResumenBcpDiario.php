@@ -258,8 +258,8 @@ class ResumenBcpDiario extends CActiveRecord
 		$criteria->select = "GROUP_CONCAT(CONCAT('IFNULL(GROUP_CONCAT((SELECT t.cantd_msj FROM operadoras_activas o WHERE t.operadora = ', id_operadora, ' AND o.id_operadora = t.operadora )), 0) AS ', descripcion) SEPARATOR ', ') AS descripcion";
 		$cond_oper = OperadorasActivas::model()->find($criteria);
 
-		$sql = "SELECT id_cliente_bcnl AS id, sc, $cond_oper->descripcion FROM (
-					SELECT r.id_cliente_bcnl, r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_diario r 
+		$sql = "SELECT id_cliente_bcp AS id, id_cliente_bcnl, sc, $cond_oper->descripcion FROM (
+					SELECT r.id_cliente_bcp, r.id_cliente_bcnl, r.sc, r.operadora, SUM(r.cantd_msj) AS cantd_msj FROM resumen_bcp_diario r 
 						WHERE ".$condicion." GROUP BY r.id_cliente_bcnl, r.sc, r.operadora) AS t 
 				GROUP BY id_cliente_bcnl, sc";
 

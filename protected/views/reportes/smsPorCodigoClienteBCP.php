@@ -1,3 +1,5 @@
+<?php Yii::import("application.controllers.ReportesController", true); ?>
+
 <fieldset> 
     <legend>Reporte de SMS por Código / Cliente</legend>
 <br>
@@ -30,7 +32,7 @@ $data_arr[] = array(
                 'header' => 'Cliente',
                 'value' => function($data)
 	            {
-	            	return $this->actionGetDescripcionClienteBCNL($data["id"]);
+	            	return ReportesController::actionGetDescripcionClienteBCP($data["id"]);
 	            },
                 'type' => 'raw',
                 'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),

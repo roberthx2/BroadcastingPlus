@@ -27,7 +27,7 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen', 'smsPorCodigoCliente', 'smsPorCodigoCliente', 'reporteMTMO'),
+                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen', 'smsPorCodigoCliente', 'reporteMTMO'),
                 'users' => array('@'),
             ),
 
