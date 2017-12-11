@@ -1,5 +1,7 @@
 <?php
- 
+
+Yii::import('application.extensions.PdfReporteMtMo', true);
+
 class ReportesController extends Controller
 {
     /**
@@ -479,7 +481,66 @@ class ReportesController extends Controller
 
     public function actionReporteMTMO()
     {
+        $periodo = $this->getPeriodo();
+
+        $pdf = new PDF('L','mm','A4');
+        $pdf->AliasNbPages();
+
+        $pdf->AddPage();
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(0,10, "Reporte MT's Clientes",0,0,"L");
+
+        $pdf->Ln(6);
+
+        $pdf->Cell(40,10,'Periodo: '.$periodo["mes"]." ".$periodo["ano"],0,0,'L');
+        $pdf->Ln(15);
+        $pdf->Cell(0,10,'1. Reporte MT BCP',0,0,'L');
+        $pdf->Ln(10);
+
+        //Reporte BCP
+        $data = $pdf->LoadDataMT(90/*$id_fecha*/, 1);
+        $pdf->FancyTableMT($data);
         
+        //Reporte Hostgator
+        $pdf->AddPage();
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(0,10,'2. Reporte MT Hostgator',0,0,'L');
+        $pdf->Ln(10);
+
+        $data = $pdf->LoadDataMT(90/*$id_fecha,*/, 2);
+        $pdf->FancyTableMT($data);
+
+        //Reporte MO
+        $pdf->AddPage();
+        $pdf->SetFont('Arial','B',12);
+        $pdf->Cell(0,10,'3. Reporte MO',0,0,'L');
+        $pdf->Ln(10);
+
+        $data = $pdf->LoadDataMO(/*$id_fecha*/90);
+        $pdf->FancyTableMO($data);
+
+        $pdf->Output();
+    }
+
+    private function getPeriodo()
+    {
+        $mes = date('m',strtotime('-1 month', strtotime(date('Y-m-01'))));
+        $ano = date('Y',strtotime('-1 month', strtotime(date('Y-m-01'))));
+        //Nunca quiso hacer la traduccion del mes por eso utilice un arreglo
+        $meses = array('01'=>'Enero', 
+                       '02'=>'Febrero', 
+                       '03'=>'Marzo', 
+                       '04'=>'Abril', 
+                       '05'=>'Mayo', 
+                       '06'=>'Junio', 
+                       '07'=>'Julio',
+                       '08'=>'Agosto',
+                       '09'=>'Septiembre',
+                       '10'=>'Octubre',
+                       '11'=>'Noviembre',
+                       '12'=>'Diciembre');
+
+        return array("ano"=>$ano, "mes"=>$meses[$mes]);
     }
 }
 
