@@ -484,8 +484,8 @@ class ReportesController extends Controller
     {
         $sql = "SELECT id_fecha as id FROM reporte_fecha WHERE fecha = DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01')";
         $id_fecha = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
-
-        if ($id_fecha !== null)
+        
+        if (!isset($id_fecha["id"]))
         {
             $transaction = Yii::app()->db_masivo_premium->beginTransaction();
 
