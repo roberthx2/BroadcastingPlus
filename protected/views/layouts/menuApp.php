@@ -83,7 +83,7 @@
                         <?php if ($permisos->reporte_sms_por_codigo_cliente_bcp) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/smsPorCodigoCliente');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> SMS por código/cliente </a></li> <?php } ?>
                         <?php if ($permisos->reporte_generar_mt_mo) { ?>
-                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('reportes/reporteMTMO');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> Reporte MT/MO </a></li> <?php } ?>
+                        <li class="subMenu"><a target="_blank" href="<?php echo Yii::app()->createUrl('reportes/reporteMTMO');?>"><span class="glyphicon glyphicon-calendar " aria-hidden="true"></span> Reporte MT/MO </a></li> <?php } ?>
                         <?php /*if ($permisos->reporte_sms_recibidos_bcnl || $permisos->reporte_sms_recibidos_bcp) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('reportes/smsRecibidos');?>"><span class="glyphicon glyphicon-import" aria-hidden="true"></span> SMS Recibidos </a></li> <?php } */?>
                     </ul>

@@ -1,6 +1,7 @@
 <?php
 
 Yii::import('application.extensions.PdfReporteMtMo', true);
+ini_set("max_execution_time",0);
 
 class ReportesController extends Controller
 {
@@ -29,7 +30,7 @@ class ReportesController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen', 'smsPorCodigoCliente', 'reporteMTMO'),
+                'actions' => array('smsPorCodigo', 'smsPeriodoResumen', 'smsPorClienteBcp', 'smsPorClienteResumen', 'smsEnviadosBcp', 'smsEnviadosBcpResumen', 'smsPorCodigoCliente', 'reporteMTMO', 'generarReporteMTMO'),
                 'users' => array('@'),
             ),
 
@@ -481,6 +482,153 @@ class ReportesController extends Controller
 
     public function actionReporteMTMO()
     {
+        $sql = "SELECT id_fecha as id FROM reporte_fecha WHERE fecha = DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01')";
+        $id_fecha = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+        if ($id_fecha !== null)
+        {
+            $transaction = Yii::app()->db_masivo_premium->beginTransaction();
+
+            try
+            {
+                $periodo =  $this->getPeriodo();
+
+                $fecha_ini = date('Y-m-01',strtotime('-1 month', strtotime(date('Y-m-01'))));
+                $fecha_fin = $this->getUltimoDiaMes($fecha_ini);
+
+                $criteria = new CDbCriteria;
+                $criteria->compare('estado', 1);
+                $model = ReporteDestinatarios::model()->findAll($criteria);
+
+                $correos = array();
+                $numeros = array();
+
+                //print_r("Correos a los que sera enviado el reporte: \n");
+
+                foreach ($model as $value)
+                { 
+                    $correos[] = $value["correo"];
+
+                    if ($value["numero"] != "" && $value["numero"] != "0")
+                    {
+                        $mensaje = "Reporte MTs Cliente - Periodo: ".$periodo["mes"]." ".$periodo["ano"]." disponible en su correo electronico ".$value["correo"];
+
+                        $numeros[] = "('".$value["numero"]."', '".$mensaje."', '".date("Y-m-d")."', '07:30:00', 2909, 1, ".$value["id_operadora"].")";
+                    }
+                }
+
+                $model_fecha = new ReporteFecha;
+                $model_fecha->fecha = $fecha_ini;
+                $model_fecha->save();
+
+                $criteria = new CDbCriteria;
+                $criteria->select = "GROUP_CONCAT(id_promo) AS id_promo";
+                $criteria->addBetweenCondition("fecha", $fecha_ini, $fecha_fin);
+                $total_promo = PromocionesPremium::model()->find($criteria);
+
+                $total_promo = $total_promo->id_promo == "" ? 0 : (substr_count($total_promo->id_promo, ",")+1);
+
+                $sql = "SELECT cliente, GROUP_CONCAT(t.cantidades ORDER BY t.operadora ASC) AS cantidades, GROUP_CONCAT(t.operadora ORDER BY t.operadora ASC) AS operadoras FROM (
+                    SELECT id_cliente_bcp AS cliente, SUM(cantd_msj) AS cantidades, operadora 
+                    FROM resumen_bcp_diario 
+                    WHERE fecha BETWEEN '".$fecha_ini."' AND '".$fecha_fin."'  GROUP BY id_cliente_bcp, operadora
+                    order by id_cliente_bcp ASC
+                    ) t
+                GROUP BY t.cliente";
+
+                $resultado = Yii::app()->db_masivo_premium->createCommand($sql)->queryAll();
+                $insert = array();
+
+                foreach ($resultado as $value)
+                {
+                        $operadoras = array(2=>0, 3=>0, 4=>0);
+
+                        $oper = explode(",", $value["operadoras"]);
+                        $cant = explode(",", $value["cantidades"]);
+
+                        for ($i=0; $i < count($oper); $i++)
+                        { 
+                                $operadoras[$oper[$i]] = $cant[$i]; 
+                        }
+
+                        $insert[] = "(".$id_fecha["id"].", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 1)";
+                }
+
+                $sql = "SELECT cliente, GROUP_CONCAT(t.cantd_env ORDER BY t.op ASC) AS cantidades, GROUP_CONCAT(t.op ORDER BY t.op ASC) AS operadoras
+                    FROM (SELECT cliente, COUNT(*) AS cantd_env, IF(operadora IN (1 , 2), 2, IF(operadora IN (3 , 4), 3, 4)) AS op 
+                        FROM outgoing o
+                        WHERE fecha_in BETWEEN '".$fecha_ini."' AND '".$fecha_fin."' AND status = 1 AND sdr IS NULL   
+                        GROUP BY cliente , op ORDER BY cliente ASC) t
+                    GROUP BY t.cliente";
+
+                $resultado = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryAll();
+
+                foreach ($resultado as $value)
+                {
+                        $operadoras = array(2=>0, 3=>0, 4=>0);
+
+                        $oper = explode(",", $value["operadoras"]);
+                        $cant = explode(",", $value["cantidades"]);
+
+                        for ($i=0; $i < count($oper); $i++)
+                        { 
+                                $operadoras[$oper[$i]] = $cant[$i]; 
+                        }
+
+                        $insert[] = "(".$id_fecha["id"].", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 2)";
+                }
+
+                $sql = "INSERT INTO reporte_detalles_mt (id_fecha, id_cliente, movistar, movilnet, digitel, tipo) VALUES ".implode(",", $insert);
+                Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
+
+                $sql = "UPDATE reporte_detalles_mt r 
+                                INNER JOIN cliente c ON r.id_cliente = c.id 
+                                SET r.descripcion = REPLACE(c.descripcion, '@', ''),
+                                r.sc = c.sc 
+                                WHERE r.id_fecha = ".$id_fecha["id"];
+
+                Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
+
+                $sql = "INSERT INTO reporte_detalles_mo (id_fecha, id_cliente, descripcion, sc) 
+                    SELECT ".$id_fecha["id"].", id, REPLACE(descripcion, '@', '') AS descripcion, sc FROM cliente WHERE sc REGEXP '^[0-9]+$'";
+
+                Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
+
+                $sql = "SELECT GROUP_CONCAT(DISTINCT sc) AS sc FROM reporte_detalles_mo WHERE id_fecha = ".$id_fecha["id"];
+                $resultado = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
+
+                $sql = "SELECT sc, COUNT(id_sms) AS total FROM smsin 
+                                        WHERE data_arrive BETWEEN '".$fecha_ini."' AND '".$fecha_fin."' 
+                                                        AND sc IN(".$resultado["sc"].") 
+                                                        GROUP BY sc";
+
+                $resultado = Yii::app()->db_sms->createCommand($sql)->queryAll();
+
+                foreach ($resultado as $value)
+                {
+                        $sql = "UPDATE reporte_detalles_mo SET total = ".$value["total"]." WHERE id_fecha = ".$id_fecha["id"]." AND sc = ".$value["sc"];
+                        Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
+                }
+
+                generarPDF($conexion_alarmas, $id_fecha);
+
+                $transaction->commit();
+
+            } catch (Exception $e)
+                {
+                    print_r($e);
+                    $transaction->rollBack();
+                }
+        }
+        else
+        {
+            $this->actionGenerarReporteMTMO($id_fecha["id"]);
+        }
+
+    }
+
+    public function actionGenerarReporteMTMO($id_fecha)
+    {
         $periodo = $this->getPeriodo();
 
         $pdf = new PDF('L','mm','A4');
@@ -498,7 +646,7 @@ class ReportesController extends Controller
         $pdf->Ln(10);
 
         //Reporte BCP
-        $data = $pdf->LoadDataMT(90/*$id_fecha*/, 1);
+        $data = $pdf->LoadDataMT($id_fecha, 1);
         $pdf->FancyTableMT($data);
         
         //Reporte Hostgator
@@ -507,7 +655,7 @@ class ReportesController extends Controller
         $pdf->Cell(0,10,'2. Reporte MT Hostgator',0,0,'L');
         $pdf->Ln(10);
 
-        $data = $pdf->LoadDataMT(90/*$id_fecha,*/, 2);
+        $data = $pdf->LoadDataMT($id_fecha, 2);
         $pdf->FancyTableMT($data);
 
         //Reporte MO
@@ -516,7 +664,7 @@ class ReportesController extends Controller
         $pdf->Cell(0,10,'3. Reporte MO',0,0,'L');
         $pdf->Ln(10);
 
-        $data = $pdf->LoadDataMO(/*$id_fecha*/90);
+        $data = $pdf->LoadDataMO($id_fecha);
         $pdf->FancyTableMO($data);
 
         $pdf->Output();
@@ -541,6 +689,17 @@ class ReportesController extends Controller
                        '12'=>'Diciembre');
 
         return array("ano"=>$ano, "mes"=>$meses[$mes]);
+    }
+
+    private function getUltimoDiaMes($fecha_ini)
+    {
+        $aux = explode("-", $fecha_ini);
+        $month = date($aux[1]);
+        $year = date($aux[0]);
+
+        $day = date("d", mktime(0,0,0, $month+1, 0, $year));
+
+        return date('Y-m-d', mktime(0,0,0, $month, $day, $year));
     }
 }
 
