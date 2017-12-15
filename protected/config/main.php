@@ -213,7 +213,7 @@ return array(
 
 		'db_insignia_admin'=>array(
 			'class' => 'CDbConnection',
-			'connectionString' => 'mysql:host='.$host_F1.';dbname=insignia_admin',
+			'connectionString' => 'mysql:host='.$host_Linode_3.';dbname=insignia_admin',
 			'emulatePrepare' => true,
 			'username' => $user_F1,
 			'password' => $pwd_F1,
