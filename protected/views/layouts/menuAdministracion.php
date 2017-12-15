@@ -39,6 +39,8 @@
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('palabrasObscenas/admin');?>"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Palabras Obscenas </a></li>  <?php } ?>
                         <?php if (true) { ?>
                         <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('operadorasActivas/admin');?>"><span class="glyphicon glyphicon-phone" aria-hidden="true"></span> Operadoras Activas </a></li>  <?php } ?>
+                        <?php if (true) { ?>
+                        <li class="subMenu"><a class="opcion_menu" href="<?php echo Yii::app()->createUrl('clienteAlarmas/admin');?>"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Burst </a></li>  <?php } ?>
                         <?php /*if ($permisos->crear_promo_bcnl) { ?>
                         <li class="subMenu"><a href="<?php echo Yii::app()->createUrl('usuarioMasivo/accesoBcplus');?>"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Acceso de Usuarios </a></li>  <?php } */ ?>
                     </ul>

@@ -20,6 +20,8 @@
  */
 class ClienteAlarmas extends CActiveRecord
 {
+	public $buscar;
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -101,6 +103,37 @@ class ClienteAlarmas extends CActiveRecord
 		
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
+		));
+	}
+
+	public function search2()
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+		$criteria->select = "id, descripcion, sc, burst, segundos";
+		$criteria->condition = "(onoff = 1) AND (";
+		$criteria->condition .= "descripcion LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "sc LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "burst LIKE '%".$this->buscar."%' OR ";
+		$criteria->condition .= "segundos LIKE '%".$this->buscar."%')";
+		//$criteria->select = "id, sc, onoff";
+		//$criteria->compare('id_cliente_sms',$id_cliente_sms);
+		//$criteria->compare("id_cliente_sc_numerico", 0);
+		//$criteria->addCondition("sc NOT REGEXP '[a-zA-Z]+'"); 
+		
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>array(
+				'defaultOrder'=>'id_cliente_sms DESC',
+        		'attributes'=>array(
+             		'id_clientes_sms', 'sc'
+        		),
+    		),
 		));
 	}
 
