@@ -63,6 +63,7 @@ class PDF extends FPDF
 	{
 		$criteria=new CDbCriteria;
 		$criteria->select = "descripcion, sc, total";
+		$criteria->compare("id_fecha", $id_fecha);
 		$criteria->order = "descripcion ASC";
 		$model = ReporteDetallesMo::model()->findAll($criteria);
 
