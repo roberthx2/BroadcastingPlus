@@ -551,7 +551,7 @@ class ReportesController extends Controller
                                 $operadoras[$oper[$i]] = $cant[$i]; 
                         }
 
-                        $insert[] = "(".$id_fecha["id"].", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 1)";
+                        $insert[] = "(".$model_fecha->id_fecha.", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 1)";
                 }
 
                 $sql = "SELECT cliente, GROUP_CONCAT(t.cantd_env ORDER BY t.op ASC) AS cantidades, GROUP_CONCAT(t.op ORDER BY t.op ASC) AS operadoras
@@ -575,7 +575,7 @@ class ReportesController extends Controller
                                 $operadoras[$oper[$i]] = $cant[$i]; 
                         }
 
-                        $insert[] = "(".$id_fecha["id"].", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 2)";
+                        $insert[] = "(".$model_fecha->id_fecha.", ".$value["cliente"].", ".$operadoras[2].", ".$operadoras[3].", ".$operadoras[4].", 2)";
                 }
 
                 $sql = "INSERT INTO reporte_detalles_mt (id_fecha, id_cliente, movistar, movilnet, digitel, tipo) VALUES ".implode(",", $insert);
@@ -585,16 +585,16 @@ class ReportesController extends Controller
                                 INNER JOIN cliente c ON r.id_cliente = c.id 
                                 SET r.descripcion = REPLACE(c.descripcion, '@', ''),
                                 r.sc = c.sc 
-                                WHERE r.id_fecha = ".$id_fecha["id"];
+                                WHERE r.id_fecha = ".$model_fecha->id_fecha;
 
                 Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
 
                 $sql = "INSERT INTO reporte_detalles_mo (id_fecha, id_cliente, descripcion, sc) 
-                    SELECT ".$id_fecha["id"].", id, REPLACE(descripcion, '@', '') AS descripcion, sc FROM cliente WHERE sc REGEXP '^[0-9]+$'";
+                    SELECT ".$model_fecha->id_fecha.", id, REPLACE(descripcion, '@', '') AS descripcion, sc FROM cliente WHERE sc REGEXP '^[0-9]+$'";
 
                 Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
 
-                $sql = "SELECT GROUP_CONCAT(DISTINCT sc) AS sc FROM reporte_detalles_mo WHERE id_fecha = ".$id_fecha["id"];
+                $sql = "SELECT GROUP_CONCAT(DISTINCT sc) AS sc FROM reporte_detalles_mo WHERE id_fecha = ".$model_fecha->id_fecha;
                 $resultado = Yii::app()->db_insignia_alarmas->createCommand($sql)->queryRow();
 
                 $sql = "SELECT sc, COUNT(id_sms) AS total FROM smsin 
@@ -606,11 +606,11 @@ class ReportesController extends Controller
 
                 foreach ($resultado as $value)
                 {
-                        $sql = "UPDATE reporte_detalles_mo SET total = ".$value["total"]." WHERE id_fecha = ".$id_fecha["id"]." AND sc = ".$value["sc"];
+                        $sql = "UPDATE reporte_detalles_mo SET total = ".$value["total"]." WHERE id_fecha = ".$model_fecha->id_fecha." AND sc = ".$value["sc"];
                         Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
                 }
 
-                generarPDF($conexion_alarmas, $id_fecha);
+                $this->actionGenerarReporteMTMO($id_fecha);
 
                 $transaction->commit();
 
