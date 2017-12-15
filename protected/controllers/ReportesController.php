@@ -610,7 +610,7 @@ class ReportesController extends Controller
                         Yii::app()->db_insignia_alarmas->createCommand($sql)->execute();
                 }
 
-                $this->actionGenerarReporteMTMO($id_fecha);
+                $this->actionGenerarReporteMTMO($model_fecha->id_fecha);
 
                 $transaction->commit();
 
