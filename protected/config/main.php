@@ -215,8 +215,8 @@ return array(
 			'class' => 'CDbConnection',
 			'connectionString' => 'mysql:host='.$host_Linode_3.';dbname=insignia_admin',
 			'emulatePrepare' => true,
-			'username' => $user_F1,
-			'password' => $pwd_F1,
+			'username' => $user_Linode_3,
+			'password' => $pwd_Linode_3,
 			'charset' => 'utf8',
 		),
 
