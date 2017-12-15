@@ -52,8 +52,8 @@ if(($_SERVER['SERVER_NAME'] == 'localhost') || ($_SERVER['SERVER_NAME'] == '72.1
 		$pwd_Hostgator = 'fkhXOF3UXhIMC2015';
 
 		//Datos Linode 3
-		$user_Linode_3 = 'bcp_listas';
-		$pwd_Linode_3 = 'IMC$L!sta2';
+		$user_Linode_3 = 'fe_admin';
+		$pwd_Linode_3 = 'AdMI5!Su0G+4';
 	}
 
 // uncomment the following to define a path alias
