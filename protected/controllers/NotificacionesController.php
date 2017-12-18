@@ -184,7 +184,7 @@ class NotificacionesController extends Controller
             {
                 $asunto = "Acuse de recibo";
                 $body = "Estimado Cliente, el equipo de Insignia Mobile ha recibido su notificaci&oacute;n; en la brevedad posible le estará dando respuesta a su caso.";
-                $body .= '<br><small><i>'.$mensaje.'</small></i>';
+                $body .= '<br><br><small><i>'.$mensaje.'</small></i>';
 
                 $destinatario[] = array("correo"=>$model_user->email_u, "nombre"=>$model_user->login);
                 $destinatarios_copia = array();
