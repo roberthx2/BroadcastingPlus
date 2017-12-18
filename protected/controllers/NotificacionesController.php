@@ -127,9 +127,9 @@ class NotificacionesController extends Controller
                         Yii::app()->Procedimientos->setNotificacion($value, Yii::app()->user->id, $asunto, $model->mensaje);
                     }
 
-                    $model = new Notificaciones;
+                    $this->actionEnviarCorreo($model->mensaje);
 
-                    $this->actionEnviarCorreo();
+                    $model = new Notificaciones;
                     
                     $transaction->commit();
 
@@ -172,7 +172,7 @@ class NotificacionesController extends Controller
         }
     }
 
-    public function actionEnviarCorreo()
+    public function actionEnviarCorreo($mensaje)
     {
         $model_user = Yii::app()->user->modelSMS();
 
@@ -183,7 +183,8 @@ class NotificacionesController extends Controller
             if ($model_contactos)
             {
                 $asunto = "Acuse de recibo";
-                $body = "Estimado Cliente, el equipo de Insignia Mobile ha recibido su notificaci&oacute;n; en la brevedad posible le estará dando respuesta a su caso";
+                $body = "Estimado Cliente, el equipo de Insignia Mobile ha recibido su notificaci&oacute;n; en la brevedad posible le estará dando respuesta a su caso.";
+                $body .= '<br><small><i>'.$mensaje.'</small></i>';
 
                 $destinatario[] = array("correo"=>$model_user->email_u, "nombre"=>$model_user->login);
                 $destinatarios_copia = array();
