@@ -15,7 +15,7 @@ class CupoController extends Controller
 
         return (array(
             array('allow', // allow all users to perform 'index' and 'view' actions
-                'actions' => array('historico', 'recarga', 'getInfoCupoBcp', 'recargarCupoBcp', 'admin', 'formulario', 'update'),
+                'actions' => array('historico', 'recarga', 'getInfoCupoBcp', 'recargarCupoBcp', 'admin', 'formulario', 'update', 'usuarioVenceCupo'),
                 'users' => array('@'),
             ),
 
@@ -81,7 +81,8 @@ class CupoController extends Controller
                         'login' => $model_usuario->login,
                         'ejecutado_por' => $ejecutado_por,
                         'fecha' => $fecha,
-                        'maximo' => number_format($this->actionMaximoMontoBcp($id_usuario), 0, '', '.')
+                        'maximo' => number_format($this->actionMaximoMontoBcp($id_usuario), 0, '', '.'),
+                        'vence_cupo' => $this->actionUsuarioVenceCupo($id_usuario)
                     ));
 
             Yii::app()->end();
@@ -268,8 +269,14 @@ class CupoController extends Controller
 
                     $cantidad_maxima = $this->actionMaximoMontoBcp($id_usuario);
 
-                    $sql = "INSERT INTO usuario_cupo_premium (id_usuario, disponible) VALUES (".$id_usuario.",".$cantidad.") "
-                            . "ON DUPLICATE KEY UPDATE disponible=disponible+".$cantidad;
+                    $vence = $this->actionUsuarioVenceCupo($id_usuario);
+
+                    if ($vence)
+                        $fecha_vencimiento = $_POST['RecargaCupoBcpForm']['fecha_vencimiento'];
+                    else $fecha_vencimiento = '0000-00-00';
+
+                    $sql = "INSERT INTO usuario_cupo_premium (id_usuario, disponible, fecha_vencimiento) VALUES (".$id_usuario.",".$cantidad.", '".$fecha_vencimiento."') "
+                            . "ON DUPLICATE KEY UPDATE disponible=disponible+".$cantidad.", fecha_vencimiento='".$fecha_vencimiento."'";
                     Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
                     $log = 'RECARGA - El usuario '.UsuarioSmsController::actionGetLogin(Yii::app()->user->id).' (id='.Yii::app()->user->id.') recargo cupo BCP ('.$cantidad.' SMS) al usuario '.UsuarioSmsController::actionGetLogin($id_usuario).' (id='.$id_usuario.')';
@@ -329,7 +336,7 @@ class CupoController extends Controller
     public function actionFormulario()
     {
         $model = UsuarioCupoPremium::model()->find("id_usuario=:id_usuario", array(":id_usuario"=>$_GET["id"]));
-        $this->renderPartial('formBcp', array("model"=>$model));
+        $this->renderPartial('formBcp', array("model"=>$model),false,true);
     }
 
     public function actionUpdate()
@@ -367,6 +374,23 @@ class CupoController extends Controller
                 echo CJSON::encode(array('salida' => $valido, 'error'=>$model->getErrors()));
             }
         }
+    }
+
+    public function actionUsuarioVenceCupo($id_usuario)
+    {
+        $model_usuario = UsuarioSms::model()->findByPk($id_usuario);
+        $model_contrato = ClienteTipoContrato::model()->find("id_cliente = ".$model_usuario->id_cliente);
+        $vence = true;
+
+        if($model_contrato !== null)
+        {
+            if ($model_contrato->id_tipo_contrato == 2) //Sin renta basica
+                $vence = true;
+            else if ($model_contrato->id_tipo_contrato == 1 || $model_contrato->id_tipo_contrato == 3) //Renta basica y Clasico
+                $vence = false;
+        }
+
+        return $vence;
     }
 }
 ?>

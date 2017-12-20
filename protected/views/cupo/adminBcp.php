@@ -51,6 +51,13 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
               'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
               'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
           ),
+          array(
+              'name' => 'fecha_vencimiento',
+              'header' => 'Vencimiento',
+              'type' => 'text',
+              'htmlOptions' => array('style' => 'text-align: center;', 'class'=>'trOverFlow'),
+              'headerHtmlOptions' => array('class'=>'tableHover hrefHover'),
+          ),
         	array(
 	            'class' => 'CButtonColumn',
 	            'header' => 'Acciones',
@@ -145,9 +152,11 @@ $this->widget( 'booster.widgets.TbExtendedGridView' , array (
               $("#respuesta").html("Actualizacion realizada exitosamente");
               $("#div_success").show();
 
-              $('#admin-bcp').yiiGridView('update', {
+              /*$('#admin-bcp').yiiGridView('update', {
                 data: $(this).serialize()
-              });
+              });*/
+
+              location.reload(true);
 
               $("#modalEditar .close").click()
 

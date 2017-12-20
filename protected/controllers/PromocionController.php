@@ -225,7 +225,20 @@ class PromocionController extends Controller
                     //BCP
                     if ($model->tipo == 3)
                     {
-                        $cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+                        $criteria = new CDbCriteria;
+                        $criteria->select = "disponible";
+                        $criteria->condition = "id_usuario = ".Yii::app()->user->id." AND ";
+                        $criteria->condition .= "(fecha_vencimiento = '0000-00-00' OR fecha_vencimiento >= CURDATE())";
+                        $model_cupo = UsuarioCupoPremium::model()->find($criteria);
+
+                        $cupo = 0;
+                    
+                        if ($model_cupo)
+                        {
+                            $cupo = $model_cupo->disponible;
+                        }
+
+                        //$cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
 
                         $operadorasPermitidasBCP = $this->actionGetOperadorasPermitidasBCP($model->id_cliente, $model->sc_bcp);
 
@@ -281,7 +294,7 @@ class PromocionController extends Controller
                         }
 
                         //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
-                        Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo->disponible);
+                        Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo);
 
                         //Updatea a estado = 1 todos los numeros validos 
                         Yii::app()->Filtros->filtrarAceptados($id_proceso);
@@ -529,7 +542,20 @@ class PromocionController extends Controller
                             //BCP
                             if ($model->tipo == 3)
                             {
-                                $cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+                                $criteria = new CDbCriteria;
+                                $criteria->select = "disponible";
+                                $criteria->condition = "id_usuario = ".Yii::app()->user->id." AND ";
+                                $criteria->condition .= "(fecha_vencimiento = '0000-00-00' OR fecha_vencimiento >= CURDATE())";
+                                $model_cupo = UsuarioCupoPremium::model()->find($criteria);
+
+                                $cupo = 0;
+                            
+                                if ($model_cupo)
+                                {
+                                    $cupo = $model_cupo->disponible;
+                                }
+
+                                //$cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
 
                                 $operadorasPermitidasBCP = $this->actionGetOperadorasPermitidasBCP($model->id_cliente, $model->sc_bcp);
 
@@ -561,7 +587,7 @@ class PromocionController extends Controller
                                 }
 
                                 //Updatea a estado = 7 todos los numeros que sobrepasen la cantidad de cupo disponible 
-                                Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo->disponible);
+                                Yii::app()->Filtros->filtrarCupo($id_proceso, $cupo);
 
                                 //Updatea a estado = 1 todos los numeros validos 
                                 Yii::app()->Filtros->filtrarAceptados($id_proceso);
@@ -1039,7 +1065,11 @@ class PromocionController extends Controller
                 else if ($tipo == 3) //BCP
                 {
                     $data = Yii::app()->Procedimientos->getClientesBCP(Yii::app()->user->id);
-                    $model_cupo = UsuarioCupoPremium::model()->findByPk(Yii::app()->user->id);
+                    $criteria = new CDbCriteria;
+                    $criteria->select = "disponible";
+                    $criteria->condition = "id_usuario = ".Yii::app()->user->id." AND ";
+                    $criteria->condition .= "(fecha_vencimiento = '0000-00-00' OR fecha_vencimiento >= CURDATE())";
+                    $model_cupo = UsuarioCupoPremium::model()->find($criteria);
                 }
 
                 $cupo = 0;

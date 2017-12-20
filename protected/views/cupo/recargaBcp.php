@@ -73,6 +73,35 @@ $form = $this->beginWidget(
 		</div>
 	<?php } ?>
 
+    <?php if (Yii::app()->user->isAdmin()){ ?>
+
+        <div id="fecha_vencimiento" style="display: none;">
+            <?php echo $form->datePickerGroup(
+                $model,
+                'fecha_vencimiento',
+                array(
+                    //'value' => date("Y-m-24"),
+                    'widgetOptions' => array(
+                        'options' => array(
+                            'language' => 'es',
+                            'format' => 'yyyy-mm-dd',
+                            'startDate' => date('Y-m-d'),
+                            //'endDate' => date("Y-m-d"),
+                            'autoclose' => true,
+                        ),
+                        'htmlOptions' => array('value'=>date("Y-m-d", strtotime ( '+1 month' , strtotime ( date("Y-m-d") ) )), 'readonly'=>true, 'style'=>'background-color: white;'),
+                    ),
+                    'wrapperHtmlOptions' => array(
+                        //'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+                    ),
+                    //'hint' => 'Click inside! This is a super cool date field.',
+                    'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
+                )
+            ); ?>
+        </div>
+
+    <?php } ?>
+
 	<div>
 		<?php echo $form->textFieldGroup(
 				$model,
@@ -173,6 +202,7 @@ $form = $this->beginWidget(
             {
             	$("#bontonRecargar").addClass("disabled");
             	$(".loader").css("display", "block");
+                $("#fecha_vencimiento").hide();
             },
             complete: function()
             {
@@ -186,6 +216,9 @@ $form = $this->beginWidget(
                 $(".detalleUltimaRecargaBCP").text(data.fecha);
                 $(".detalleEjecutadoPorBCP").text(data.ejecutado_por);
                 $(".detalleMontoMaximoBCP").text(data.maximo);
+
+                if (data.vence_cupo)
+                    $("#fecha_vencimiento").show();
             },
             error: function()
             {

@@ -30,6 +30,32 @@
         )
     );
 ?>
+<?php if ($this->actionUsuarioVenceCupo($model->id_usuario)) {
+
+    echo $form->datePickerGroup(
+        $model,
+        'fecha_vencimiento',
+        array(
+            //'value' => date("Y-m-d"),
+            'widgetOptions' => array(
+                'options' => array(
+                    'language' => 'es',
+                    'format' => 'yyyy-mm-dd',
+                    'startDate' => date('Y-m-d'),
+                    //'endDate' => date("Y-m-d"),
+                    'autoclose' => true,
+                ),
+                'htmlOptions' => array(/*'value'=>date("Y-m-d"), */'readonly'=>true, 'style'=>'background-color: white;'),
+            ),
+            'wrapperHtmlOptions' => array(
+                'class' => 'col-xs-12 col-sm-6 col-md-6 col-lg-5',
+            ),
+            //'hint' => 'Click inside! This is a super cool date field.',
+            'prepend' => '<i class="glyphicon glyphicon-calendar"></i>'
+        )
+    ); 
+} ?>
+
 
 <?php echo $form->hiddenField($model, 'id_usuario'); ?>
         
@@ -60,3 +86,9 @@
     ?>
 </div>
  
+
+ <style>
+    .clsDatePicker {
+        z-index: 100000 !important;
+    }
+</style>

@@ -1,22 +1,21 @@
 <?php
 
 /**
- * This is the model class for table "usuario_cupo_premium".
+ * This is the model class for table "cliente_tipo_contrato".
  *
- * The followings are the available columns in table 'usuario_cupo_premium':
- * @property integer $id_usuario
- * @property integer $disponible
+ * The followings are the available columns in table 'cliente_tipo_contrato':
+ * @property integer $id
+ * @property integer $id_cliente
+ * @property integer $id_tipo_contrato
  */
-class UsuarioCupoPremium extends CActiveRecord
+class ClienteTipoContrato extends CActiveRecord
 {
-	public $buscar;
-	public $login;
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'usuario_cupo_premium';
+		return 'cliente_tipo_contrato';
 	}
 
 	/**
@@ -27,12 +26,11 @@ class UsuarioCupoPremium extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id_usuario', 'required'),
-			array('id_usuario, disponible', 'numerical', 'integerOnly'=>true),
-			array('fecha_vencimiento', 'safe'),
+			array('id_cliente, id_tipo_contrato', 'required'),
+			array('id_cliente, id_tipo_contrato', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id_usuario, disponible, fecha_vencimiento', 'safe', 'on'=>'search'),
+			array('id, id_cliente, id_tipo_contrato', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -53,9 +51,9 @@ class UsuarioCupoPremium extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id_usuario' => 'Id Usuario',
-			'disponible' => 'Disponible',
-			'fecha_vencimiento' => 'Vencimiento'
+			'id' => 'ID',
+			'id_cliente' => 'Id Cliente',
+			'id_tipo_contrato' => 'Id Tipo Contrato',
 		);
 	}
 
@@ -77,34 +75,20 @@ class UsuarioCupoPremium extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->select = "t.id_usuario, t.disponible, t.fecha_vencimiento, u.login AS login";
-		$criteria->join = "INNER JOIN insignia_masivo.usuario u ON t.id_usuario = u.id_usuario";
-		$criteria->condition = "login LIKE '%".$this->buscar."%'";
+		$criteria->compare('id',$this->id);
+		$criteria->compare('id_cliente',$this->id_cliente);
+		$criteria->compare('id_tipo_contrato',$this->id_tipo_contrato);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
-			'sort'=>array(
-				'defaultOrder'=>'login ASC',
-        		'attributes'=>array(
-             		'login'
-        		),
-    		),
 		));
-	}
-
-	/**
-	 * @return CDbConnection the database connection used for this class
-	 */
-	public function getDbConnection()
-	{
-		return Yii::app()->db_masivo_premium;
 	}
 
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
 	 * @param string $className active record class name.
-	 * @return UsuarioCupoPremium the static model class
+	 * @return ClienteTipoContrato the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{

@@ -4,6 +4,7 @@ class RecargaCupoBcpForm extends CFormModel
 {
 	public $id_usuario;
 	public $cantidad;
+	public $fecha_vencimiento;
 
 	//public $operadoras;
 	/**
@@ -26,6 +27,7 @@ class RecargaCupoBcpForm extends CFormModel
 		return array(
 			'id_usuario' => 'Usuario',
 			'cantidad' => 'Cantidad',
+			'fecha_vencimiento' => 'Vencimiento'
 		);
 	}
 
