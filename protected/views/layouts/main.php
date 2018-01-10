@@ -57,7 +57,14 @@
 
     $permisos = Yii::app()->user->getPermisos();
 
-    $old_version = "https://".$_SERVER['SERVER_NAME']."/broadcasting/2.2_ORIGINAL/ingresar.php?login_bcplus=".Yii::app()->user->name."&pwd_bcplus=".(isset($_SESSION["user_pass"]) ? $_SESSION["user_pass"] : '');
+    if ($_SERVER['SERVER_NAME'] != 'broadcasting.insignia.web.ve')
+    {
+    	$old_version = "https://".$_SERVER['SERVER_NAME']."/broadcasting/2.2_ORIGINAL/ingresar.php?login_bcplus=".Yii::app()->user->name."&pwd_bcplus=".(isset($_SESSION["user_pass"]) ? $_SESSION["user_pass"] : '');
+    }
+    else
+    {
+    	$old_version = "https://insigniamobile.web.ve/broadcasting/2.2_ORIGINAL/ingresar.php?login_bcplus=".Yii::app()->user->name."&pwd_bcplus=".(isset($_SESSION["user_pass"]) ? $_SESSION["user_pass"] : '');
+    }
 ?>
 
 <div class="container-fluid">
