@@ -333,7 +333,7 @@ class PromocionController extends Controller
                     {
                         $error = "Ocurrio un error al procesar los datos, intente nuevamente.";
                         Yii::app()->user->setFlash("danger", $error);
-                        print_r($e);
+                        //print_r($e);
                         $transaction->rollBack();
                         $transaction2->rollBack();
                     }   
