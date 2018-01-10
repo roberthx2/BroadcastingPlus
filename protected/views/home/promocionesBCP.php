@@ -28,6 +28,20 @@ $('.BCP form').change(function(){
 </div><!-- search-form -->
 
 <?php
+
+$criteria = new CDbCriteria;
+$criteria->select = "propiedad, valor";
+$criteria->addInCondition("propiedad", array('hora_inicio_bcp', 'hora_fin_bcp'));
+$resultado = ConfiguracionSistema::model()->findAll($criteria);
+
+foreach ($resultado as $value)
+{
+    if ($value["propiedad"] == 'hora_inicio_bcp')
+        $hora_ini_bcp = $value["valor"];
+    else if ($value["propiedad"] == 'hora_fin_bcp')
+        $hora_fin_bcp = $value["valor"];
+}
+
 $this->widget( 'booster.widgets.TbExtendedGridView' , array (
         'id'=>'detallesBCPToday',
         'type'=>'striped bordered', 
@@ -300,8 +314,15 @@ function visibleCancelar($data)
 		return false;
 }
 
+
 function visibleReactivar($data)
 {
+    /*global $hora_ini_bcp, $hora_fin_bcp;
+
+    print_r("--------->");
+    print_r($hora_ini_bcp);
+    print_r($hora_fin_bcp);
+    exit;*/
     $array = array(
         "estado"=>$data["estado"], 
         "fecha"=>$data["fecha"], 
@@ -322,7 +343,7 @@ function visibleReactivar($data)
         return false;
     else if (($data["total"] - $data["enviados"]) > 0 && ($hora_actual > $hora_inicio) )
     {
-        return true;
+        return PromocionesPremiumController::actionValidarReactivar();
     }
 }
 

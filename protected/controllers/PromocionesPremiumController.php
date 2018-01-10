@@ -676,4 +676,30 @@ class PromocionesPremiumController extends Controller
     	
     	$this->redirect(Yii::app()->createUrl("home/index"));
 	}
+
+	public function actionValidarReactivar()
+	{
+		$criteria = new CDbCriteria;
+        $criteria->select = "propiedad, valor";
+        $criteria->addInCondition("propiedad", array('hora_inicio_bcp', 'hora_fin_bcp'));
+        $resultado = ConfiguracionSistema::model()->findAll($criteria);
+
+        foreach ($resultado as $value)
+	    {
+	        if ($value["propiedad"] == 'hora_inicio_bcp')
+	            $hora_ini_bcp = $value["valor"];
+	        else if ($value["propiedad"] == 'hora_fin_bcp')
+	            $hora_fin_bcp = $value["valor"];
+	    }
+
+	    $nueva_hora_fin = date("H:i", strtotime ( '+60 minute' , strtotime ( date("H:i:00") ) ));
+
+
+	    if (strtotime($nueva_hora_fin) >= strtotime($hora_ini_bcp) && strtotime($nueva_hora_fin) <= strtotime($hora_fin_bcp))
+	    {
+	    	return true;
+	    }
+
+	    return false;
+	}
 }
