@@ -1602,12 +1602,19 @@ class PromocionController extends Controller
 
             $capacidad_maxima = ($operadora->sms_x_seg * 60 * $intervalo) * ($operadora->porcentaje_permitido/100);
 
-            $capacidad_disponible = $capacidad_maxima - $total_sms;
+            $cant_usuarios = ConfiguracionSistema::model()->find("propiedad='cant_usuarios_concurrencia_reservacion'");
 
-            if($capacidad_disponible < 0)
-                return 0;
-            else
-                return $capacidad_disponible;
+            $tope_maximo_excedido = $cant_usuarios->valor * $capacidad_maxima;
+
+            $disponible = $tope_maximo_excedido - $total_sms;
+
+            if ($disponible >= $capacidad_maxima)
+                $capacidad_disponible = $capacidad_maxima;
+            else if ($disponible < $capacidad_maxima && $disponible > 0)
+                $capacidad_disponible = $disponible;
+            else $capacidad_disponible = 0;
+
+            return $capacidad_disponible;
         }
         else return 'unlimited';
     }
