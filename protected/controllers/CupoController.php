@@ -385,9 +385,9 @@ class CupoController extends Controller
         if($model_contrato !== null)
         {
             if ($model_contrato->id_tipo_contrato == 2) //Sin renta basica
-                $vence = true;
-            else if ($model_contrato->id_tipo_contrato == 1 || $model_contrato->id_tipo_contrato == 3) //Renta basica y Clasico
                 $vence = false;
+            else if ($model_contrato->id_tipo_contrato == 1 || $model_contrato->id_tipo_contrato == 3) //Renta basica y Clasico
+                $vence = true;
         }
 
         return $vence;
