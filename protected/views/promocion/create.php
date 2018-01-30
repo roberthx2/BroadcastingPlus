@@ -204,7 +204,7 @@
 
 		<div id="div_prefijo" style="display:none;">
 			<?php //Visible si tiene permisos al modulo de prefijos
-			if ($permisos->modulo_btl)
+			if ($permisos->administrar_prefijo)
 			{
 				echo $form->dropDownListGroup(
 					$model,
