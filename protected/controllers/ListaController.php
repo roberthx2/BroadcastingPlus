@@ -102,14 +102,19 @@ class ListaController extends Controller
 
 					if ($total > 0)
 					{
+						$model_user = UsuarioSms::model()->findByPk($model->id_usuario);
+						$hipico = Yii::app()->Procedimientos->clienteIsHipicoLotero($model_user->id_cliente);
+						$estado_lista = ($hipico ? 0 : 1);
+
 						$model_lista = new Lista;
 						$model_lista->id_usuario = $model->id_usuario;
 						$model_lista->nombre = $model->nombre;
 						$model_lista->fecha = date("Y-m-d");
+						$model_lista->estado = $estado_lista;
 						$model_lista->save();
 						$id_lista = $model_lista->primaryKey;
 
-						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
+						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora, estado) SELECT ".$id_lista.", numero, id_operadora, ".$estado_lista." FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
 						$log = "LISTA CREADA | id_lista: ".$id_lista." | Destinatarios: ".$total;
@@ -229,10 +234,15 @@ class ListaController extends Controller
 					if ($total > 0)
 					{
 						$model_lista=$this->loadModel($id_lista);
-						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora) SELECT ".$id_lista.", numero, id_operadora FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
+
+						$model_user = UsuarioSms::model()->findByPk($model_lista->id_usuario);
+						$hipico = Yii::app()->Procedimientos->clienteIsHipicoLotero($model_user->id_cliente);
+						$estado_lista = ($hipico ? 0 : 1);
+
+						$sql = "INSERT INTO lista_destinatarios (id_lista, numero, id_operadora, estado) SELECT ".$id_lista.", numero, id_operadora, ".$estado_lista." FROM tmp_procesamiento WHERE id_proceso = ".$id_proceso." AND estado = 1";
 						Yii::app()->db_masivo_premium->createCommand($sql)->execute();
 
-						$model_lista->estado = 0;
+						$model_lista->estado = $estado_lista;
 						$model_lista->update(array('estado'));
 
 						$log = "LISTA EDITADA (AGREGAR) | id_lista: ".$id_lista." | Destinatarios: ".$total;
