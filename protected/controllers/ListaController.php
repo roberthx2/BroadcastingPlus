@@ -121,7 +121,7 @@ class ListaController extends Controller
 	                    Yii::app()->Procedimientos->setLog($log);
 
 						$transaction->commit();
-						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, 'show_horario'=>'true'));
+						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model->nombre, 'show_horario'=>json_encode($hipico)));
 					}
 					else
 					{
@@ -249,7 +249,7 @@ class ListaController extends Controller
 	                    Yii::app()->Procedimientos->setLog($log);
 
 						$transaction->commit();
-						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre, 'show_horario'=>'true'));
+						$this->redirect(array("reporteCrearLista", "id_proceso"=>$id_proceso, "nombre"=>$model_lista->nombre, 'show_horario'=>json_encode($hipico)));
 					}
 					else
 					{
