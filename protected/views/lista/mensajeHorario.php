@@ -12,7 +12,7 @@
       		<div class="panel-body">
       			<ul class="list-group">
       				<li class="list-group-item">
-      					<strong>Esta lista prodrá ser usada una vez sea analizada por el sistema </strong>
+      					<strong>Esta lista podrá ser usada una vez sea analizada por el sistema </strong>
       				</li>
       				<li class="list-group-item">
       					<strong>Horarios de análisis:</strong>
